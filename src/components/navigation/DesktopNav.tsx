@@ -10,6 +10,8 @@ import {
     Button,
 } from "@heroui/react";
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
+import './DesktopNav.css'
 
 export const AcmeLogo = () => {
     return (
@@ -25,15 +27,25 @@ export const AcmeLogo = () => {
 };
 
 export const DesktopNav = () => {
+    const { t, i18n } = useTranslation("common");
+
+    const currentLang = i18n.language.startsWith("ar") ? "ar" : "en";
+
+    const toggleLanguage = () => {
+        const nextLang = currentLang === "en" ? "ar" : "en";
+        i18n.changeLanguage(nextLang);
+    };
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const menuItems = [
-        "About",
-        'Contact Us'
+        t('nav.home'),
+        t("nav.about"),
+        t('nav.contact')
     ];
 
     return (
-        <Navbar onMenuOpenChange={setIsMenuOpen}>
+        <Navbar className={'navbar'} maxWidth="full" onMenuOpenChange={setIsMenuOpen} >
             <NavbarContent>
                 <NavbarMenuToggle
                     aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -45,34 +57,40 @@ export const DesktopNav = () => {
                 </NavbarBrand>
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
+            <NavbarContent className="hidden sm:flex gap-10" justify="start" dir={i18n.language.startsWith("ar") ? "rtl" : "ltr"}>
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Features
+                        {t('nav.home')}
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
                     <Link aria-current="page" href="#">
-                        Customers
+                        {t("nav.about")}
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Integrations
-                    </Link>
+                        {        t('nav.contact')
+                        }                    </Link>
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
                 <NavbarItem className="hidden lg:flex">
-                    <Link href="#">Login</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Button as={Link} color="primary" href="#" variant="flat">
-                        Sign Up
+                    <Button
+                        onClick={toggleLanguage}
+                        style={{
+                            padding: "0.3rem",
+                            borderRadius: "999px",
+                            border: "1px solid #ccc",
+                            background: "white",
+                            cursor: "pointer"
+                        }}
+                    >
+                        {currentLang === "en" ? "عربي" : "EN"}
                     </Button>
                 </NavbarItem>
             </NavbarContent>
-            <NavbarMenu>
+            <NavbarMenu dir={i18n.language.startsWith("ar") ? "rtl" : "ltr"}>
                 {menuItems.map((item, index) => (
                     <NavbarMenuItem key={`${item}-${index}`}>
                         <Link

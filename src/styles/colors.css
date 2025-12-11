@@ -1,0 +1,21 @@
+:root {
+    --cinnamon-lightest: #F1EDE5;
+    --cinnamon-lighter: #E4DBCC;
+    --cinnamon-light: #A1834C;
+    --cinnamon: #7A4E00;
+    --cinnamon-dark: #613E00;
+    --cinnamon-darker: #301F00;
+    --cinnamon-darkest: #241700;
+
+    --black: #000000;
+
+    --goblin-lightest: #EAF0EB;
+    --goblin-lighter: #D5E2D7;
+    --goblin-light: #6C9A75;
+    --goblin: #2E6F3A;
+    --goblin-dark: #24582E;
+    --goblin-darker: #122C17;
+    --goblin-darkest: #0D2111;
+
+
+}
