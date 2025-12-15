@@ -1,18 +1,17 @@
-import './App.css'
-import SimpleWorldMap from "./components/mapbox/Map.tsx";
-import {Layout} from "./components/layout/Layout.tsx";
+import "./App.css";
+import { Layout } from "./components/layout/Layout.tsx";
+import { Route, Routes } from "react-router-dom";
+import { About } from "./pages/about/About.tsx";
 
 function App() {
-
-  return (
-      <div className="App">
-          <Layout>
-        <h1>My Map</h1>
-        <SimpleWorldMap />
-          </Layout>
-      </div>
-
-)
+    return (
+        <Routes>
+            <Route element={<Layout />}>
+                <Route path="/" element={<About />} />
+                <Route path="/about-us" element={<About />} />
+            </Route>
+        </Routes>
+    );
 }
 
-export default App
+export default App;

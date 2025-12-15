@@ -1,0 +1,11 @@
+{
+    "nav": {
+        "home": "Home",
+        "about": "About",
+        "contact": "Contact Us"
+    },
+    "actions": {
+        "login": "Login",
+        "logout": "Logout"
+    }
+}
