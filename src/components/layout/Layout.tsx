@@ -1,15 +1,16 @@
-import {DesktopNav} from "../navigation/DesktopNav.tsx";
-import type {ReactNode} from "react";
+import { DesktopNav } from "../navigation/DesktopNav.tsx";
+import "./Layout.css";
+import { Outlet } from "react-router-dom";
+import { Footer } from "../footer/Footer.tsx";
 
-type LayoutProps = {
-    children: ReactNode;
-};
-
-export const Layout = ({children}: LayoutProps) => {
+export const Layout = () => {
     return (
         <>
             <DesktopNav />
-            <div className={"content-container"}>{children}</div>
+            <div>
+                <Outlet />
+            </div>
+            <Footer />
         </>
-    )
-}
+    );
+};

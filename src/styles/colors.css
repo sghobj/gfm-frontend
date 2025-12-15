@@ -1,0 +1,110 @@
+:root {
+    /* brand */
+    --color-primary-lightest: #eaf0eb;
+    --color-primary-lighter: #d5e2d7;
+    --color-primary-light: #6c9a75;
+    --color-primary: #2e6f3a; /* GOBLIN */
+    --color-primary-dark: #24582e;
+    --color-primary-darker: #122c17;
+    --color-primary-darkest: #0d2111;
+
+    --color-secondary-lightest: #f1ede5;
+    --color-secondary-lighter: #e4dbcc;
+    --color-secondary-light: #a1834c;
+    --color-secondary: #7a4e00; /* CINNAMON */
+    --color-secondary-dark: #301f00;
+    --color-secondary-darker: #301f00;
+    --color-secondary-darkest: #241700;
+
+    /* semantic */
+    --color-success: #2e6f3a;
+    --color-error: #b91c1c;
+
+    /* surfaces */
+    --color-bg: #f1ede5;
+    --color-surface-green: #ffffff;
+
+    /* text */
+    --color-text-primary: #000000;
+    --color-text-secondary: #ffffff;
+
+    /* shape */
+    --radius: 8px;
+
+    /* --- scheme tokens (used by BOTH HeroUI + MUI) --- */
+    --app-bg: #ffffff;
+    --app-foreground: #f1ede5;
+    --app-text: #000000;
+    --app-border: rgba(0, 0, 0, 0.15);
+    --app-accent: var(--color-secondary);
+    --app-accent-foreground: #ffffff;
+    --app-link-active: var(--color-primary);
+    --app-highlight: var(--color-primary-dark);
+}
+
+/* Scheme 1
+background: white
+text: black
+foreground: cinnamon lightest
+border: black 15%
+accent: cinnamon
+*/
+.scheme-1 {
+    --app-bg: #ffffff;
+    --app-text: #000000;
+    --app-foreground: var(--color-secondary-lightest);
+    --app-border: rgba(0, 0, 0, 0.15);
+    --app-accent: var(--color-secondary);
+    --app-accent-foreground: #ffffff;
+    --app-link-active: var(--color-primary);
+    --app-highlight: var(--color-primary-dark);
+}
+
+/* Scheme 2
+background: cinnamon lightest
+text: black
+foreground: cinnamon lighter
+border: black 15%
+accent: cinnamon
+*/
+.scheme-2 {
+    --app-bg: var(--color-secondary-lightest);
+    --app-text: #000000;
+    --app-foreground: var(--color-secondary-lighter);
+    --app-border: rgba(0, 0, 0, 0.15);
+    --app-accent: var(--color-secondary);
+    --app-accent-foreground: #ffffff;
+}
+
+/* Scheme 3
+background: goblin darker
+text: white
+foreground: goblin darkest
+border: white 20%
+accent: white
+*/
+.scheme-3 {
+    --app-bg: var(--color-primary-darker);
+    --app-text: #ffffff;
+    --app-foreground: var(--color-primary-darkest);
+    --app-border: rgba(255, 255, 255, 0.2);
+    --app-accent: #ffffff;
+    --app-accent-foreground: #000000;
+}
+
+/* Scheme 4
+background: goblin lighter
+text: black
+foreground: goblin-lightest
+border: black 15%
+accent: cinnamon
+*/
+.scheme-4 {
+    --app-bg: var(--color-primary-lighter);
+    --app-text: #000000;
+    --app-foreground: var(--color-primary-lightest);
+    --app-border: rgba(0, 0, 0, 0.15);
+    --app-accent: var(--color-secondary);
+    --app-accent-foreground: #ffffff;
+    --app-link-active: var(--color-primary);
+}

@@ -1,13 +1,8 @@
 import React from "react";
-import {
-    ComposableMap,
-    Geographies,
-    Geography,
-} from "react-simple-maps";
+import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 
 // Public topojson with country shapes
-const geoUrl =
-    "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const SimpleWorldMap: React.FC = () => {
     return (

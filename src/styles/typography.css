@@ -1,0 +1,27 @@
+.about .section-heading {
+    margin-bottom: 1rem;
+    font-size: clamp(2.5rem, 4.5vw + 0.5rem, 5rem);
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+/*.about h2 {*/
+/*    !*text-align: center;*!*/
+/*    !*margin-bottom: 2rem;*!*/
+/*    font-size: 3rem;*/
+/*    font-weight: normal;*/
+/*}*/
+
+/* keep it scoped */
+.about h2.leading-text {
+    font-size: clamp(2.25rem, 6vw + 0.5rem, 6rem);
+    line-height: 1.05;
+    margin: 0 auto 1rem;
+    width: 100%;
+    overflow-wrap: anywhere;
+}
+
+p.mission-text {
+    font-size: 1rem;
+    font-weight: normal;
+}

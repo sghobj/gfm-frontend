@@ -7,22 +7,32 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,scss,md,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,css,scss,md,json}\""
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/roboto": "^5.2.9",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
     "graphql": "^16.12.0",
+    "i18next": "^25.7.2",
+    "i18next-browser-languagedetector": "^8.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tailwindcss": "^4.1.18"
+    "react-i18next": "^16.4.1",
+    "react-icons": "^5.5.0",
+    "react-material-ui-carousel": "^3.4.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@heroui/react": "^2.8.5",
     "@types/node": "^24.10.1",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",

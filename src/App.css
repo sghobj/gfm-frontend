@@ -1,6 +1,12 @@
-
-
 .App {
-  padding: 0 2rem;
-  margin: auto;
+    margin: auto;
+}
+
+.section .scheme {
+    padding: 4rem;
+}
+
+.about img {
+    display: block;
+    margin: auto;
 }
