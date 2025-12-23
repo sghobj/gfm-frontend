@@ -1,9 +1,7 @@
-import * as React from "react";
 import {
     AppBar,
     Box,
     Button,
-    Container,
     Divider,
     Drawer,
     IconButton,
@@ -19,17 +17,8 @@ import { MdLanguage } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { Scheme } from "../scheme/Scheme.tsx";
-
-export const AcmeLogo = () => (
-    <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
-        <path
-            clipRule="evenodd"
-            d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-            fill="currentColor"
-            fillRule="evenodd"
-        />
-    </svg>
-);
+import { useMemo, useState } from "react";
+import { Logo } from "../logo/Logo.tsx";
 
 type NavItem = { label: string; to: string };
 
@@ -43,63 +32,66 @@ export function DesktopNav() {
         i18n.changeLanguage(nextLang);
     };
 
-    const navItems: NavItem[] = React.useMemo(
+    const navItems: NavItem[] = useMemo(
         () => [
             { label: t("nav.home"), to: "/" },
             { label: t("nav.about"), to: "/about-us" },
-            // { label: t("nav.contact"), to: "/contact-us" },
+            { label: t("nav.contact"), to: "/contact-us" },
         ],
         [t],
     );
 
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
         <Box component="header" sx={{ width: "100%" }}>
-            <Scheme id={4}>
+            <Scheme id={1}>
                 <AppBar
                     position="static"
                     elevation={0}
-                    sx={{ background: "transparent", py: 2, height: "10vh" }}
+                    sx={{ background: "transparent", height: "fit-content" }}
                 >
                     {/* consistent width across breakpoints */}
-                    <Container disableGutters sx={{ width: "min(1100px, calc(100% - 24px))" }}>
+                    <Box>
                         <Paper
                             elevation={3}
                             sx={{
-                                borderRadius: 3,
-                                background: "white",
-                                border: "1px solid var(--app-border)",
+                                borderRadius: 0,
+                                background: `white`,
                                 backdropFilter: "blur(10px)",
                             }}
                         >
-                            <Toolbar sx={{ minHeight: 64, px: 2 }}>
-                                {/* LEFT: hamburger (mobile) + brand */}
-                                <IconButton
-                                    onClick={() => setMobileOpen(true)}
-                                    edge="start"
-                                    aria-label="open navigation menu"
-                                    sx={{
-                                        mr: 1,
-                                        display: { xs: "inline-flex", md: "none" },
-                                        // color: "var(--app-text)",
-                                    }}
-                                >
-                                    <MenuIcon />
-                                </IconButton>
-
+                            <Toolbar sx={{ minHeight: 64, px: 2, width: "100%" }}>
+                                {/* LEFT AREA (mobile): burger left, logo right */}
                                 <Box
                                     sx={{
-                                        display: "flex",
+                                        flex: 1,
+                                        display: { xs: "flex", md: "none" },
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <IconButton
+                                        onClick={() => setMobileOpen(true)}
+                                        edge="start"
+                                        aria-label="open navigation menu"
+                                    >
+                                        <MenuIcon />
+                                    </IconButton>
+
+                                    <Logo width={50} />
+                                </Box>
+
+                                {/* Desktop logo */}
+                                <Box
+                                    sx={{
+                                        display: { xs: "none", md: "flex" },
                                         alignItems: "center",
                                         gap: 1,
                                         color: "var(--app-text)",
                                     }}
                                 >
-                                    <AcmeLogo />
-                                    <Typography fontWeight={800} sx={{ letterSpacing: 0.5 }}>
-                                        ACME
-                                    </Typography>
+                                    <Logo width={50} />
                                 </Box>
 
                                 {/* CENTER: desktop links */}
@@ -150,8 +142,7 @@ export function DesktopNav() {
                                             textTransform: "none",
                                             color: "var(--app-text)",
                                             "&:hover": {
-                                                backgroundColor:
-                                                    "color-mix(in srgb, var(--app-accent) 12%, transparent)",
+                                                color: "color-mix(in srgb, var(--app-highlight) 100%, transparent)",
                                             },
                                             display: { xs: "none", md: "inline-flex" },
                                         }}
@@ -161,11 +152,11 @@ export function DesktopNav() {
                                 </Box>
                             </Toolbar>
                         </Paper>
-                    </Container>
+                    </Box>
                 </AppBar>
             </Scheme>
 
-            <Scheme id={1}>
+            <Scheme id={4}>
                 {/* MOBILE DRAWER */}
                 <Drawer
                     anchor={isRtl ? "right" : "left"}
@@ -174,7 +165,7 @@ export function DesktopNav() {
                     PaperProps={{
                         sx: {
                             width: 280,
-                            background: "var(--app-foreground)",
+                            background: "white",
                             color: "var(--app-text)",
                         },
                     }}
