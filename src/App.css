@@ -20,3 +20,9 @@
     align-items: center;
     align-content: center;
 }
+
+@media (max-width: 500px) {
+    .section .scheme {
+        padding: 2rem;
+    }
+}
