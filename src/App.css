@@ -10,3 +10,13 @@
     display: block;
     margin: auto;
 }
+
+.footer {
+    padding: 4rem;
+}
+
+.contact .text-area {
+    margin: auto;
+    align-items: center;
+    align-content: center;
+}

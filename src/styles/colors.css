@@ -56,7 +56,7 @@ accent: cinnamon
     --app-border: rgba(0, 0, 0, 0.15);
     --app-accent: var(--color-secondary);
     --app-accent-foreground: #ffffff;
-    --app-link-active: var(--color-primary);
+    --app-link-active: var(--color-primary-dark);
     --app-highlight: var(--color-primary-dark);
 }
 

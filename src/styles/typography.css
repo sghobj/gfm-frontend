@@ -5,13 +5,6 @@
     overflow-wrap: anywhere;
 }
 
-/*.about h2 {*/
-/*    !*text-align: center;*!*/
-/*    !*margin-bottom: 2rem;*!*/
-/*    font-size: 3rem;*/
-/*    font-weight: normal;*/
-/*}*/
-
 /* keep it scoped */
 .about h2.leading-text {
     font-size: clamp(2.25rem, 6vw + 0.5rem, 6rem);
@@ -24,4 +17,14 @@
 p.mission-text {
     font-size: 1rem;
     font-weight: normal;
+}
+
+.contact .subheader {
+    font-size: clamp(1rem, 3vw + 0.5rem, 1.5rem);
+    margin-top: 1rem;
+    overflow-wrap: anywhere;
+}
+
+.contact .landing {
+    margin-top: 1rem;
 }

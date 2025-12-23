@@ -12,6 +12,7 @@ export const SCHEMES: Record<
         border: string; // rgba
         accent: string;
         accentFg: string;
+        fields: string;
     }
 > = {
     1: {
@@ -21,6 +22,7 @@ export const SCHEMES: Record<
         border: "rgba(0,0,0,0.15)",
         accent: COLORS.secondary.main, // cinnamon
         accentFg: COLORS.text.secondary,
+        fields: "#ffffff",
     },
     2: {
         bg: COLORS.secondary.lightest, // #F1EDE5
@@ -29,6 +31,7 @@ export const SCHEMES: Record<
         border: "rgba(0,0,0,0.15)",
         accent: COLORS.secondary.main,
         accentFg: COLORS.text.secondary,
+        fields: "#ffffff",
     },
     3: {
         bg: COLORS.primary.darker, // #122C17
@@ -37,6 +40,7 @@ export const SCHEMES: Record<
         border: "rgba(255,255,255,0.20)",
         accent: "#ffffff",
         accentFg: "#000000",
+        fields: "#ffffff",
     },
     4: {
         bg: COLORS.primary.lighter, // #D5E2D7
@@ -45,5 +49,6 @@ export const SCHEMES: Record<
         border: "rgba(0,0,0,0.15)",
         accent: COLORS.secondary.main,
         accentFg: COLORS.text.secondary,
+        fields: "#ffffff",
     },
 };
