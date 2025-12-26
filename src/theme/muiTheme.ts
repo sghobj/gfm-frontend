@@ -29,7 +29,7 @@ export function muiTheme(schemeId: SchemeId) {
                 styleOverrides: {
                     root: ({ theme }) => ({
                         // Background for the input "box"
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.default,
                         borderRadius: 10,
 
                         // Default (out of focus) border

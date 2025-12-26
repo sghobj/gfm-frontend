@@ -37,6 +37,7 @@ export function DesktopNav() {
             { label: t("nav.home"), to: "/" },
             { label: t("nav.about"), to: "/about-us" },
             { label: t("nav.contact"), to: "/contact-us" },
+            { label: t("nav.products"), to: "/products" },
         ],
         [t],
     );
