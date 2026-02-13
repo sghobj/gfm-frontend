@@ -53,7 +53,7 @@ export const LocationMap = () => {
                             background: "white",
                             boxShadow: "none",
                             height: "100%",
-                            p: {lg: 4},
+                            p: { lg: 4 },
                         }}
                     >
                         <CardHeader

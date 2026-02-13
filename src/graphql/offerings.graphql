@@ -1,0 +1,112 @@
+query GetAllOfferings {
+    offerings {
+        documentId
+        availability
+
+        brand {
+            name
+            slug
+            documentId
+            logo {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        product {
+            documentId
+            name
+            description
+            category {
+                name
+                documentId
+            }
+            image {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        images {
+            documentId
+            alternativeText
+            url
+            width
+        }
+
+        dateSpecifications {
+            grade
+            sizes
+            pack_options {
+                documentId
+                displayLabel
+                amount
+                unit
+                amountMin
+                amountMax
+                note
+                applicable_sizes
+            }
+        }
+    }
+}
+
+query GetOffering($id: ID!) {
+    offering(documentId: $id) {
+        documentId
+        availability
+
+        brand {
+            name
+            slug
+            documentId
+            logo {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        product {
+            documentId
+            name
+            description
+            category {
+                name
+            }
+            image {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        images {
+            documentId
+            alternativeText
+            url
+            width
+        }
+
+        dateSpecifications {
+            grade
+            sizes
+            pack_options {
+                documentId
+                displayLabel
+                amount
+                unit
+                amountMin
+                amountMax
+                note
+                applicable_sizes
+            }
+        }
+    }
+}

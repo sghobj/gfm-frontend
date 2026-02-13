@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
     Box,
     Breadcrumbs,
@@ -8,196 +7,409 @@ import {
     Divider,
     Grid,
     Link,
-    Paper,
     Stack,
     Typography,
+    CircularProgress,
+    Avatar,
 } from "@mui/material";
 
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import { Scheme } from "../../components/scheme/Scheme.tsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { HeroSection } from "../../components/section/HeroSection.tsx";
+import { resolveStrapiMediaUrl } from "../../utils/strapiMedia.ts";
+import { GetOfferingDocument } from "../../gql/graphql.ts";
+import { StrapiImage } from "../../components/image/StrapiImage.tsx";
+import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
+import type { BlocksContent } from "@strapi/blocks-react-renderer";
+import { useQuery } from "@apollo/client/react";
+import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
+import {useEffect, useMemo, useState} from "react";
 
-type Product = {
-    id: string;
-    name: string;
-    brand: string;
-    price: number;
-    compareAt?: number;
-    rating: number;
-    reviewCount: number;
-    inStock: boolean;
-    badges?: string[];
-    description: string;
-    highlights: string[];
-    images: string[];
-};
-
-const demoProduct: Product = {
-    id: "sku-123",
-    name: "Wireless Noise-Cancelling Headphones",
-    brand: "Acme Audio",
-    price: 199.99,
-    compareAt: 249.99,
-    rating: 4.5,
-    reviewCount: 328,
-    inStock: true,
-    badges: ["Best Seller", "Free Shipping"],
-    description:
-        "Premium over-ear headphones with active noise cancellation, 30-hour battery life, and ultra-soft ear cushions.",
-    highlights: [
-        "Active Noise Cancellation (ANC)",
-        "Up to 30 hours battery life",
-        "Bluetooth 5.3 + multipoint",
-        "Fast charging (10 min = 5 hours)",
-    ],
-    images: [
-        "https://images.unsplash.com/photo-1518444028785-8febb8153c8f?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1200&q=80",
-    ],
-};
+function initials(name: string) {
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0]?.toUpperCase())
+        .join("");
+}
 
 export const ProductDetails = () => {
-    const product = demoProduct;
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
 
-    const [activeImg, setActiveImg] = React.useState(product.images[0]);
-    const [qty] = React.useState(1);
+    const { data, loading, error } = useQuery(GetOfferingDocument, {
+        variables: { id: id || "" },
+        skip: !id,
+    });
 
-    const discount =
-        product.compareAt && product.compareAt > product.price
-            ? Math.round(((product.compareAt - product.price) / product.compareAt) * 100)
-            : null;
+    const offering = data?.offering;
+
+    const images =useMemo(() => {
+        const list = [];
+        if (offering?.images && offering.images.length > 0) {
+            list.push(...offering.images.filter(Boolean));
+        } else if (offering?.product?.image) {
+            list.push(offering.product.image);
+        }
+        return list;
+    }, [offering]);
+
+    const [activeImg, setActiveImg] = useState<any>(null);
+    const [orderModalOpen, setOrderModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (images.length > 0) {
+            setActiveImg(images[0]);
+        }
+    }, [images]);
+
+    if (loading) {
+        return (
+            <Box sx={{ py: 20, textAlign: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error || !offering) {
+        return (
+            <Container maxWidth="xl" sx={{ py: 10, textAlign: "center" }}>
+                <Typography variant="h5" color="error" fontWeight={900}>
+                    {error ? "Failed to load product" : "Product not found"}
+                </Typography>
+                <Button onClick={() => navigate("/products")} sx={{ mt: 2 }}>
+                    Back to Products
+                </Button>
+            </Container>
+        );
+    }
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            <Stack spacing={2}>
-                <Breadcrumbs aria-label="breadcrumb">
-                    <Link underline="hover" color="inherit" href="#">
+        <>
+            <HeroSection
+                title={offering.product?.name || "Product Details"}
+                subtitle={offering.product?.category?.name || ""}
+                image={resolveStrapiMediaUrl(images[0]?.url) || "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop"}
+                height={{ xs: "40vh", md: "50vh" }}
+            >
+                <Breadcrumbs
+                    aria-label="breadcrumb"
+                    sx={{
+                        color: "white",
+                        "& .MuiBreadcrumbs-separator": { color: "rgba(255,255,255,0.7)" }
+                    }}
+                >
+                    <Link
+                        underline="hover"
+                        onClick={() => navigate("/")}
+                        sx={{ cursor: 'pointer', color: "rgba(255,255,255,0.8)", "&:hover": { color: "white" } }}
+                    >
                         Home
                     </Link>
-                    <Link underline="hover" color="inherit" href="#">
-                        Audio
+                    <Link
+                        underline="hover"
+                        onClick={() => navigate("/products")}
+                        sx={{ cursor: 'pointer', color: "rgba(255,255,255,0.8)", "&:hover": { color: "white" } }}
+                    >
+                        Products
                     </Link>
-                    <Typography color="text.primary">{product.name}</Typography>
+                    <Typography sx={{ color: "white", fontWeight: 700 }}>{offering.product?.name}</Typography>
                 </Breadcrumbs>
+            </HeroSection>
+            <Scheme id={1}>
+                <Box
+                    sx={{
+                        py: { xs: 8, md: 12 },
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Container
+                        maxWidth="xl"
+                        sx={{
+                            maxWidth: "1440px",
+                            px: { xs: 2, sm: 4, md: 6 },
+                        }}
+                    >
+                        <Stack spacing={2}>
+                            <Box>
+                                <Grid container spacing={{ xs: 4, md: 10 }}>
+                                    {/* Left: Images */}
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <Box sx={{ position: "sticky", top: 100 }}>
+                                            {activeImg && (
+                                                <StrapiImage
+                                                    media={activeImg}
+                                                    alt={offering.product?.name || ""}
+                                                    sx={{
+                                                        width: "100%",
+                                                        height: { xs: 300, md: 500 },
+                                                        objectFit: "contain",
+                                                        borderRadius: 4,
+                                                        bgcolor: "white",
+                                                        border: "1px solid",
+                                                        borderColor: "divider",
+                                                        p: 2,
+                                                    }}
+                                                />
+                                            )}
 
-                <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 } }}>
-                    <Grid container spacing={3}>
-                        {/* Left: Images */}
-                        <Grid size={{xs: 12, md: 6}}>
-                            <Box
-                                component="img"
-                                src={activeImg}
-                                alt={product.name}
-                                sx={{
-                                    width: "100%",
-                                    height: { xs: 280, md: 420 },
-                                    objectFit: "cover",
-                                    borderRadius: 2,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                }}
-                            />
+                                            {images.length > 1 && (
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={1.5}
+                                                    sx={{ mt: 2, overflowX: "auto", pb: 1 }}
+                                                >
+                                                    {images.map((img, idx) => (
+                                                        <Box
+                                                            key={img?.documentId || idx}
+                                                            component="button"
+                                                            onClick={() => setActiveImg(img)}
+                                                            style={{
+                                                                border: "none",
+                                                                background: "transparent",
+                                                                padding: 0,
+                                                                cursor: "pointer",
+                                                            }}
+                                                            aria-label="Select product image"
+                                                        >
+                                                            <StrapiImage
+                                                                media={img}
+                                                                alt=""
+                                                                sx={{
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    objectFit: "contain",
+                                                                    borderRadius: 2,
+                                                                    border: "2px solid",
+                                                                    borderColor:
+                                                                        img === activeImg
+                                                                            ? "primary.main"
+                                                                            : "divider",
+                                                                    opacity: img === activeImg ? 1 : 0.6,
+                                                                    bgcolor: "white",
+                                                                    p: 1,
+                                                                    transition: "all 0.2s ease",
+                                                                }}
+                                                            />
+                                                        </Box>
+                                                    ))}
+                                                </Stack>
+                                            )}
+                                        </Box>
+                                    </Grid>
 
-                            <Stack direction="row" spacing={1.5} sx={{ mt: 2, overflowX: "auto", pb: 1 }}>
-                                {product.images.map((img) => (
-                                    <Box
-                                        key={img}
-                                        component="button"
-                                        onClick={() => setActiveImg(img)}
-                                        style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer" }}
-                                        aria-label="Select product image"
-                                    >
-                                        <Box
-                                            component="img"
-                                            src={img}
-                                            alt=""
-                                            sx={{
-                                                width: 140,
-                                                height: 120,
-                                                objectFit: "cover",
-                                                borderRadius: 1.5,
-                                                border: "2px solid",
-                                                borderColor: img === activeImg ? "primary.main" : "divider",
-                                                opacity: img === activeImg ? 1 : 0.85,
-                                            }}
-                                        />
-                                    </Box>
-                                ))}
-                            </Stack>
-                        </Grid>
+                                    {/* Right: Details */}
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <Stack spacing={4}>
+                                            <Box>
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={2}
+                                                    alignItems="center"
+                                                    sx={{ mb: 2 }}
+                                                >
+                                                    {offering.brand?.logo ? (
+                                                        <StrapiImage
+                                                            media={offering.brand.logo}
+                                                            sx={{
+                                                                height: 40,
+                                                                width: "auto",
+                                                                objectFit: "contain",
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <Avatar
+                                                            sx={{
+                                                                bgcolor: "primary.main",
+                                                                fontWeight: 800,
+                                                            }}
+                                                        >
+                                                            {initials(offering.brand?.name || "")}
+                                                        </Avatar>
+                                                    )}
+                                                    <Typography
+                                                        variant="overline"
+                                                        color="text.secondary"
+                                                        fontWeight={800}
+                                                        sx={{ letterSpacing: 1.2 }}
+                                                    >
+                                                        {offering.brand?.name}
+                                                    </Typography>
+                                                </Stack>
 
-                        {/* Right: Details */}
-                        <Grid size={{xs: 12, md: 6}}>
-                            <Stack spacing={2}>
-                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                                    <Typography variant="overline" color="text.secondary">
-                                        {product.brand}
-                                    </Typography>
-                                    {product.badges?.map((b) => (
-                                        <Chip key={b} size="small" label={b} />
-                                    ))}
-                                </Stack>
-
-                                <Typography variant="h4" sx={{ lineHeight: 1.15 }}>
-                                    {product.name}
-                                </Typography>
-
-                                <Stack direction="row" spacing={1.5} alignItems="baseline" flexWrap="wrap">
-                                    <Typography variant="h5">${product.price.toFixed(2)}</Typography>
-                                    {product.compareAt ? (
-                                        <Typography
-                                            variant="body1"
-                                            color="text.secondary"
-                                            sx={{ textDecoration: "line-through" }}
-                                        >
-                                            ${product.compareAt.toFixed(2)}
-                                        </Typography>
-                                    ) : null}
-                                    {discount ? <Chip color="success" size="small" label={`${discount}% OFF`} /> : null}
-                                </Stack>
-
-                                <Typography color={product.inStock ? "success.main" : "error.main"} variant="body2">
-                                    {product.inStock ? "In stock" : "Out of stock"}
-                                </Typography>
-
-                                <Divider />
-
-                                <Typography variant="body1">{product.description}</Typography>
-
-                                <Box>
-                                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                        Highlights
-                                    </Typography>
-                                    <Box component="ul" sx={{ m: 0, pl: 2, color: "text.secondary" }}>
-                                        {product.highlights.map((h) => (
-                                            <li key={h}>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {h}
+                                                <Typography
+                                                    variant="h2"
+                                                    fontWeight={900}
+                                                    sx={{ lineHeight: 1.1, mb: 1 }}
+                                                >
+                                                    {offering.product?.name}
                                                 </Typography>
-                                            </li>
-                                        ))}
-                                    </Box>
-                                </Box>
+                                                <Typography
+                                                    variant="h5"
+                                                    color="primary.main"
+                                                    fontWeight={700}
+                                                >
+                                                    {offering.product?.category?.name}
+                                                </Typography>
+                                            </Box>
 
-                                <Divider />
+                                            <Divider />
 
-                                {/* Actions */}
-                                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }}>
-                                    <Button
-                                        variant="contained"
-                                        size="large"
-                                        startIcon={<AddShoppingCartIcon />}
-                                        disabled={!product.inStock}
-                                        sx={{ flex: 1, minHeight: 48 }}
-                                        onClick={() => console.log("Add to cart", { productId: product.id, qty })}
-                                    >
-                                        Make an Order
-                                    </Button>
-                                </Stack>
-                            </Stack>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Stack>
-        </Container>
+                                            <Box>
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    fontWeight={800}
+                                                    sx={{
+                                                        mb: 2,
+                                                        textTransform: "uppercase",
+                                                        fontSize: "0.85rem",
+                                                        color: "text.secondary",
+                                                    }}
+                                                >
+                                                    Product Description
+                                                </Typography>
+                                                {offering.product?.description ? (
+                                                    <BlocksTypography
+                                                        content={
+                                                            offering.product
+                                                                .description as BlocksContent
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <Typography
+                                                        color="text.secondary"
+                                                        sx={{ fontStyle: "italic" }}
+                                                    >
+                                                        No description available for this offering.
+                                                    </Typography>
+                                                )}
+                                            </Box>
+
+                                            <Box>
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    fontWeight={800}
+                                                    sx={{
+                                                        mb: 2,
+                                                        textTransform: "uppercase",
+                                                        fontSize: "0.85rem",
+                                                        color: "text.secondary",
+                                                    }}
+                                                >
+                                                    Availability & Specifications
+                                                </Typography>
+                                                <Stack spacing={3}>
+                                                    {offering.dateSpecifications?.map(
+                                                        (spec, sIdx) => (
+                                                            <Box
+                                                                key={sIdx}
+                                                                sx={{
+                                                                    p: 2,
+                                                                    borderRadius: 2,
+                                                                    bgcolor: "background.paper",
+                                                                    border: "1px solid",
+                                                                    borderColor: "divider",
+                                                                }}
+                                                            >
+                                                                <Typography
+                                                                    variant="subtitle2"
+                                                                    fontWeight={800}
+                                                                    color="primary.main"
+                                                                    gutterBottom
+                                                                >
+                                                                    {spec?.grade} - {spec?.sizes}
+                                                                </Typography>
+                                                                <Stack
+                                                                    direction="row"
+                                                                    spacing={1}
+                                                                    flexWrap="wrap"
+                                                                    useFlexGap
+                                                                    sx={{ gap: 1, mt: 1 }}
+                                                                >
+                                                                    {spec?.pack_options?.map(
+                                                                        (opt, oIdx) => (
+                                                                            <Chip
+                                                                                key={oIdx}
+                                                                                label={
+                                                                                    opt?.displayLabel ||
+                                                                                    `${opt?.amount} ${opt?.unit}`
+                                                                                }
+                                                                                variant="outlined"
+                                                                                sx={{
+                                                                                    fontWeight: 600,
+                                                                                }}
+                                                                            />
+                                                                        ),
+                                                                    )}
+                                                                </Stack>
+                                                            </Box>
+                                                        ),
+                                                    )}
+                                                </Stack>
+                                            </Box>
+
+                                            <Box
+                                                sx={{
+                                                    p: 3,
+                                                    borderRadius: 3,
+                                                    bgcolor: "primary.50",
+                                                    border: "1px dashed",
+                                                    borderColor: "primary.200",
+                                                }}
+                                            >
+                                                <Stack direction="row" spacing={2} alignItems="center">
+                                                    <Box sx={{ fontSize: "2rem" }}>🌿</Box>
+                                                    <Box>
+                                                        <Typography
+                                                            variant="subtitle1"
+                                                            color="primary.900"
+                                                            fontWeight={800}
+                                                        >
+                                                            Authentic Organic Produce
+                                                        </Typography>
+                                                        <Typography variant="body2" color="primary.800">
+                                                            Sourced directly from certified organic
+                                                            farms in Jordan.
+                                                        </Typography>
+                                                    </Box>
+                                                </Stack>
+                                            </Box>
+
+                                            <Button
+                                                variant="contained"
+                                                size="large"
+                                                startIcon={<AddShoppingCartIcon />}
+                                                sx={{
+                                                    py: 2,
+                                                    borderRadius: 2,
+                                                    fontWeight: 900,
+                                                    fontSize: "1.2rem",
+                                                    boxShadow: 6,
+                                                    textTransform: "none",
+                                                }}
+                                                onClick={() => setOrderModalOpen(true)}
+                                            >
+                                                Product Inquiry
+                                            </Button>
+                                        </Stack>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Stack>
+                    </Container>
+                </Box>
+            </Scheme>
+
+            {offering && (
+                <ProductInquiryModal
+                    open={orderModalOpen}
+                    onClose={() => setOrderModalOpen(false)}
+                    offering={offering}
+                />
+            )}
+        </>
     );
-}
+};

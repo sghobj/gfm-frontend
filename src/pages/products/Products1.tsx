@@ -15,24 +15,23 @@ import {
     DialogTitle,
     IconButton,
     Button,
-    Chip, Divider,
+    Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useNavigate } from "react-router-dom";
+import { Scheme } from "../../components/scheme/Scheme";
 import { StrapiImage } from "../../components/image/StrapiImage";
 import { useQuery } from "@apollo/client/react";
-
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
+import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
 import {
     GetAllOfferingsDocument,
     type GetAllOfferingsQuery,
 } from "../../gql/graphql.ts";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
-import {Scheme} from "../../components/scheme/Scheme.tsx";
-import {SectionSubtitle, SectionTitle} from "../../components/typography/SectionTypography.tsx";
 
 // ----------------------------
 // GraphQL Query
@@ -64,7 +63,7 @@ function initials(name: string) {
 }
 
 // ---------- Component ----------
-export function Products() {
+export function Products1() {
     const navigate = useNavigate();
     const { data, loading, error } = useQuery(GET_ALL_OFFERINGS);
 
@@ -151,7 +150,12 @@ export function Products() {
                                 <SectionTitle>
                                     Our Products
                                 </SectionTitle>
-                                <SectionSubtitle>
+                                <SectionSubtitle
+                                    sx={{
+                                        maxWidth: 600,
+                                        fontWeight: 400,
+                                    }}
+                                >
                                     Experience the finest organic harvest from Jordan.
                                 </SectionSubtitle>
                             </Stack>
@@ -227,68 +231,96 @@ export function Products() {
                         </Typography>
                     </Box>
                 ) : (
-                    <Stack spacing={10}>
+                    <Stack spacing={16}>
                         {productsList.map(({ product, offerings: groupOfferings }) => {
                             const heroImage = product.image;
 
                             return (
                                 <Box key={product.documentId}>
-                                        <Grid container spacing={{ xs: 4, md: 10 }} sx={{ mb: 6 }} alignItems="center">
-                                            {heroImage && (
-                                                <Grid size={{ xs: 12, md: 6 }}>
-                                                    <StrapiImage
-                                                        media={heroImage}
-                                                        alt={product.name}
-                                                        sx={{
-                                                            width: "100%",
-                                                            height: { xs: 250, md: 350 },
-                                                            objectFit: "cover",
-                                                            borderRadius: 2,
-                                                            filter: "grayscale(10%) contrast(1.1)",
-                                                            transition: "filter 0.3s ease",
-                                                            "&:hover": {
-                                                                filter: "none",
-                                                            },
+                                    {/* Product Item Hero */}
+                                    <Box
+                                        sx={{
+                                            position: "relative",
+                                            width: "100%",
+                                            height: { xs: 300, md: 500 },
+                                            borderRadius: 4,
+                                            overflow: "hidden",
+                                            mb: 6,
+                                            boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+                                        }}
+                                    >
+                                        {heroImage ? (
+                                            <StrapiImage
+                                                media={heroImage}
+                                                alt={product.name}
+                                                sx={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    filter: "contrast(1.05)",
+                                                }}
+                                            />
+                                        ) : (
+                                            <Box sx={{ width: "100%", height: "100%", bgcolor: "grey.200" }} />
+                                        )}
+
+                                        {/* Overlay Content */}
+                                        <Box
+                                            sx={{
+                                                position: "absolute",
+                                                bottom: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                p: { xs: 3, md: 6 },
+                                                background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
+                                                color: "white",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "flex-end",
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="overline"
+                                                sx={{
+                                                    color: "primary.light",
+                                                    fontWeight: 900,
+                                                    letterSpacing: "0.2em",
+                                                    textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+                                                }}
+                                            >
+                                                {product.category?.name || "Premium Harvest"}
+                                            </Typography>
+                                            <Typography
+                                                variant="h2"
+                                                sx={{
+                                                    fontWeight: 900,
+                                                    fontSize: { xs: "2rem", md: "3.5rem" },
+                                                    lineHeight: 1.1,
+                                                    textShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                                                }}
+                                            >
+                                                {product.name}
+                                            </Typography>
+
+                                            {product.description && (
+                                                <Box sx={{ mt: 2, maxWidth: 800, display: { xs: "none", sm: "block" } }}>
+                                                    <BlocksTypography
+                                                        content={product.description as BlocksContent}
+                                                        paragraphSx={{
+                                                            color: "rgba(255,255,255,0.9)",
+                                                            fontSize: { md: "1.1rem" },
+                                                            lineHeight: 1.5,
+                                                            textShadow: "0 1px 2px rgba(0,0,0,0.5)",
+                                                            display: "-webkit-box",
+                                                            WebkitLineClamp: 2,
+                                                            WebkitBoxOrient: "vertical",
+                                                            overflow: "hidden",
                                                         }}
                                                     />
-                                                </Grid>
+                                                </Box>
                                             )}
-                                            <Grid size={{ xs: 12, md: heroImage ? 6 : 12 }}>
-                                                <Stack spacing={3}>
-                                                    <Stack spacing={0.5}>
-                                                        <Typography
-                                                            variant="overline"
-                                                            color="primary.main"
-                                                            fontWeight={800}
-                                                            sx={{ letterSpacing: "0.2em", opacity: 0.8 }}
-                                                        >
-                                                            {product.category?.name || "Other"}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="h4"
-                                                            fontWeight={900}
-                                                            sx={{
-                                                                letterSpacing: "-0.03em",
-                                                                fontSize: { xs: "2.25rem", md: "3rem" },
-                                                                lineHeight: 1.1,
-                                                            }}
-                                                        >
-                                                            {product.name}
-                                                        </Typography>
-                                                    </Stack>
-                                                    {product.description ? (
-                                                        <BlocksTypography
-                                                            content={product.description as BlocksContent}
-                                                            paragraphSx={{
-                                                                lineHeight: 1.4,
-                                                                color: "text.secondary",
-                                                                overflow: "hidden",
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                </Stack>
-                                            </Grid>
-                                        </Grid>
+                                        </Box>
+                                    </Box>
 
                                     {/* Brand offerings */}
                                     <Box
@@ -299,8 +331,7 @@ export function Products() {
                                                 sm: "repeat(2, 1fr)",
                                                 lg: "repeat(4, 1fr)",
                                             },
-                                            gap: { xs: 4, md: 10 },
-                                            mb: 6,
+                                            gap: 4,
                                         }}
                                     >
                                         {groupOfferings.map((o) => {
@@ -432,7 +463,6 @@ export function Products() {
                                             );
                                         })}
                                     </Box>
-                                    <Divider />
                                 </Box>
                             );
                         })}

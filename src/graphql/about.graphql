@@ -1,0 +1,106 @@
+query About($locale: I18NLocaleCode) {
+    about(locale: $locale) {
+        landing {
+            id
+            title
+            subtitle
+            text
+            image {
+                caption
+                url
+                alternativeText
+            }
+        }
+        whyUs {
+            general {
+                text
+                title
+                subtitle
+                image {
+                    caption
+                    alternativeText
+                    url
+                    width
+                }
+
+            }
+            points {
+                id
+                image {
+                    caption
+                    alternativeText
+                    url
+                    width
+                }
+                subtitle
+                title
+            }
+        }
+        csr {
+            goals {
+                title
+                id
+                subtitle
+                icon
+            }
+            title
+            subtitle
+            text
+        }
+        locale
+        mission {
+            id
+            image {
+                height
+                name
+                url
+                width
+                caption
+                alternativeText
+            }
+            title
+            subtitle
+            text
+        }
+        vision {
+            general {
+                image {
+                    caption
+                    alternativeText
+                    documentId
+                    height
+                    name
+                    size
+                    url
+                    width
+                }
+                subtitle
+                text
+                title
+            }
+            goals {
+                id
+                title
+                value
+            }
+        }
+        values {
+            general {
+                image {
+                    alternativeText
+                    caption
+                    width
+                    url
+                }
+                subtitle
+                text
+                title
+            }
+            values {
+                id
+                title
+                value
+            }
+        }
+    }
+}
