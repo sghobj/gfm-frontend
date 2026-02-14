@@ -36,7 +36,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
     const handleClose = () => setSelectedCert(null);
 
     return (
-        <Scheme id={5}>
+        <Scheme id={1}>
             <Box
                 sx={{
                     py: { xs: 8, md: 12 },
