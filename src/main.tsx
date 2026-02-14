@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import "./i18n/i18n";
-import { client } from "./utils/apollo";
 import { ApolloProvider } from "@apollo/client/react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
@@ -14,16 +13,20 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import { muiTheme } from "./theme/muiTheme";
+import { apolloClient } from "./apollo/apolloClient.ts";
+import { BreakpointProvider } from "./providers/BreakpointProvider";
 
 const theme = muiTheme(1);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
-            <ApolloProvider client={client}>
+            <ApolloProvider client={apolloClient}>
                 <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <App />
+                    <BreakpointProvider>
+                        <CssBaseline />
+                        <App />
+                    </BreakpointProvider>
                 </ThemeProvider>
             </ApolloProvider>
         </BrowserRouter>

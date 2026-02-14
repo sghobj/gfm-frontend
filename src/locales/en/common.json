@@ -2,7 +2,8 @@
     "nav": {
         "home": "Home",
         "about": "About",
-        "contact": "Contact Us"
+        "contact": "Contact Us",
+        "products": "Our Products"
     },
     "actions": {
         "login": "Login",

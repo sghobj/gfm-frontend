@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,scss,md,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,css,scss,md,json}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,css,scss,md,json}\"",
+    "codegen": "graphql-codegen"
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
@@ -19,6 +20,7 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/lab": "^7.0.1-beta.20",
     "@mui/material": "^7.3.6",
+    "@strapi/blocks-react-renderer": "^1.0.2",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
@@ -31,10 +33,13 @@
     "react-hook-form": "^7.69.0",
     "react-i18next": "^16.4.1",
     "react-icons": "^5.5.0",
-    "react-material-ui-carousel": "^3.4.2"
+    "react-material-ui-carousel": "^3.4.2",
+    "swiper": "^12.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@graphql-codegen/cli": "^6.1.0",
+    "@graphql-codegen/client-preset": "^5.2.2",
     "@types/node": "^24.10.1",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
@@ -44,6 +49,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "prettier": "^3.7.4",
     "react-router-dom": "^7.10.1",
     "react-simple-maps": "^3.0.0",

@@ -14,8 +14,8 @@
     overflow-wrap: anywhere;
 }
 
-p.mission-text {
-    font-size: 1rem;
+.mission-text {
+    font-size: 1.2rem;
     font-weight: normal;
 }
 

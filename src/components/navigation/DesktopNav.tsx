@@ -37,6 +37,8 @@ export function DesktopNav() {
             { label: t("nav.home"), to: "/" },
             { label: t("nav.about"), to: "/about-us" },
             { label: t("nav.contact"), to: "/contact-us" },
+            { label: t("nav.products"), to: "/products" },
+            { label: "Certifications", to: "/certificates" },
         ],
         [t],
     );
@@ -44,7 +46,7 @@ export function DesktopNav() {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
-        <Box component="header" sx={{ width: "100%" }}>
+        <Box component="header" sx={{ width: "100%", position: "sticky", top: 0, zIndex: 1100 }}>
             <Scheme id={1}>
                 <AppBar
                     position="static"

@@ -1,5 +1,5 @@
 // src/theme/muiTheme.ts
-import { createTheme } from "@mui/material/styles";
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { COLORS } from "./colors";
 import { SCHEMES, type SchemeId } from "./schemes";
 import { alpha } from "@mui/material";
@@ -7,7 +7,7 @@ import { alpha } from "@mui/material";
 export function muiTheme(schemeId: SchemeId) {
     const s = SCHEMES[schemeId] ?? SCHEMES[1];
 
-    return createTheme({
+    const theme = createTheme({
         palette: {
             primary: { main: COLORS.primary.main },
             secondary: { main: COLORS.secondary.main },
@@ -23,13 +23,61 @@ export function muiTheme(schemeId: SchemeId) {
             },
             divider: s.border,
         },
+        typography: {
+            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+            h1: {
+                fontFamily: '"Playfair Display", serif',
+                fontSize: "3.5rem",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+            },
+            h2: {
+                fontFamily: '"Playfair Display", serif',
+                fontSize: "2rem",
+                fontWeight: 700,
+                letterSpacing: "-0.01em",
+            },
+            h3: {
+                fontFamily: '"Inter", sans-serif',
+                fontSize: "1.25rem",
+                fontWeight: 500,
+                lineHeight: 1.6,
+                letterSpacing: "0.01em",
+            },
+            h4: {
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 600,
+            },
+            h5: {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 600,
+            },
+            h6: {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 600,
+            },
+            subtitle1: {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 500,
+            },
+            body1: {
+                fontFamily: '"Inter", sans-serif',
+                lineHeight: 1.7,
+            },
+            overline: {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 700,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+            },
+        },
         shape: { borderRadius: 8 },
         components: {
             MuiOutlinedInput: {
                 styleOverrides: {
                     root: ({ theme }) => ({
                         // Background for the input "box"
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.default,
                         borderRadius: 10,
 
                         // Default (out of focus) border
@@ -63,4 +111,6 @@ export function muiTheme(schemeId: SchemeId) {
             },
         },
     });
+
+    return responsiveFontSizes(theme);
 }

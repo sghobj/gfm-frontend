@@ -1,0 +1,25 @@
+query Certificates {
+    certificates {
+        audit_report {
+            alternativeText
+            caption
+            url
+        }
+        certificate {
+            alternativeText
+            caption
+            formats
+            name
+            url
+        }
+        documentId
+        description
+        logo {
+            alternativeText
+            caption
+            formats
+            url
+        }
+        name
+    }
+}

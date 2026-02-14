@@ -1,0 +1,12 @@
+query GetHomeData($locale: I18NLocaleCode) {
+    brands(locale: $locale) {
+        documentId
+        name
+        slug
+        description
+        logo {
+            url
+            alternativeText
+        }
+    }
+}

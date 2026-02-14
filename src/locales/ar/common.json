@@ -2,7 +2,8 @@
     "nav": {
         "home": "الرئيسية",
         "about": "من نحن",
-        "contact": "اتصل بنا"
+        "contact": "اتصل بنا",
+        "products": "منتجاتنا"
     },
     "actions": {
         "login": "تسجيل الدخول",

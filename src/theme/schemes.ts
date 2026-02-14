@@ -17,7 +17,7 @@ export const SCHEMES: Record<
 > = {
     1: {
         bg: "#ffffff",
-        surface: COLORS.secondary.lightest, // #F1EDE5
+        surface: COLORS.primary.lightest, // #F1EDE5
         text: COLORS.text.primary, // #000
         border: "rgba(0,0,0,0.15)",
         accent: COLORS.secondary.main, // cinnamon
