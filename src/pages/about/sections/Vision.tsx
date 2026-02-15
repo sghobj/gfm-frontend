@@ -1,8 +1,11 @@
 import { Box, Typography, Stack, Divider } from "@mui/material";
 import type { AboutQuery } from "../../../gql/graphql.ts";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
-import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography.tsx";
-import {SectionLayout} from "../../../components/layout/SectionLayout.tsx";
+import {
+    SectionSubtitle,
+    SectionTitle,
+} from "../../../components/typography/SectionTypography.tsx";
+import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
 
 type VisionType = NonNullable<AboutQuery["about"]>["vision"];
@@ -12,7 +15,6 @@ type VisionSectionProps = {
 };
 
 export const VisionSection = ({ data }: VisionSectionProps) => {
-
     return (
         <SectionLayout
             schemeId={4}
@@ -20,12 +22,8 @@ export const VisionSection = ({ data }: VisionSectionProps) => {
             reverse={false}
             left={
                 <Stack>
-                    <SectionTitle>
-                        {data?.general?.title}
-                    </SectionTitle>
-                    <SectionSubtitle>
-                        {data?.general?.subtitle}
-                    </SectionSubtitle>
+                    <SectionTitle>{data?.general?.title}</SectionTitle>
+                    <SectionSubtitle>{data?.general?.subtitle}</SectionSubtitle>
                 </Stack>
             }
             right={
@@ -82,8 +80,12 @@ export function Line({ label, value }: LineProps) {
                 overflowWrap: "anywhere",
             }}
         >
-            <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>{label}</Typography>
-            <Typography variant="body1" sx={{ fontWeight: 600 }}>{value}</Typography>
+            <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                {label}
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                {value}
+            </Typography>
         </Box>
     );
 }

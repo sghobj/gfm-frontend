@@ -26,14 +26,9 @@ query About($locale: I18NLocaleCode) {
             }
             points {
                 id
-                image {
-                    caption
-                    alternativeText
-                    url
-                    width
-                }
                 subtitle
                 title
+                iconName
             }
         }
         csr {

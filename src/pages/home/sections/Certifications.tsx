@@ -31,9 +31,9 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
     const navigate = useNavigate();
     const [selectedCert, setSelectedCert] = useState<CertificateType | null>(null);
 
-    if (!certificates || certificates.length === 0) return null;
-
     const handleClose = () => setSelectedCert(null);
+
+    const sortedCertificates = [...certificates];
 
     return (
         <Scheme id={1}>
@@ -51,10 +51,10 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                     sx={{
                         position: "absolute",
                         inset: 0,
-                        background:
-                            "radial-gradient(800px 400px at 10% 80%, rgba(99,102,241,0.04), transparent 70%)," +
-                            "radial-gradient(600px 400px at 90% 20%, rgba(16,185,129,0.04), transparent 70%)," +
-                            "linear-gradient(180deg, rgba(248,250,252,1) 0%, rgba(255,255,255,1) 100%)",
+                        // background:
+                        //     "radial-gradient(800px 400px at 90% 80%, rgba(99,102,241,0.04), transparent 70%)," +
+                        //     "radial-gradient(600px 400px at 10% 20%, rgba(16,185,129,0.04), transparent 70%)," +
+                        //     "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,250,252,1) 100%)",
                         zIndex: 0,
                     }}
                 />
@@ -108,66 +108,67 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         <Grid size={{ xs: 12, lg: 7 }}>
                             <Box
                                 sx={{
-                                    display: "grid",
-                                    gridTemplateColumns: {
-                                        xs: "repeat(2, 1fr)",
-                                        sm: "repeat(3, 1fr)",
-                                    },
-                                    gap: { xs: 4, md: 6 },
+                                    display: "flex",
+                                    flexDirection: "column",
                                     alignItems: "center",
+                                    gap: 6,
                                 }}
                             >
-                                {certificates.map((cert, idx) => (
-                                    <Box
-                                        key={cert?.documentId ?? idx}
-                                        onClick={() => setSelectedCert(cert)}
-                                        sx={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                            transition: "all 0.3s ease",
-                                            "&:hover": {
-                                                transform: "translateY(-4px)",
-                                                "& img": {
-                                                    filter: "grayscale(0%) opacity(1)",
-                                                },
-                                                "& .cert-name": {
-                                                    color: "primary.main",
-                                                },
-                                            },
-                                        }}
-                                    >
-                                        <Box
-                                            component="img"
-                                            src={resolveStrapiMediaUrl(cert?.logo?.url)}
-                                            alt={cert?.name ?? "Certificate"}
-                                            sx={{
-                                                maxHeight: { xs: 60, md: 80 },
-                                                width: "100%",
-                                                maxWidth: 140,
-                                                objectFit: "contain",
-                                                filter: "grayscale(100%) opacity(0.6)",
-                                                transition: "all 0.3s ease",
-                                                mb: 1.5,
-                                            }}
-                                        />
-                                        <Typography
-                                            className="cert-name"
-                                            variant="caption"
-                                            sx={{
-                                                fontWeight: 700,
-                                                textAlign: "center",
-                                                color: "text.secondary",
-                                                transition: "color 0.3s ease",
-                                                textTransform: "uppercase",
-                                                letterSpacing: 1,
-                                            }}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: { xs: 3, md: 4 },
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        width: "100%",
+                                    }}
+                                >
+                                    {sortedCertificates.map((cert, idx) => (
+                                        <Tooltip
+                                            key={cert?.documentId ?? idx}
+                                            title={cert?.name}
+                                            arrow
                                         >
-                                            {cert?.name}
-                                        </Typography>
-                                    </Box>
-                                ))}
+                                            <Box
+                                                onClick={() => setSelectedCert(cert)}
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    minWidth: { xs: 100, md: 130 },
+                                                    transition: "all 0.3s ease",
+                                                    cursor: "pointer",
+                                                    "&:hover": {
+                                                        transform: "translateY(-4px)",
+                                                        "& img": {
+                                                            opacity: 1,
+                                                            filter: "grayscale(0%) drop-shadow(0 10px 15px rgba(0,0,0,0.05))",
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <Box
+                                                    component="img"
+                                                    src={resolveStrapiMediaUrl(cert?.logo?.url)}
+                                                    alt={cert?.name ?? "Certificate"}
+                                                    loading="lazy"
+                                                    sx={{
+                                                        // maxHeight: { xs: 70, md: 90 },
+                                                        width: "100%",
+                                                        maxWidth: 160,
+                                                        objectFit: "contain",
+                                                        opacity: 0.6,
+                                                        // filter: "grayscale(100%)",
+                                                        transition: "all 0.4s ease",
+                                                        borderRadius: 2,
+                                                    }}
+                                                />
+                                            </Box>
+                                        </Tooltip>
+                                    ))}
+                                </Box>
                             </Box>
                         </Grid>
                     </Grid>
@@ -180,9 +181,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                 onClose={handleClose}
                 maxWidth="md"
                 fullWidth
-                PaperProps={{
-                    sx: { borderRadius: 4, overflow: "hidden" },
-                }}
+                sx={{ borderRadius: 4, overflow: "hidden", backgroundColor: "#fff" }}
             >
                 <DialogTitle
                     sx={{
@@ -191,6 +190,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
+                        backgroundColor: "#fff",
                     }}
                 >
                     <Typography variant="h6" fontWeight={800}>
@@ -214,7 +214,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         </IconButton>
                     </Stack>
                 </DialogTitle>
-                <DialogContent dividers sx={{ p: 0, bgcolor: "#f8fafc", minHeight: 400 }}>
+                <DialogContent dividers sx={{ p: 2, bgcolor: "#f8fafc", minHeight: 400 }}>
                     {selectedCert?.certificate?.url ? (
                         selectedCert.certificate.url.toLowerCase().endsWith(".pdf") ? (
                             <Box
@@ -247,7 +247,15 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         </Box>
                     )}
                 </DialogContent>
-                <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                <Box
+                    sx={{
+                        p: 2,
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: 2,
+                        backgroundColor: "#fff",
+                    }}
+                >
                     <Button
                         variant="outlined"
                         onClick={handleClose}

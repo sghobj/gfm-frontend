@@ -3,7 +3,7 @@ import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
 import type { AboutQuery } from "../../../gql/graphql.ts";
-import {SectionTitle} from "../../../components/typography/SectionTypography.tsx";
+import { SectionTitle } from "../../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
 
 type MissionType = NonNullable<AboutQuery["about"]>["mission"];
@@ -43,9 +43,7 @@ export const Mission = ({ data }: MissionProps) => {
             }
             left={
                 <Stack spacing={2}>
-                    <SectionTitle>
-                        {data?.title}
-                    </SectionTitle>
+                    <SectionTitle>{data?.title}</SectionTitle>
                     <BlocksTypography
                         content={missionText}
                         paragraphSx={{ textAlign: "justify" }}

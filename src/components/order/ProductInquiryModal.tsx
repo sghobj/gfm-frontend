@@ -15,9 +15,9 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
-import { useForm, Controller } from "react-hook-form";
 import type { GetOfferingQuery } from "../../gql/graphql";
 import { StrapiImage } from "../image/StrapiImage";
+import { useForm, Controller, useWatch } from "react-hook-form";
 
 type Offering = NonNullable<GetOfferingQuery["offering"]>;
 
@@ -38,14 +38,67 @@ interface OrderFormValues {
     message: string;
 }
 
-export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({ open, onClose, offering }) => {
-    const specs = offering.dateSpecifications || [];
+type DateSpec = NonNullable<NonNullable<Offering["dateSpecifications"]>[number]>;
+type DatePackOption = NonNullable<NonNullable<DateSpec["pack_options"]>[number]>;
+type NonDatePackOption = NonNullable<NonNullable<Offering["pack_options"]>[number]>;
+
+function formatNonDatePackOption(opt: NonDatePackOption): string {
+    return opt.displayLabel || `${opt.amount ?? ""} ${opt.unit ?? ""}`.trim() || "Option";
+}
+
+function formatDatePackOption(opt: DatePackOption): string {
+    if (opt.displayLabel) return opt.displayLabel;
+    if (opt.amountMin != null && opt.amountMax != null)
+        return `${opt.amountMin}-${opt.amountMax} ${opt.unit ?? ""}`.trim();
+    if (opt.amount != null) return `${opt.amount} ${opt.unit ?? ""}`.trim();
+    return "Packaging";
+}
+
+function normalizeApplicableSizes(value: unknown): string[] {
+    if (value == null) return [];
+    if (Array.isArray(value))
+        return value.filter((v): v is string => typeof v === "string" && v.length > 0);
+    if (typeof value === "string" && value.length > 0) return [value];
+    return [];
+}
+
+function dedupeByDocumentId<T extends { documentId: string }>(items: T[]): T[] {
+    const map = new Map<string, T>();
+    for (const item of items) map.set(item.documentId, item);
+    return Array.from(map.values());
+}
+
+function idxValue(i: number) {
+    return `__idx:${i}`;
+}
+function parseIdxValue(v: string): number | null {
+    if (!v.startsWith("__idx:")) return null;
+    const n = Number(v.slice(6));
+    return Number.isFinite(n) ? n : null;
+}
+
+export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
+    open,
+    onClose,
+    offering,
+}) => {
+    const specs = useMemo(() => {
+        const raw = offering.dateSpecifications ?? [];
+        return raw.filter((s): s is DateSpec => Boolean(s));
+    }, [offering.dateSpecifications]);
+
+    const nonDatePackOptions = useMemo(() => {
+        const raw = offering.pack_options ?? [];
+        return raw.filter((p): p is NonDatePackOption => Boolean(p));
+    }, [offering.pack_options]);
+
+    const isDatesFlow = Boolean(offering.isMedjoolDate && specs.length > 0);
 
     const {
         control,
         handleSubmit,
-        watch,
         setValue,
+        register,
         formState: { errors },
     } = useForm<OrderFormValues>({
         defaultValues: {
@@ -60,65 +113,136 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({ open, on
         },
     });
 
-    const selectedGrade = watch("grade");
-    const selectedSize = watch("size");
+    const selectedGrade = useWatch({ control, name: "grade" });
+    const selectedSize = useWatch({ control, name: "size" });
+    const selectedPackOption = useWatch({ control, name: "packOption" });
 
-    // Memoized options based on selections
-    const availableGrades = useMemo(() => {
-        return Array.from(new Set(specs.map((s) => s?.grade).filter(Boolean)));
-    }, [specs]);
+    // Clear date-only fields when switching to non-dates flow
+    useEffect(() => {
+        if (!isDatesFlow) {
+            setValue("grade", "");
+        }
+    }, [isDatesFlow, setValue]);
 
-    const availableSizes = useMemo(() => {
+    // ----- Dates: grades -----
+    const availableGrades = useMemo((): string[] => {
+        if (!isDatesFlow) return [];
+        return Array.from(new Set(specs.map((s) => s.grade).filter((v) => Boolean(v))));
+    }, [isDatesFlow, specs]);
+
+    const availableSizes = useMemo((): Array<{ value: string; label: string }> => {
+        if (isDatesFlow) {
+            if (!selectedGrade) return [];
+            const sizes = Array.from(
+                new Set(
+                    specs
+                        .filter((s) => s.grade === selectedGrade)
+                        .map((s) => s.sizes)
+                        .filter((v) => Boolean(v)),
+                ),
+            );
+            return sizes.map((s) => ({ value: s, label: s }));
+        }
+
+        return nonDatePackOptions.map((opt, i) => ({
+            value: idxValue(i),
+            label: formatNonDatePackOption(opt),
+        }));
+    }, [isDatesFlow, specs, selectedGrade, nonDatePackOptions]);
+
+    // ----- Dates: pack options filtered by size (applicable_sizes) -----
+    const availableDatePackOptions = useMemo((): DatePackOption[] => {
+        if (!isDatesFlow) return [];
         if (!selectedGrade) return [];
-        return Array.from(
-            new Set(
-                specs
-                    .filter((s) => s?.grade === selectedGrade)
-                    .map((s) => s?.sizes)
-                    .filter((s): s is NonNullable<typeof s> => !!s),
-            ),
+
+        const candidates: DatePackOption[] = [];
+        for (const s of specs) {
+            if (s.grade !== selectedGrade) continue;
+            const opts = (s.pack_options ?? []).filter((o): o is DatePackOption => Boolean(o));
+            candidates.push(...opts);
+        }
+
+        if (!selectedSize) return dedupeByDocumentId(candidates);
+
+        return dedupeByDocumentId(
+            candidates.filter((o) => {
+                const applicable = normalizeApplicableSizes(o.applicable_sizes as unknown);
+                if (applicable.length === 0) return true;
+                return applicable.includes(selectedSize);
+            }),
         );
-    }, [specs, selectedGrade]);
+    }, [isDatesFlow, specs, selectedGrade, selectedSize]);
 
-    const availablePackOptions = useMemo(() => {
-        if (!selectedGrade || !selectedSize) return [];
-        const currentSpec = specs.find((s) => s?.grade === selectedGrade && s?.sizes === selectedSize);
-        return currentSpec?.pack_options?.filter((o): o is NonNullable<typeof o> => !!o) || [];
-    }, [specs, selectedGrade, selectedSize]);
-
-    // Reset dependent fields
+    // ----- Auto-select grade (dates) -----
     useEffect(() => {
+        if (!isDatesFlow) return;
         if (availableGrades.length === 1 && !selectedGrade) {
-            setValue("grade", availableGrades[0] as string);
+            setValue("grade", availableGrades[0]);
         }
-    }, [availableGrades, setValue, selectedGrade]);
+    }, [isDatesFlow, availableGrades, selectedGrade, setValue]);
 
+    // ----- Reset/auto-select size -----
     useEffect(() => {
+        const currentValues = availableSizes.map((x) => x.value);
+
         if (availableSizes.length === 1 && !selectedSize) {
-            setValue("size", availableSizes[0] as string);
-        } else if (!availableSizes.includes(selectedSize as any)) {
-            setValue("size", "");
+            setValue("size", availableSizes[0].value);
+            return;
         }
-    }, [availableSizes, setValue, selectedSize]);
 
-    useEffect(() => {
-        if (availablePackOptions.length === 1) {
-            setValue("packOption", availablePackOptions[0].documentId);
-        } else if (!availablePackOptions.some((o) => o?.documentId === watch("packOption"))) {
+        if (selectedSize && !currentValues.includes(selectedSize)) {
+            setValue("size", "");
             setValue("packOption", "");
         }
-    }, [availablePackOptions, setValue, watch("packOption")]);
+    }, [availableSizes, selectedSize, setValue]);
 
+    useEffect(() => {
+        if (isDatesFlow) return;
+        setValue("packOption", selectedSize ?? "");
+    }, [isDatesFlow, selectedSize, setValue]);
+
+    useEffect(() => {
+        if (!isDatesFlow) return;
+
+        if (availableDatePackOptions.length === 1) {
+            setValue("packOption", availableDatePackOptions[0].documentId);
+            return;
+        }
+
+        if (
+            selectedPackOption &&
+            !availableDatePackOptions.some((o) => o.documentId === selectedPackOption)
+        ) {
+            setValue("packOption", "");
+        }
+    }, [isDatesFlow, availableDatePackOptions, selectedPackOption, setValue]);
+
+    // ----- Resolve selected non-date pack option object (for later calculations) -----
+    const selectedNonDatePack = useMemo(() => {
+        if (isDatesFlow) return null;
+        const idx = selectedSize ? parseIdxValue(selectedSize) : null;
+        if (idx == null) return null;
+        return nonDatePackOptions[idx] ?? null;
+    }, [isDatesFlow, selectedSize, nonDatePackOptions]);
+
+    // ----- Submit handlers -----
     const onSubmitEmail = (data: OrderFormValues) => {
-        const selectedPack = availablePackOptions.find(o => o?.documentId === data.packOption);
-        
+        const selectedDatePack = isDatesFlow
+            ? (availableDatePackOptions.find((o) => o.documentId === data.packOption) ?? null)
+            : null;
+
+        const packLabel = isDatesFlow
+            ? selectedDatePack?.displayLabel ||
+              formatDatePackOption(selectedDatePack as DatePackOption)
+            : selectedNonDatePack
+              ? formatNonDatePackOption(selectedNonDatePack)
+              : data.size;
+
         const subject = `Inquiry: ${offering.product?.name} - ${offering.brand?.name}`;
         const body = `Hello, I am interested in:
 Product: ${offering.product?.name}
 Brand: ${offering.brand?.name}
-Grade: ${data.grade}
-Size: ${data.size}
-Packaging: ${selectedPack?.displayLabel || data.packOption}
+${isDatesFlow ? `Grade: ${data.grade}\nSize: ${data.size}\n` : ""}Packaging: ${packLabel}
 Quantity: ${data.quantity}
 
 My Details:
@@ -129,19 +253,27 @@ Email: ${data.email}
 Message:
 ${data.message}`;
 
-        window.location.href = `mailto:sales@gfm.jo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = `mailto:sales@gfm.jo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.assign(mailtoUrl);
         onClose();
     };
 
     const onSubmitWhatsApp = (data: OrderFormValues) => {
-        const selectedPack = availablePackOptions.find(o => o?.documentId === data.packOption);
+        const selectedDatePack = isDatesFlow
+            ? (availableDatePackOptions.find((o) => o.documentId === data.packOption) ?? null)
+            : null;
+
+        const packLabel = isDatesFlow
+            ? selectedDatePack?.displayLabel ||
+              formatDatePackOption(selectedDatePack as DatePackOption)
+            : selectedNonDatePack
+              ? formatNonDatePackOption(selectedNonDatePack)
+              : data.size;
 
         const text = `Hello, I am interested in:
 *Product:* ${offering.product?.name}
 *Brand:* ${offering.brand?.name}
-*Grade:* ${data.grade}
-*Size:* ${data.size}
-*Packaging:* ${selectedPack?.displayLabel || data.packOption}
+${isDatesFlow ? `*Grade:* ${data.grade}\n*Size:* ${data.size}\n` : ""}*Packaging:* ${packLabel}
 *Quantity:* ${data.quantity}
 
 *My Details:*
@@ -173,15 +305,20 @@ ${data.message}`;
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
+
             <form>
                 <DialogContent dividers>
                     <Stack spacing={3}>
-                        {/* Product Summary */}
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                             {offering.product?.image && (
                                 <StrapiImage
                                     media={offering.product.image}
-                                    sx={{ width: 60, height: 60, borderRadius: 1, objectFit: "cover" }}
+                                    sx={{
+                                        width: 60,
+                                        height: 60,
+                                        borderRadius: 1,
+                                        objectFit: "cover",
+                                    }}
                                 />
                             )}
                             <Box>
@@ -200,7 +337,7 @@ ${data.message}`;
                             Specifications
                         </Typography>
 
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                        {isDatesFlow && (
                             <Controller
                                 name="grade"
                                 control={control}
@@ -215,65 +352,72 @@ ${data.message}`;
                                         helperText={errors.grade?.message}
                                     >
                                         {availableGrades.map((g) => (
-                                            <MenuItem key={g} value={g as string}>
+                                            <MenuItem key={g} value={g}>
                                                 {g}
                                             </MenuItem>
                                         ))}
                                     </TextField>
                                 )}
                             />
+                        )}
 
-                            <Controller
-                                name="size"
-                                control={control}
-                                rules={{ required: "Size is required" }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        select
-                                        fullWidth
-                                        label="Size"
-                                        disabled={!selectedGrade}
-                                        error={!!errors.size}
-                                        helperText={errors.size?.message}
-                                    >
-                                        {availableSizes.map((s) => (
-                                            <MenuItem key={s} value={s as string}>
-                                                {s}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                )}
-                            />
-                        </Stack>
-
+                        {/* Size (dates: real sizes, non-dates: pack option label choices) */}
                         <Controller
-                            name="packOption"
+                            name="size"
                             control={control}
-                            rules={{ required: "Packaging is required" }}
+                            rules={{ required: "Selection is required" }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     select
                                     fullWidth
-                                    label="Packaging Option"
-                                    disabled={!selectedSize}
-                                    error={!!errors.packOption}
-                                    helperText={errors.packOption?.message}
+                                    label={isDatesFlow ? "Size" : "Option"}
+                                    disabled={isDatesFlow ? !selectedGrade : false}
+                                    error={!!errors.size}
+                                    helperText={errors.size?.message}
                                 >
-                                    {availablePackOptions.map((opt) => (
-                                        <MenuItem key={opt.documentId} value={opt.documentId}>
-                                            {opt.displayLabel || `${opt.amount} ${opt.unit}`}
+                                    {availableSizes.map((opt) => (
+                                        <MenuItem key={opt.value} value={opt.value}>
+                                            {opt.label}
                                         </MenuItem>
                                     ))}
                                 </TextField>
                             )}
                         />
 
+                        {/* Packaging only for dates */}
+                        {isDatesFlow && (
+                            <Controller
+                                name="packOption"
+                                control={control}
+                                rules={{ required: "Packaging is required" }}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        fullWidth
+                                        label="Packaging Option"
+                                        disabled={!selectedSize}
+                                        error={!!errors.packOption}
+                                        helperText={errors.packOption?.message}
+                                    >
+                                        {availableDatePackOptions.map((opt) => (
+                                            <MenuItem key={opt.documentId} value={opt.documentId}>
+                                                {opt.displayLabel || formatDatePackOption(opt)}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                )}
+                            />
+                        )}
+
                         <Controller
                             name="quantity"
                             control={control}
-                            rules={{ required: "Quantity is required", min: { value: 1, message: "Min quantity is 1" } }}
+                            rules={{
+                                required: "Quantity is required",
+                                min: { value: 1, message: "Min quantity is 1" },
+                            }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
@@ -293,7 +437,7 @@ ${data.message}`;
                         </Typography>
 
                         <TextField
-                            {...control.register("name", { required: "Name is required" })}
+                            {...register("name", { required: "Name is required" })}
                             fullWidth
                             label="Full Name"
                             error={!!errors.name}
@@ -302,9 +446,9 @@ ${data.message}`;
 
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                             <TextField
-                                {...control.register("email", { 
+                                {...register("email", {
                                     required: "Email is required",
-                                    pattern: { value: /^\S+@\S+$/i, message: "Invalid email" }
+                                    pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
                                 })}
                                 fullWidth
                                 label="Email Address"
@@ -312,14 +456,14 @@ ${data.message}`;
                                 helperText={errors.email?.message}
                             />
                             <TextField
-                                {...control.register("company")}
+                                {...register("company")}
                                 fullWidth
                                 label="Company (Optional)"
                             />
                         </Stack>
 
                         <TextField
-                            {...control.register("message")}
+                            {...register("message")}
                             fullWidth
                             label="Additional Message"
                             multiline
@@ -327,35 +471,37 @@ ${data.message}`;
                         />
                     </Stack>
                 </DialogContent>
-            <Box sx={{ p: 2, pt: 0 }}>
-                <Stack direction="row" spacing={2}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        startIcon={<EmailIcon />}
-                        onClick={handleSubmit(onSubmitEmail)}
-                        sx={{ fontWeight: 900, py: 1.5 }}
-                    >
-                        Inquire via Email
-                    </Button>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="success"
-                        startIcon={<WhatsAppIcon />}
-                        onClick={handleSubmit(onSubmitWhatsApp)}
-                        sx={{
-                            fontWeight: 900,
-                            py: 1.5,
-                            bgcolor: "#25D366",
-                            "&:hover": { bgcolor: "#128C7E" },
-                        }}
-                    >
-                        WhatsApp
-                    </Button>
-                </Stack>
-            </Box>
+
+                <Box sx={{ p: 2, pt: 0 }}>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            startIcon={<EmailIcon />}
+                            onClick={handleSubmit(onSubmitEmail)}
+                            sx={{ fontWeight: 900, py: 1.5 }}
+                        >
+                            Inquire via Email
+                        </Button>
+
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="success"
+                            startIcon={<WhatsAppIcon />}
+                            onClick={handleSubmit(onSubmitWhatsApp)}
+                            sx={{
+                                fontWeight: 900,
+                                py: 1.5,
+                                bgcolor: "#25D366",
+                                "&:hover": { bgcolor: "#128C7E" },
+                            }}
+                        >
+                            WhatsApp
+                        </Button>
+                    </Stack>
+                </Box>
             </form>
         </Dialog>
     );

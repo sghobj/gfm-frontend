@@ -38,10 +38,10 @@ export const Brands = ({ brands }: BrandsProps) => {
                     sx={{
                         position: "absolute",
                         inset: 0,
-                        background:
-                            "radial-gradient(800px 400px at 90% 80%, rgba(99,102,241,0.04), transparent 70%)," +
-                            "radial-gradient(600px 400px at 10% 20%, rgba(16,185,129,0.04), transparent 70%)," +
-                            "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,250,252,1) 100%)",
+                        // background:
+                        //     "radial-gradient(800px 400px at 90% 80%, rgba(99,102,241,0.04), transparent 70%)," +
+                        //     "radial-gradient(600px 400px at 10% 20%, rgba(16,185,129,0.04), transparent 70%)," +
+                        //     "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,250,252,1) 100%)",
                         zIndex: 0,
                     }}
                 />
@@ -92,26 +92,31 @@ export const Brands = ({ brands }: BrandsProps) => {
                             </Stack>
                         </Grid>
 
-                        {/* Right Column: Logo Grid */}
                         <Grid size={{ xs: 12, lg: 7 }}>
-                            <Stack
-                                direction={{ xs: "column", sm: "row" }}
-                                spacing={{ xs: 6, md: 8 }}
-                                alignItems="center"
-                                justifyContent={{ xs: "center", lg: "flex-start" }}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    gap: 6,
+                                }}
                             >
-                                {/* Prominent First Brand */}
+                                {/* Prominent First Brand - Featured Label */}
                                 {sortedBrands[0] && (
                                     <Box
                                         sx={{
+                                            position: "relative",
+                                            width: "100%",
+                                            maxWidth: 600,
                                             display: "flex",
+                                            flexDirection: "column",
                                             alignItems: "center",
-                                            justifyContent: "center",
-                                            transition: "all 0.3s ease",
+                                            transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                                             "&:hover": {
-                                                transform: "translateY(-4px)",
+                                                transform: "translateY(-5px)",
                                                 "& img": {
-                                                    filter: "grayscale(0%) opacity(1)",
+                                                    transform: "scale(1.05)",
+                                                    filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.1))",
                                                 },
                                             },
                                         }}
@@ -126,27 +131,39 @@ export const Brands = ({ brands }: BrandsProps) => {
                                             }
                                             loading="lazy"
                                             sx={{
-                                                maxHeight: { xs: 140, md: 200 },
+                                                maxHeight: { xs: 160, md: 220 },
                                                 width: "100%",
-                                                maxWidth: 220,
+                                                maxWidth: 340,
                                                 objectFit: "contain",
-                                                filter: "grayscale(100%) opacity(0.6)",
-                                                transition: "all 0.3s ease",
+                                                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                mb: 2,
+                                                borderRadius: 3,
                                             }}
                                         />
+                                        <Typography
+                                            variant="h5"
+                                            sx={{
+                                                fontWeight: 900,
+                                                textAlign: "center",
+                                                color: "primary.main",
+                                                textTransform: "uppercase",
+                                                letterSpacing: 2,
+                                            }}
+                                        >
+                                            {sortedBrands[0].name}
+                                        </Typography>
                                     </Box>
                                 )}
 
-                                {/* Other Brands in a 3x1 line, centered vertically */}
+                                {/* Other Brands in a clean horizontal flex/wrap for modern look */}
                                 <Box
                                     sx={{
-                                        display: "grid",
-                                        gridTemplateColumns: {
-                                            xs: "repeat(2, 1fr)",
-                                            sm: "repeat(3, 1fr)",
-                                        },
-                                        gap: { xs: 4, md: 5 },
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: { xs: 3, md: 4 },
+                                        justifyContent: "center",
                                         alignItems: "center",
+                                        width: "100%",
                                     }}
                                 >
                                     {sortedBrands.slice(1).map((brand, idx) => (
@@ -154,13 +171,21 @@ export const Brands = ({ brands }: BrandsProps) => {
                                             key={brand?.documentId ?? idx}
                                             sx={{
                                                 display: "flex",
+                                                flexDirection: "column",
                                                 alignItems: "center",
                                                 justifyContent: "center",
+                                                minWidth: { xs: 120, md: 150 },
                                                 transition: "all 0.3s ease",
+                                                cursor: "default",
                                                 "&:hover": {
                                                     transform: "translateY(-4px)",
                                                     "& img": {
-                                                        filter: "grayscale(0%) opacity(1)",
+                                                        opacity: 1,
+                                                        filter: "grayscale(0%) drop-shadow(0 10px 15px rgba(0,0,0,0.05))",
+                                                    },
+                                                    "& .brand-name": {
+                                                        color: "primary.main",
+                                                        opacity: 1,
                                                     },
                                                 },
                                             }}
@@ -175,18 +200,37 @@ export const Brands = ({ brands }: BrandsProps) => {
                                                 }
                                                 loading="lazy"
                                                 sx={{
-                                                    maxHeight: { xs: 60, md: 80 },
+                                                    maxHeight: { xs: 60, md: 75 },
                                                     width: "100%",
-                                                    maxWidth: 160,
+                                                    maxWidth: 140,
                                                     objectFit: "contain",
-                                                    filter: "grayscale(100%) opacity(0.6)",
-                                                    transition: "all 0.3s ease",
+                                                    opacity: 0.6,
+                                                    // filter: "grayscale(100%)",
+                                                    transition: "all 0.4s ease",
+                                                    mb: 1.5,
+                                                    borderRadius: 3,
                                                 }}
                                             />
+                                            <Typography
+                                                variant="caption"
+                                                className="brand-name"
+                                                sx={{
+                                                    fontWeight: 700,
+                                                    textAlign: "center",
+                                                    color: "text.secondary",
+                                                    textTransform: "uppercase",
+                                                    letterSpacing: 1,
+                                                    fontSize: "0.65rem",
+                                                    opacity: 0.7,
+                                                    transition: "all 0.3s ease",
+                                                }}
+                                            >
+                                                {brand?.name}
+                                            </Typography>
                                         </Box>
                                     ))}
                                 </Box>
-                            </Stack>
+                            </Box>
                         </Grid>
                     </Grid>
                 </Container>

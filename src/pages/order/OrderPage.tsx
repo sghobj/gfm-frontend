@@ -85,7 +85,9 @@ export const OrderPage = () => {
 
     const availablePackOptions = useMemo(() => {
         if (!selectedGrade || !selectedSize) return [];
-        const currentSpec = specs.find((s) => s?.grade === selectedGrade && s?.sizes === selectedSize);
+        const currentSpec = specs.find(
+            (s) => s?.grade === selectedGrade && s?.sizes === selectedSize,
+        );
         return currentSpec?.pack_options?.filter((o): o is NonNullable<typeof o> => !!o) || [];
     }, [specs, selectedGrade, selectedSize]);
 
@@ -105,9 +107,9 @@ export const OrderPage = () => {
         console.log("Submitting Official Order:", data);
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        
+
         // After DB save, also send email to sales
-        const selectedPack = availablePackOptions.find(o => o?.documentId === data.packOption);
+        const selectedPack = availablePackOptions.find((o) => o?.documentId === data.packOption);
         const subject = `OFFICIAL ORDER: ${offering?.product?.name} - ${offering?.brand?.name}`;
         const body = `Official Order Submitted:
 Product: ${offering?.product?.name}
@@ -132,14 +134,28 @@ ${data.message}`;
     if (!isSecret) {
         return (
             <Container sx={{ py: 20, textAlign: "center" }}>
-                <Typography variant="h4" fontWeight={900}>Access Denied</Typography>
-                <Typography color="text.secondary">This order form is private. Please contact us to get a valid link.</Typography>
+                <Typography variant="h4" fontWeight={900}>
+                    Access Denied
+                </Typography>
+                <Typography color="text.secondary">
+                    This order form is private. Please contact us to get a valid link.
+                </Typography>
             </Container>
         );
     }
 
-    if (loading) return <Box sx={{ py: 20, textAlign: "center" }}><CircularProgress /></Box>;
-    if (error || !offering) return <Box sx={{ py: 20, textAlign: "center" }}><Typography color="error">Error loading product</Typography></Box>;
+    if (loading)
+        return (
+            <Box sx={{ py: 20, textAlign: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
+    if (error || !offering)
+        return (
+            <Box sx={{ py: 20, textAlign: "center" }}>
+                <Typography color="error">Error loading product</Typography>
+            </Box>
+        );
 
     return (
         <Scheme id={1}>
@@ -147,7 +163,12 @@ ${data.message}`;
                 <Paper elevation={4} sx={{ p: { xs: 3, md: 6 }, borderRadius: 4 }}>
                     <Stack spacing={4}>
                         <Box textAlign="center">
-                            <Typography variant="overline" color="primary" fontWeight={800} sx={{ letterSpacing: 2 }}>
+                            <Typography
+                                variant="overline"
+                                color="primary"
+                                fontWeight={800}
+                                sx={{ letterSpacing: 2 }}
+                            >
                                 Official Order Form
                             </Typography>
                             <Typography variant="h3" fontWeight={900}>
@@ -162,8 +183,13 @@ ${data.message}`;
 
                         {isSubmitSuccessful ? (
                             <Alert severity="success" sx={{ py: 4, borderRadius: 2 }}>
-                                <Typography variant="h6" fontWeight={800}>Order Submitted Successfully!</Typography>
-                                <Typography>Your order has been saved in our system and sent to the sales department. We will contact you shortly for confirmation.</Typography>
+                                <Typography variant="h6" fontWeight={800}>
+                                    Order Submitted Successfully!
+                                </Typography>
+                                <Typography>
+                                    Your order has been saved in our system and sent to the sales
+                                    department. We will contact you shortly for confirmation.
+                                </Typography>
                             </Alert>
                         ) : (
                             <form onSubmit={handleSubmit(onSubmit)}>
@@ -173,21 +199,49 @@ ${data.message}`;
                                             {offering.product?.image && (
                                                 <StrapiImage
                                                     media={offering.product.image}
-                                                    sx={{ width: "100%", borderRadius: 2, aspectRatio: "1/1", objectFit: "cover" }}
+                                                    sx={{
+                                                        width: "100%",
+                                                        borderRadius: 2,
+                                                        aspectRatio: "1/1",
+                                                        objectFit: "cover",
+                                                    }}
                                                 />
                                             )}
                                         </Grid>
                                         <Grid size={{ xs: 12, md: 8 }}>
                                             <Stack spacing={3}>
-                                                <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>Specifications</Typography>
-                                                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    fontWeight={800}
+                                                    sx={{ mb: -1 }}
+                                                >
+                                                    Specifications
+                                                </Typography>
+                                                <Stack
+                                                    direction={{ xs: "column", sm: "row" }}
+                                                    spacing={2}
+                                                >
                                                     <Controller
                                                         name="grade"
                                                         control={control}
                                                         rules={{ required: "Grade is required" }}
                                                         render={({ field }) => (
-                                                            <TextField {...field} select fullWidth label="Grade" error={!!errors.grade} helperText={errors.grade?.message}>
-                                                                {availableGrades.map((g) => <MenuItem key={g} value={g as string}>{g}</MenuItem>)}
+                                                            <TextField
+                                                                {...field}
+                                                                select
+                                                                fullWidth
+                                                                label="Grade"
+                                                                error={!!errors.grade}
+                                                                helperText={errors.grade?.message}
+                                                            >
+                                                                {availableGrades.map((g) => (
+                                                                    <MenuItem
+                                                                        key={g}
+                                                                        value={g as string}
+                                                                    >
+                                                                        {g}
+                                                                    </MenuItem>
+                                                                ))}
                                                             </TextField>
                                                         )}
                                                     />
@@ -196,8 +250,23 @@ ${data.message}`;
                                                         control={control}
                                                         rules={{ required: "Size is required" }}
                                                         render={({ field }) => (
-                                                            <TextField {...field} select fullWidth label="Size" disabled={!selectedGrade} error={!!errors.size} helperText={errors.size?.message}>
-                                                                {availableSizes.map((s) => <MenuItem key={s} value={s as string}>{s}</MenuItem>)}
+                                                            <TextField
+                                                                {...field}
+                                                                select
+                                                                fullWidth
+                                                                label="Size"
+                                                                disabled={!selectedGrade}
+                                                                error={!!errors.size}
+                                                                helperText={errors.size?.message}
+                                                            >
+                                                                {availableSizes.map((s) => (
+                                                                    <MenuItem
+                                                                        key={s}
+                                                                        value={s as string}
+                                                                    >
+                                                                        {s}
+                                                                    </MenuItem>
+                                                                ))}
                                                             </TextField>
                                                         )}
                                                     />
@@ -207,10 +276,22 @@ ${data.message}`;
                                                     control={control}
                                                     rules={{ required: "Packaging is required" }}
                                                     render={({ field }) => (
-                                                        <TextField {...field} select fullWidth label="Packaging Option" disabled={!selectedSize} error={!!errors.packOption} helperText={errors.packOption?.message}>
+                                                        <TextField
+                                                            {...field}
+                                                            select
+                                                            fullWidth
+                                                            label="Packaging Option"
+                                                            disabled={!selectedSize}
+                                                            error={!!errors.packOption}
+                                                            helperText={errors.packOption?.message}
+                                                        >
                                                             {availablePackOptions.map((opt) => (
-                                                                <MenuItem key={opt.documentId} value={opt.documentId}>
-                                                                    {opt.displayLabel || `${opt.amount} ${opt.unit}`}
+                                                                <MenuItem
+                                                                    key={opt.documentId}
+                                                                    value={opt.documentId}
+                                                                >
+                                                                    {opt.displayLabel ||
+                                                                        `${opt.amount} ${opt.unit}`}
                                                                 </MenuItem>
                                                             ))}
                                                         </TextField>
@@ -219,9 +300,22 @@ ${data.message}`;
                                                 <Controller
                                                     name="quantity"
                                                     control={control}
-                                                    rules={{ required: "Quantity is required", min: { value: 1, message: "Min quantity is 1" } }}
+                                                    rules={{
+                                                        required: "Quantity is required",
+                                                        min: {
+                                                            value: 1,
+                                                            message: "Min quantity is 1",
+                                                        },
+                                                    }}
                                                     render={({ field }) => (
-                                                        <TextField {...field} type="number" fullWidth label="Order Quantity" error={!!errors.quantity} helperText={errors.quantity?.message} />
+                                                        <TextField
+                                                            {...field}
+                                                            type="number"
+                                                            fullWidth
+                                                            label="Order Quantity"
+                                                            error={!!errors.quantity}
+                                                            helperText={errors.quantity?.message}
+                                                        />
                                                     )}
                                                 />
                                             </Stack>
@@ -230,20 +324,59 @@ ${data.message}`;
 
                                     <Divider />
 
-                                    <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>Customer Information</Typography>
-                                    <TextField {...register("name", { required: "Name is required" })} fullWidth label="Full Name" error={!!errors.name} helperText={errors.name?.message} />
+                                    <Typography
+                                        variant="subtitle1"
+                                        fontWeight={800}
+                                        sx={{ mb: -1 }}
+                                    >
+                                        Customer Information
+                                    </Typography>
+                                    <TextField
+                                        {...register("name", { required: "Name is required" })}
+                                        fullWidth
+                                        label="Full Name"
+                                        error={!!errors.name}
+                                        helperText={errors.name?.message}
+                                    />
                                     <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                                        <TextField {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })} fullWidth label="Email Address" error={!!errors.email} helperText={errors.email?.message} />
-                                        <TextField {...register("company")} fullWidth label="Company Name" />
+                                        <TextField
+                                            {...register("email", {
+                                                required: "Email is required",
+                                                pattern: {
+                                                    value: /^\S+@\S+$/i,
+                                                    message: "Invalid email",
+                                                },
+                                            })}
+                                            fullWidth
+                                            label="Email Address"
+                                            error={!!errors.email}
+                                            helperText={errors.email?.message}
+                                        />
+                                        <TextField
+                                            {...register("company")}
+                                            fullWidth
+                                            label="Company Name"
+                                        />
                                     </Stack>
-                                    <TextField {...register("message")} fullWidth label="Notes / Special Instructions" multiline rows={4} />
+                                    <TextField
+                                        {...register("message")}
+                                        fullWidth
+                                        label="Notes / Special Instructions"
+                                        multiline
+                                        rows={4}
+                                    />
 
                                     <Button
                                         type="submit"
                                         variant="contained"
                                         size="large"
                                         disabled={isSubmitting}
-                                        sx={{ py: 2, fontWeight: 900, fontSize: "1.2rem", borderRadius: 2 }}
+                                        sx={{
+                                            py: 2,
+                                            fontWeight: 900,
+                                            fontSize: "1.2rem",
+                                            borderRadius: 2,
+                                        }}
                                     >
                                         {isSubmitting ? "Submitting..." : "Submit Official Order"}
                                     </Button>

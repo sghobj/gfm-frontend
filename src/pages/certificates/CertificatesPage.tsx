@@ -25,7 +25,7 @@ import { useQuery } from "@apollo/client/react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 
 import { CertificatesDocument, type CertificatesQuery } from "../../gql/graphql.ts";
-import { resolveStrapiMediaUrl } from "../../utils/strapiMedia";
+import { resolveStrapiMediaUrl, toSearchableText } from "../../utils/strapiMedia";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
@@ -51,17 +51,22 @@ export function CertificatesPage() {
 
     // Filtering
     const filteredCertificates = useMemo(() => {
-        const term = search.toLowerCase();
-        return certificates.filter((c) =>
-            c.name.toLowerCase().includes(term) ||
-            (c.description && c.description.toLowerCase().includes(term))
-        );
+        const term = search.trim().toLowerCase();
+        if (!term) return certificates;
+
+        return certificates.filter((c) => {
+            const name = (c.name ?? "").toLowerCase();
+
+            const descText = toSearchableText(c.description).toLowerCase();
+
+            return name.includes(term) || descText.includes(term);
+        });
     }, [certificates, search]);
 
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
             {/* Hero & Filters */}
-            <Scheme id={3} sx={{ color: "text.secondary" }}>
+            <Scheme id={3}>
                 <Box
                     sx={{
                         borderBottom: "1px solid rgba(255,255,255,0.1)",
@@ -78,12 +83,11 @@ export function CertificatesPage() {
                         }}
                     >
                         <Stack spacing={6}>
-                            <Stack spacing={2}>
-                                <SectionTitle>
-                                    Our Certifications
-                                </SectionTitle>
+                            <Stack spacing={2} sx={{ color: "text.primary" }}>
+                                <SectionTitle>Our Certifications</SectionTitle>
                                 <SectionSubtitle>
-                                    Upholding the highest international standards for food safety and organic integrity.
+                                    Upholding the highest international standards for food safety
+                                    and organic integrity.
                                 </SectionSubtitle>
                             </Stack>
 
@@ -146,7 +150,7 @@ export function CertificatesPage() {
                             filteredCertificates.map((cert) => (
                                 <Box key={cert.documentId}>
                                     <Grid container spacing={{ xs: 4, md: 10 }} alignItems="center">
-                                        <Grid size={{xs: 12, md: 4}} >
+                                        <Grid size={{ xs: 12, md: 4 }}>
                                             <Box
                                                 sx={{
                                                     bgcolor: "white",
@@ -162,7 +166,7 @@ export function CertificatesPage() {
                                                     "&:hover": {
                                                         boxShadow: "0 12px 40px rgba(0,0,0,0.06)",
                                                         borderColor: "primary.main",
-                                                    }
+                                                    },
                                                 }}
                                             >
                                                 <Box
@@ -178,7 +182,7 @@ export function CertificatesPage() {
                                                 />
                                             </Box>
                                         </Grid>
-                                        <Grid size={{xs: 12, md: 8}} >
+                                        <Grid size={{ xs: 12, md: 8 }}>
                                             <Stack spacing={4}>
                                                 <Stack spacing={2}>
                                                     <Typography
@@ -194,7 +198,9 @@ export function CertificatesPage() {
                                                     </Typography>
                                                     {cert.description && (
                                                         <BlocksTypography
-                                                            content={cert.description as BlocksContent}
+                                                            content={
+                                                                cert.description as BlocksContent
+                                                            }
                                                             paragraphSx={{
                                                                 fontSize: "1.1rem",
                                                                 lineHeight: 1.6,
@@ -206,14 +212,27 @@ export function CertificatesPage() {
                                                     )}
                                                 </Stack>
 
-                                                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                                                <Stack
+                                                    direction={{ xs: "column", sm: "row" }}
+                                                    spacing={2}
+                                                >
                                                     {cert.certificate?.url && (
                                                         <Button
                                                             variant="contained"
                                                             size="large"
                                                             startIcon={<VisibilityIcon />}
-                                                            onClick={() => setSelectedDoc({ url: cert.certificate!.url, name: cert.name })}
-                                                            sx={{ borderRadius: 2, fontWeight: 700, py: 1.5, px: 3 }}
+                                                            onClick={() =>
+                                                                setSelectedDoc({
+                                                                    url: cert.certificate!.url,
+                                                                    name: cert.name,
+                                                                })
+                                                            }
+                                                            sx={{
+                                                                borderRadius: 2,
+                                                                fontWeight: 700,
+                                                                py: 1.5,
+                                                                px: 3,
+                                                            }}
                                                         >
                                                             View Certificate
                                                         </Button>
@@ -223,8 +242,18 @@ export function CertificatesPage() {
                                                             variant="outlined"
                                                             size="large"
                                                             startIcon={<AssessmentIcon />}
-                                                            onClick={() => setSelectedDoc({ url: cert.audit_report!.url, name: `${cert.name} - Audit Report` })}
-                                                            sx={{ borderRadius: 2, fontWeight: 700, py: 1.5, px: 3 }}
+                                                            onClick={() =>
+                                                                setSelectedDoc({
+                                                                    url: cert.audit_report!.url,
+                                                                    name: `${cert.name} - Audit Report`,
+                                                                })
+                                                            }
+                                                            sx={{
+                                                                borderRadius: 2,
+                                                                fontWeight: 700,
+                                                                py: 1.5,
+                                                                px: 3,
+                                                            }}
                                                         >
                                                             Audit Report
                                                         </Button>
@@ -243,7 +272,7 @@ export function CertificatesPage() {
                                                             py: 1.5,
                                                             px: 3,
                                                             color: "text.secondary",
-                                                            "&:hover": { color: "primary.main" }
+                                                            "&:hover": { color: "primary.main" },
                                                         }}
                                                     >
                                                         Official Validation
@@ -266,10 +295,18 @@ export function CertificatesPage() {
                 maxWidth="lg"
                 fullWidth
                 PaperProps={{
-                    sx: { borderRadius: 4, height: "90vh" }
+                    sx: { borderRadius: 4, height: "90vh" },
                 }}
             >
-                <DialogTitle sx={{ m: 0, p: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <DialogTitle
+                    sx={{
+                        m: 0,
+                        p: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
                     <Typography component="span" variant="h6" fontWeight={800}>
                         {selectedDoc?.name}
                     </Typography>
@@ -300,12 +337,23 @@ export function CertificatesPage() {
                                 style={{ width: "100%", height: "calc(100% - 48px)", border: 0 }}
                             />
                         ) : (
-                            <Box sx={{ display: "flex", justifyContent: "center", p: 2, height: "100%" }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    p: 2,
+                                    height: "100%",
+                                }}
+                            >
                                 <Box
                                     component="img"
                                     src={resolveStrapiMediaUrl(selectedDoc.url)}
                                     alt={selectedDoc.name}
-                                    sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+                                    sx={{
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                        objectFit: "contain",
+                                    }}
                                 />
                             </Box>
                         )

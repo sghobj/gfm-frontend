@@ -7,3 +7,14 @@ export function resolveStrapiMediaUrl(url?: string | undefined) {
     const base = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337";
     return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
 }
+
+export function toSearchableText(value: unknown): string {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    // Strapi Blocks / rich content often comes as arrays/objects
+    try {
+        return JSON.stringify(value);
+    } catch {
+        return "";
+    }
+}

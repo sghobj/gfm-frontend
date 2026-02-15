@@ -10,7 +10,7 @@ import { AboutDocument } from "../../gql/graphql";
 import type { AboutQuery } from "../../gql/graphql.ts";
 import { Mission } from "./sections/Mission.tsx";
 import { Landing } from "./sections/Landing.tsx";
-import {WhyUs} from "./sections/WhyUs.tsx";
+import { WhyUs } from "./sections/WhyUs.tsx";
 
 export type AboutState = AboutQuery["about"];
 
@@ -37,21 +37,13 @@ export const About = () => {
 
             {aboutData?.mission ? <Mission data={aboutData?.mission} /> : null}
 
-            {aboutData?.vision ? (
-                <VisionSection data={aboutData?.vision} />
-            ) : null}
+            {aboutData?.vision ? <VisionSection data={aboutData?.vision} /> : null}
 
             {aboutData?.values ? <ValuesSection data={aboutData?.values} /> : null}
 
-            {aboutData?.whyUs ? (
+            {aboutData?.whyUs ? <WhyUs data={aboutData.whyUs} /> : null}
 
-                        <WhyUs data={aboutData?.whyUs} />
-
-            ) : null}
-
-            {aboutData?.csr ? (
-                    <CsrSection data={aboutData?.csr} />
-            ) : null}
+            {aboutData?.csr ? <CsrSection data={aboutData?.csr} /> : null}
         </Box>
     );
 };

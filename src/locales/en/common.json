@@ -3,7 +3,8 @@
         "home": "Home",
         "about": "About",
         "contact": "Contact Us",
-        "products": "Our Products"
+        "products": "Our Products",
+        "certificates": "Our Certificates"
     },
     "actions": {
         "login": "Login",

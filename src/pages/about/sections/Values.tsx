@@ -1,11 +1,11 @@
-import {
-    Typography,
-    Stack, Box, Divider,
-} from "@mui/material";
+import { Typography, Stack, Box, Divider } from "@mui/material";
 import type { AboutQuery } from "../../../gql/graphql.ts";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
-import {BlocksTypography} from "../../../components/typography/BlocksTypography.tsx";
-import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography.tsx";
+import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
+import {
+    SectionSubtitle,
+    SectionTitle,
+} from "../../../components/typography/SectionTypography.tsx";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
 
 type ValuesType = NonNullable<AboutQuery["about"]>["values"];
@@ -15,7 +15,6 @@ type ValuesSectionProps = {
 };
 
 export const ValuesSection = ({ data }: ValuesSectionProps) => {
-
     const values = data?.values ?? [];
 
     return (
@@ -24,12 +23,8 @@ export const ValuesSection = ({ data }: ValuesSectionProps) => {
             reverse={{ xs: false, lg: true }}
             left={
                 <Stack>
-                    <SectionTitle>
-                        {data?.general?.title}
-                    </SectionTitle>
-                    <SectionSubtitle>
-                        {data?.general?.subtitle}
-                    </SectionSubtitle>
+                    <SectionTitle>{data?.general?.title}</SectionTitle>
+                    <SectionSubtitle>{data?.general?.subtitle}</SectionSubtitle>
                 </Stack>
             }
             right={
@@ -53,7 +48,6 @@ export const ValuesSection = ({ data }: ValuesSectionProps) => {
                         }}
                     />
                     {values.map((item) => {
-
                         return (
                             <Box
                                 key={item?.title}
@@ -66,10 +60,11 @@ export const ValuesSection = ({ data }: ValuesSectionProps) => {
                                     overflowWrap: "anywhere",
                                 }}
                             >
-                                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>{item?.title}</Typography>
+                                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                                    {item?.title}
+                                </Typography>
                                 <Typography variant="body1">{item?.value}</Typography>
                             </Box>
-
                         );
                     })}
                 </Stack>
@@ -77,4 +72,3 @@ export const ValuesSection = ({ data }: ValuesSectionProps) => {
         />
     );
 };
-

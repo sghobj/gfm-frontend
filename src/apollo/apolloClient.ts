@@ -3,7 +3,7 @@ import { SetContextLink } from "@apollo/client/link/context";
 import i18n from "i18next";
 
 const httpLink = new HttpLink({
-    uri: import.meta.env.VITE_STRAPI_GRAPHQL_URL ?? "http://localhost:1337/graphql",
+    uri: `${import.meta.env.VITE_STRAPI_URL}/graphql`,
 });
 
 const localeLink = new SetContextLink((prevContext) => {
