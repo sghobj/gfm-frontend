@@ -24,7 +24,7 @@ import { BlocksTypography } from "../../components/typography/BlocksTypography.t
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { useQuery } from "@apollo/client/react";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function initials(name: string) {
     return name
@@ -46,7 +46,7 @@ export const ProductDetails = () => {
 
     const offering = data?.offering;
 
-    const images =useMemo(() => {
+    const images = useMemo(() => {
         const list = [];
         if (offering?.images && offering.images.length > 0) {
             list.push(...offering.images.filter(Boolean));
@@ -56,7 +56,7 @@ export const ProductDetails = () => {
         return list;
     }, [offering]);
 
-    const [activeImg, setActiveImg] = useState<any>(null);
+    const [activeImg, setActiveImg] = useState<(typeof images)[number] | null>(null);
     const [orderModalOpen, setOrderModalOpen] = useState(false);
 
     useEffect(() => {
@@ -91,31 +91,44 @@ export const ProductDetails = () => {
             <HeroSection
                 title={offering.product?.name || "Product Details"}
                 subtitle={offering.product?.category?.name || ""}
-                image={resolveStrapiMediaUrl(images[0]?.url) || "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop"}
+                image={
+                    resolveStrapiMediaUrl(images[0]?.url) ||
+                    "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop"
+                }
                 height={{ xs: "40vh", md: "50vh" }}
             >
                 <Breadcrumbs
                     aria-label="breadcrumb"
                     sx={{
                         color: "white",
-                        "& .MuiBreadcrumbs-separator": { color: "rgba(255,255,255,0.7)" }
+                        "& .MuiBreadcrumbs-separator": { color: "rgba(255,255,255,0.7)" },
                     }}
                 >
                     <Link
                         underline="hover"
                         onClick={() => navigate("/")}
-                        sx={{ cursor: 'pointer', color: "rgba(255,255,255,0.8)", "&:hover": { color: "white" } }}
+                        sx={{
+                            cursor: "pointer",
+                            color: "rgba(255,255,255,0.8)",
+                            "&:hover": { color: "white" },
+                        }}
                     >
                         Home
                     </Link>
                     <Link
                         underline="hover"
                         onClick={() => navigate("/products")}
-                        sx={{ cursor: 'pointer', color: "rgba(255,255,255,0.8)", "&:hover": { color: "white" } }}
+                        sx={{
+                            cursor: "pointer",
+                            color: "rgba(255,255,255,0.8)",
+                            "&:hover": { color: "white" },
+                        }}
                     >
                         Products
                     </Link>
-                    <Typography sx={{ color: "white", fontWeight: 700 }}>{offering.product?.name}</Typography>
+                    <Typography sx={{ color: "white", fontWeight: 700 }}>
+                        {offering.product?.name}
+                    </Typography>
                 </Breadcrumbs>
             </HeroSection>
             <Scheme id={1}>
@@ -188,7 +201,8 @@ export const ProductDetails = () => {
                                                                         img === activeImg
                                                                             ? "primary.main"
                                                                             : "divider",
-                                                                    opacity: img === activeImg ? 1 : 0.6,
+                                                                    opacity:
+                                                                        img === activeImg ? 1 : 0.6,
                                                                     bgcolor: "white",
                                                                     p: 1,
                                                                     transition: "all 0.2s ease",
@@ -301,54 +315,137 @@ export const ProductDetails = () => {
                                                 >
                                                     Availability & Specifications
                                                 </Typography>
-                                                <Stack spacing={3}>
-                                                    {offering.dateSpecifications?.map(
-                                                        (spec, sIdx) => (
-                                                            <Box
-                                                                key={sIdx}
-                                                                sx={{
-                                                                    p: 2,
-                                                                    borderRadius: 2,
-                                                                    bgcolor: "background.paper",
-                                                                    border: "1px solid",
-                                                                    borderColor: "divider",
-                                                                }}
+
+                                                {offering.isMedjoolDate ? (
+                                                    <Stack spacing={3}>
+                                                        {(offering.dateSpecifications ?? [])
+                                                            .filter(Boolean)
+                                                            .map((spec, sIdx) => {
+                                                                const grade = spec?.grade ?? "";
+                                                                const size = spec?.sizes ?? "";
+                                                                const opts = (
+                                                                    spec?.pack_options ?? []
+                                                                ).filter(Boolean);
+
+                                                                if (
+                                                                    !grade &&
+                                                                    !size &&
+                                                                    opts.length === 0
+                                                                )
+                                                                    return null;
+
+                                                                return (
+                                                                    <Box
+                                                                        key={sIdx}
+                                                                        sx={{
+                                                                            p: 2,
+                                                                            borderRadius: 2,
+                                                                            bgcolor:
+                                                                                "background.paper",
+                                                                            border: "1px solid",
+                                                                            borderColor: "divider",
+                                                                        }}
+                                                                    >
+                                                                        <Typography
+                                                                            variant="subtitle2"
+                                                                            fontWeight={800}
+                                                                            color="primary.main"
+                                                                            gutterBottom
+                                                                        >
+                                                                            {grade}{" "}
+                                                                            {grade && size
+                                                                                ? " - "
+                                                                                : ""}{" "}
+                                                                            {size}
+                                                                        </Typography>
+
+                                                                        <Stack
+                                                                            direction="row"
+                                                                            spacing={1}
+                                                                            flexWrap="wrap"
+                                                                            useFlexGap
+                                                                            sx={{ gap: 1, mt: 1 }}
+                                                                        >
+                                                                            {opts.map(
+                                                                                (opt, oIdx) => {
+                                                                                    const label =
+                                                                                        opt?.displayLabel ||
+                                                                                        (opt?.amountMin !=
+                                                                                            null &&
+                                                                                        opt?.amountMax !=
+                                                                                            null
+                                                                                            ? `${opt.amountMin}-${opt.amountMax} ${opt.unit ?? ""}`.trim()
+                                                                                            : `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim()) ||
+                                                                                        "Option";
+
+                                                                                    return (
+                                                                                        <Chip
+                                                                                            key={`${sIdx}-${oIdx}`}
+                                                                                            label={
+                                                                                                label
+                                                                                            }
+                                                                                            variant="outlined"
+                                                                                            sx={{
+                                                                                                fontWeight: 600,
+                                                                                            }}
+                                                                                        />
+                                                                                    );
+                                                                                },
+                                                                            )}
+                                                                        </Stack>
+                                                                    </Box>
+                                                                );
+                                                            })}
+
+                                                        {(!offering.dateSpecifications ||
+                                                            offering.dateSpecifications.length ===
+                                                                0) && (
+                                                            <Typography
+                                                                color="text.secondary"
+                                                                sx={{ fontStyle: "italic" }}
                                                             >
-                                                                <Typography
-                                                                    variant="subtitle2"
-                                                                    fontWeight={800}
-                                                                    color="primary.main"
-                                                                    gutterBottom
-                                                                >
-                                                                    {spec?.grade} - {spec?.sizes}
-                                                                </Typography>
-                                                                <Stack
-                                                                    direction="row"
-                                                                    spacing={1}
-                                                                    flexWrap="wrap"
-                                                                    useFlexGap
-                                                                    sx={{ gap: 1, mt: 1 }}
-                                                                >
-                                                                    {spec?.pack_options?.map(
-                                                                        (opt, oIdx) => (
-                                                                            <Chip
-                                                                                key={oIdx}
-                                                                                label={
-                                                                                    opt?.displayLabel ||
-                                                                                    `${opt?.amount} ${opt?.unit}`
-                                                                                }
-                                                                                variant="outlined"
-                                                                                sx={{
-                                                                                    fontWeight: 600,
-                                                                                }}
-                                                                            />
-                                                                        ),
-                                                                    )}
-                                                                </Stack>
-                                                            </Box>
-                                                        ),
-                                                    )}
-                                                </Stack>
+                                                                Contact for packaging details.
+                                                            </Typography>
+                                                        )}
+                                                    </Stack>
+                                                ) : (
+                                                    <Stack
+                                                        direction="row"
+                                                        spacing={1}
+                                                        flexWrap="wrap"
+                                                        useFlexGap
+                                                        sx={{ gap: 1 }}
+                                                    >
+                                                        {(offering.pack_options ?? []).filter(
+                                                            Boolean,
+                                                        ).length ? (
+                                                            (offering.pack_options ?? [])
+                                                                .filter(Boolean)
+                                                                .map((opt, idx) => {
+                                                                    const label =
+                                                                        opt?.displayLabel ||
+                                                                        `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim() ||
+                                                                        "Option";
+
+                                                                    return (
+                                                                        <Chip
+                                                                            key={idx}
+                                                                            label={label}
+                                                                            variant="outlined"
+                                                                            sx={{ fontWeight: 600 }}
+                                                                        />
+                                                                    );
+                                                                })
+                                                        ) : (
+                                                            <Typography
+                                                                color="text.secondary"
+                                                                sx={{ fontStyle: "italic" }}
+                                                            >
+                                                                Contact for packaging details.
+                                                            </Typography>
+                                                        )}
+                                                    </Stack>
+                                                )}
                                             </Box>
 
                                             <Box
@@ -360,7 +457,11 @@ export const ProductDetails = () => {
                                                     borderColor: "primary.200",
                                                 }}
                                             >
-                                                <Stack direction="row" spacing={2} alignItems="center">
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={2}
+                                                    alignItems="center"
+                                                >
                                                     <Box sx={{ fontSize: "2rem" }}>🌿</Box>
                                                     <Box>
                                                         <Typography
@@ -370,7 +471,10 @@ export const ProductDetails = () => {
                                                         >
                                                             Authentic Organic Produce
                                                         </Typography>
-                                                        <Typography variant="body2" color="primary.800">
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="primary.800"
+                                                        >
                                                             Sourced directly from certified organic
                                                             farms in Jordan.
                                                         </Typography>

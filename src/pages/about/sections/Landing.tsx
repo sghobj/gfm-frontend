@@ -4,7 +4,10 @@ import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
-import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography.tsx";
+import {
+    SectionSubtitle,
+    SectionTitle,
+} from "../../../components/typography/SectionTypography.tsx";
 
 type LandingType = NonNullable<AboutQuery["about"]>["landing"];
 
@@ -21,13 +24,9 @@ export const Landing = ({ data }: LandingProps) => {
             className="about-landing"
             left={
                 <Stack spacing={2}>
-                    <SectionTitle>
-                        {data?.title}
-                    </SectionTitle>
+                    <SectionTitle>{data?.title}</SectionTitle>
 
-                    <SectionSubtitle>
-                        {data?.subtitle}
-                    </SectionSubtitle>
+                    <SectionSubtitle>{data?.subtitle}</SectionSubtitle>
 
                     <BlocksTypography
                         content={landingText}

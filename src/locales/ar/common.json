@@ -3,7 +3,8 @@
         "home": "الرئيسية",
         "about": "من نحن",
         "contact": "اتصل بنا",
-        "products": "منتجاتنا"
+        "products": "منتجاتنا",
+        "certificates": "شهاداتنا"
     },
     "actions": {
         "login": "تسجيل الدخول",

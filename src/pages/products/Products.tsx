@@ -15,7 +15,8 @@ import {
     DialogTitle,
     IconButton,
     Button,
-    Chip, Divider,
+    Chip,
+    Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,13 +27,10 @@ import { useQuery } from "@apollo/client/react";
 
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
-import {
-    GetAllOfferingsDocument,
-    type GetAllOfferingsQuery,
-} from "../../gql/graphql.ts";
+import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../gql/graphql.ts";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
-import {Scheme} from "../../components/scheme/Scheme.tsx";
-import {SectionSubtitle, SectionTitle} from "../../components/typography/SectionTypography.tsx";
+import { Scheme } from "../../components/scheme/Scheme.tsx";
+import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 
 // ----------------------------
 // GraphQL Query
@@ -105,7 +103,8 @@ export function Products() {
                 o.product!.name.toLowerCase().includes(term) ||
                 o.brand!.name.toLowerCase().includes(term);
 
-            const matchesBrand = brandFilter === "all" || (o.brand!.slug || "unknown") === brandFilter;
+            const matchesBrand =
+                brandFilter === "all" || (o.brand!.slug || "unknown") === brandFilter;
 
             return matchesSearch && matchesBrand;
         });
@@ -148,9 +147,7 @@ export function Products() {
                     >
                         <Stack spacing={6}>
                             <Stack spacing={2}>
-                                <SectionTitle>
-                                    Our Products
-                                </SectionTitle>
+                                <SectionTitle>Our Products</SectionTitle>
                                 <SectionSubtitle>
                                     Experience the finest organic harvest from Jordan.
                                 </SectionSubtitle>
@@ -233,62 +230,72 @@ export function Products() {
 
                             return (
                                 <Box key={product.documentId}>
-                                        <Grid container spacing={{ xs: 4, md: 10 }} sx={{ mb: 6 }} alignItems="center">
-                                            {heroImage && (
-                                                <Grid size={{ xs: 12, md: 6 }}>
-                                                    <StrapiImage
-                                                        media={heroImage}
-                                                        alt={product.name}
+                                    <Grid
+                                        container
+                                        spacing={{ xs: 4, md: 10 }}
+                                        sx={{ mb: 6 }}
+                                        alignItems="center"
+                                    >
+                                        {heroImage && (
+                                            <Grid size={{ xs: 12, md: 6 }}>
+                                                <StrapiImage
+                                                    media={heroImage}
+                                                    alt={product.name}
+                                                    sx={{
+                                                        width: "100%",
+                                                        height: { xs: 250, md: 350 },
+                                                        objectFit: "cover",
+                                                        borderRadius: 2,
+                                                        filter: "grayscale(10%) contrast(1.1)",
+                                                        transition: "filter 0.3s ease",
+                                                        "&:hover": {
+                                                            filter: "none",
+                                                        },
+                                                    }}
+                                                />
+                                            </Grid>
+                                        )}
+                                        <Grid size={{ xs: 12, md: heroImage ? 6 : 12 }}>
+                                            <Stack spacing={3}>
+                                                <Stack spacing={0.5}>
+                                                    <Typography
+                                                        variant="overline"
+                                                        color="primary.main"
+                                                        fontWeight={800}
                                                         sx={{
-                                                            width: "100%",
-                                                            height: { xs: 250, md: 350 },
-                                                            objectFit: "cover",
-                                                            borderRadius: 2,
-                                                            filter: "grayscale(10%) contrast(1.1)",
-                                                            transition: "filter 0.3s ease",
-                                                            "&:hover": {
-                                                                filter: "none",
-                                                            },
+                                                            letterSpacing: "0.2em",
+                                                            opacity: 0.8,
+                                                        }}
+                                                    >
+                                                        {product.category?.name || "Other"}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="h4"
+                                                        fontWeight={900}
+                                                        sx={{
+                                                            letterSpacing: "-0.03em",
+                                                            fontSize: { xs: "2.25rem", md: "3rem" },
+                                                            lineHeight: 1.1,
+                                                        }}
+                                                    >
+                                                        {product.name}
+                                                    </Typography>
+                                                </Stack>
+                                                {product.description ? (
+                                                    <BlocksTypography
+                                                        content={
+                                                            product.description as BlocksContent
+                                                        }
+                                                        paragraphSx={{
+                                                            lineHeight: 1.4,
+                                                            color: "text.secondary",
+                                                            overflow: "hidden",
                                                         }}
                                                     />
-                                                </Grid>
-                                            )}
-                                            <Grid size={{ xs: 12, md: heroImage ? 6 : 12 }}>
-                                                <Stack spacing={3}>
-                                                    <Stack spacing={0.5}>
-                                                        <Typography
-                                                            variant="overline"
-                                                            color="primary.main"
-                                                            fontWeight={800}
-                                                            sx={{ letterSpacing: "0.2em", opacity: 0.8 }}
-                                                        >
-                                                            {product.category?.name || "Other"}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="h4"
-                                                            fontWeight={900}
-                                                            sx={{
-                                                                letterSpacing: "-0.03em",
-                                                                fontSize: { xs: "2.25rem", md: "3rem" },
-                                                                lineHeight: 1.1,
-                                                            }}
-                                                        >
-                                                            {product.name}
-                                                        </Typography>
-                                                    </Stack>
-                                                    {product.description ? (
-                                                        <BlocksTypography
-                                                            content={product.description as BlocksContent}
-                                                            paragraphSx={{
-                                                                lineHeight: 1.4,
-                                                                color: "text.secondary",
-                                                                overflow: "hidden",
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                </Stack>
-                                            </Grid>
+                                                ) : null}
+                                            </Stack>
                                         </Grid>
+                                    </Grid>
 
                                     {/* Brand offerings */}
                                     <Box
@@ -313,7 +320,8 @@ export function Products() {
                                                     onClick={() => setSelectedOffering(o)}
                                                     sx={{
                                                         cursor: "pointer",
-                                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                        transition:
+                                                            "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                                         "&:hover": {
                                                             transform: "translateY(-4px)",
                                                             "& .brand-cta": {
@@ -339,7 +347,8 @@ export function Products() {
                                                                 p: 3,
                                                                 border: "1px solid",
                                                                 borderColor: "transparent",
-                                                                transition: "border-color 0.3s ease",
+                                                                transition:
+                                                                    "border-color 0.3s ease",
                                                                 "&:hover": {
                                                                     borderColor: "primary.main",
                                                                 },
@@ -350,15 +359,16 @@ export function Products() {
                                                                     media={brand.logo}
                                                                     className="brand-logo"
                                                                     sx={{
-                                                                                 maxWidth: "100%",
-                                                                                 maxHeight: "100%",
-                                                                        width: 'auto', background: 'white',
+                                                                        maxWidth: "100%",
+                                                                        maxHeight: "100%",
+                                                                        width: "auto",
+                                                                        background: "white",
                                                                         borderRadius: 1,
-                                                                                 objectFit: "contain",
-                                                                                 filter: "grayscale(100%)",
-                                                                                 opacity: 0.6,
-                                                                                 transition: "all 0.3s ease",
-                                                                             }}
+                                                                        objectFit: "contain",
+                                                                        filter: "grayscale(100%)",
+                                                                        opacity: 0.6,
+                                                                        transition: "all 0.3s ease",
+                                                                    }}
                                                                 />
                                                             ) : (
                                                                 <Avatar
@@ -381,22 +391,32 @@ export function Products() {
                                                                 alignItems="flex-start"
                                                             >
                                                                 <Box>
-                                                                    <Typography variant="subtitle1" fontWeight={900}>
+                                                                    <Typography
+                                                                        variant="subtitle1"
+                                                                        fontWeight={900}
+                                                                    >
                                                                         {brand.name}
                                                                     </Typography>
                                                                     <Typography
                                                                         variant="caption"
                                                                         color="text.secondary"
-                                                                        sx={{ textTransform: "uppercase", letterSpacing: "0.1em" }}
+                                                                        sx={{
+                                                                            textTransform:
+                                                                                "uppercase",
+                                                                            letterSpacing: "0.1em",
+                                                                        }}
                                                                     >
                                                                         {product.name}
                                                                     </Typography>
                                                                 </Box>
                                                             </Stack>
 
-                                                {o.product?.description && (
+                                                            {o.product?.description && (
                                                                 <BlocksTypography
-                                                                    content={o.product?.description as BlocksContent}
+                                                                    content={
+                                                                        o.product
+                                                                            ?.description as BlocksContent
+                                                                    }
                                                                     paragraphSx={{
                                                                         mt: 1,
                                                                         fontSize: "0.85rem",
@@ -437,16 +457,17 @@ export function Products() {
                             );
                         })}
 
-                    {productsList.length === 0 && (
-                        <Box sx={{ py: 10, textAlign: "center" }}>
-                            <Typography variant="h5" fontWeight={900}>
-                                No results found
-                            </Typography>
-                            <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                Try adjusting your search or filters to find what you&apos;re looking for.
-                            </Typography>
-                        </Box>
-                    )}
+                        {productsList.length === 0 && (
+                            <Box sx={{ py: 10, textAlign: "center" }}>
+                                <Typography variant="h5" fontWeight={900}>
+                                    No results found
+                                </Typography>
+                                <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                    Try adjusting your search or filters to find what you&apos;re
+                                    looking for.
+                                </Typography>
+                            </Box>
+                        )}
                     </Stack>
                 )}
             </Container>
@@ -458,12 +479,20 @@ export function Products() {
                 maxWidth="md"
                 fullWidth
                 PaperProps={{
-                    sx: { borderRadius: 3, p: 1, background: 'white' },
+                    sx: { borderRadius: 3, p: 1, background: "white" },
                 }}
             >
                 {selectedOffering && (
                     <>
-                        <DialogTitle sx={{ m: 0, p: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <DialogTitle
+                            sx={{
+                                m: 0,
+                                p: 2,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
                             <Typography variant="h6" fontWeight={900}>
                                 Product Overview
                             </Typography>
@@ -493,14 +522,27 @@ export function Products() {
                                 <Grid size={{ xs: 12, md: 7 }}>
                                     <Stack spacing={3}>
                                         <Box>
-                                            <Typography variant="overline" color="primary" fontWeight={800} sx={{ letterSpacing: 1.5 }}>
-                                                {selectedOffering.product?.category?.name || "Premium Harvest"}
+                                            <Typography
+                                                variant="overline"
+                                                color="primary"
+                                                fontWeight={800}
+                                                sx={{ letterSpacing: 1.5 }}
+                                            >
+                                                {selectedOffering.product?.category?.name ||
+                                                    "Premium Harvest"}
                                             </Typography>
-                                            <Typography variant="h4" fontWeight={900} sx={{ mb: 1, lineHeight: 1.2 }}>
+                                            <Typography
+                                                variant="h4"
+                                                fontWeight={900}
+                                                sx={{ mb: 1, lineHeight: 1.2 }}
+                                            >
                                                 {selectedOffering.product?.name}
                                             </Typography>
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <Typography variant="subtitle1" color="text.secondary">
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    color="text.secondary"
+                                                >
                                                     by
                                                 </Typography>
                                                 <Typography variant="subtitle1" fontWeight={700}>
@@ -510,38 +552,164 @@ export function Products() {
                                         </Box>
 
                                         <Box>
-                                            <Typography variant="subtitle2" fontWeight={800} gutterBottom sx={{ textTransform: "uppercase", fontSize: "0.75rem", color: "text.secondary" }}>
+                                            <Typography
+                                                variant="subtitle2"
+                                                fontWeight={800}
+                                                gutterBottom
+                                                sx={{
+                                                    textTransform: "uppercase",
+                                                    fontSize: "0.75rem",
+                                                    color: "text.secondary",
+                                                }}
+                                            >
                                                 Available Packaging
                                             </Typography>
-                                            <Stack spacing={2}>
-                                                {selectedOffering.dateSpecifications?.map((spec, specIdx) => (
-                                                    <Box key={specIdx}>
-                                                        <Typography variant="caption" fontWeight={700} sx={{ color: 'primary.main', mb: 1, display: 'block' }}>
-                                                            {spec?.grade} - {spec?.sizes}
+
+                                            {selectedOffering.isMedjoolDate ? (
+                                                <Stack spacing={2}>
+                                                    {selectedOffering.dateSpecifications?.map(
+                                                        (spec, specIdx) => {
+                                                            const grade = spec?.grade ?? "";
+                                                            const size = spec?.sizes ?? "";
+                                                            const packOpts = (
+                                                                spec?.pack_options ?? []
+                                                            ).filter(Boolean);
+
+                                                            if (
+                                                                !grade &&
+                                                                !size &&
+                                                                packOpts.length === 0
+                                                            )
+                                                                return null;
+
+                                                            return (
+                                                                <Box key={specIdx}>
+                                                                    <Typography
+                                                                        variant="caption"
+                                                                        fontWeight={700}
+                                                                        sx={{
+                                                                            color: "primary.main",
+                                                                            mb: 1,
+                                                                            display: "block",
+                                                                        }}
+                                                                    >
+                                                                        {grade}{" "}
+                                                                        {grade && size ? " - " : ""}{" "}
+                                                                        {size}
+                                                                    </Typography>
+
+                                                                    <Stack
+                                                                        direction="row"
+                                                                        spacing={1}
+                                                                        flexWrap="wrap"
+                                                                        useFlexGap
+                                                                        sx={{ gap: 1 }}
+                                                                    >
+                                                                        {packOpts.map(
+                                                                            (opt, idx) => {
+                                                                                const label =
+                                                                                    opt?.displayLabel ||
+                                                                                    (opt?.amountMin !=
+                                                                                        null &&
+                                                                                    opt?.amountMax !=
+                                                                                        null
+                                                                                        ? `${opt.amountMin}-${opt.amountMax} ${opt.unit ?? ""}`.trim()
+                                                                                        : `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim());
+
+                                                                                return (
+                                                                                    <Chip
+                                                                                        key={`${specIdx}-${idx}`}
+                                                                                        label={
+                                                                                            label ||
+                                                                                            "Option"
+                                                                                        }
+                                                                                        variant="outlined"
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            fontWeight: 600,
+                                                                                            borderRadius: 1.5,
+                                                                                        }}
+                                                                                    />
+                                                                                );
+                                                                            },
+                                                                        )}
+                                                                    </Stack>
+                                                                </Box>
+                                                            );
+                                                        },
+                                                    )}
+
+                                                    {(!selectedOffering.dateSpecifications ||
+                                                        selectedOffering.dateSpecifications
+                                                            .length === 0) && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="text.secondary"
+                                                            sx={{ fontStyle: "italic" }}
+                                                        >
+                                                            Contact for packaging details
                                                         </Typography>
-                                                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ gap: 1 }}>
-                                                            {spec?.pack_options?.map((opt, idx) => (
-                                                                <Chip
-                                                                    key={idx}
-                                                                    label={opt?.displayLabel || `${opt?.amount} ${opt?.unit}`}
-                                                                    variant="outlined"
-                                                                    size="small"
-                                                                    sx={{ fontWeight: 600, borderRadius: 1.5 }}
-                                                                />
-                                                            ))}
-                                                        </Stack>
-                                                    </Box>
-                                                ))}
-                                                {(!selectedOffering.dateSpecifications || selectedOffering.dateSpecifications.length === 0) && (
-                                                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                                                        Contact for packaging details
-                                                    </Typography>
-                                                )}
-                                            </Stack>
+                                                    )}
+                                                </Stack>
+                                            ) : (
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={1}
+                                                    flexWrap="wrap"
+                                                    useFlexGap
+                                                    sx={{ gap: 1 }}
+                                                >
+                                                    {(selectedOffering.pack_options ?? []).filter(
+                                                        Boolean,
+                                                    ).length ? (
+                                                        (selectedOffering.pack_options ?? [])
+                                                            .filter(Boolean)
+                                                            .map((opt, idx) => {
+                                                                const label =
+                                                                    opt?.displayLabel ||
+                                                                    `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim() ||
+                                                                    "Option";
+
+                                                                return (
+                                                                    <Chip
+                                                                        key={`nd-${idx}`}
+                                                                        label={label}
+                                                                        variant="outlined"
+                                                                        size="small"
+                                                                        sx={{
+                                                                            fontWeight: 600,
+                                                                            borderRadius: 1.5,
+                                                                        }}
+                                                                    />
+                                                                );
+                                                            })
+                                                    ) : (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="text.secondary"
+                                                            sx={{ fontStyle: "italic" }}
+                                                        >
+                                                            Contact for packaging details
+                                                        </Typography>
+                                                    )}
+                                                </Stack>
+                                            )}
                                         </Box>
 
-                                        <Box sx={{ bgcolor: "primary.50", p: 2, borderRadius: 2, border: "1px dashed", borderColor: "primary.200" }}>
-                                            <Typography variant="body2" color="primary.900" fontWeight={600}>
+                                        <Box
+                                            sx={{
+                                                bgcolor: "primary.50",
+                                                p: 2,
+                                                borderRadius: 2,
+                                                border: "1px dashed",
+                                                borderColor: "primary.200",
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                color="primary.900"
+                                                fontWeight={600}
+                                            >
                                                 🌿 Authentic Organic Produce from Jordan
                                             </Typography>
                                             <Typography variant="caption" color="primary.800">
@@ -572,7 +740,9 @@ export function Products() {
                                                 size="large"
                                                 endIcon={<OpenInNewIcon />}
                                                 onClick={() => {
-                                                    navigate(`/product/${selectedOffering.documentId}`);
+                                                    navigate(
+                                                        `/product/${selectedOffering.documentId}`,
+                                                    );
                                                     handleCloseModal();
                                                 }}
                                                 sx={{

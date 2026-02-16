@@ -28,7 +28,9 @@ type TwoColumnSectionProps = {
     rightSx?: SxProps<Theme>;
 
     /** Vertical alignment of the content within the columns (defaults to center) */
-    alignItems?: ResponsiveStyleValue<"flex-start" | "center" | "flex-end" | "stretch" | "baseline">;
+    alignItems?: ResponsiveStyleValue<
+        "flex-start" | "center" | "flex-end" | "stretch" | "baseline"
+    >;
 };
 
 export const TwoColumnSection = ({
@@ -70,7 +72,7 @@ export const TwoColumnSection = ({
             spacing={spacing}
             className={className}
             sx={{
-                alignItems: alignItems as any,
+                alignItems: alignItems as ResponsiveStyleValue<string>,
                 ...sx,
             }}
         >

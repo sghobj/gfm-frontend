@@ -21,13 +21,9 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
             reverse={{ xs: false, lg: true }}
             left={
                 <Stack>
-                    <SectionTitle>
-                        {data?.title}
-                    </SectionTitle>
+                    <SectionTitle>{data?.title}</SectionTitle>
 
-                    <SectionSubtitle>
-                        {data?.subtitle}
-                    </SectionSubtitle>
+                    <SectionSubtitle>{data?.subtitle}</SectionSubtitle>
 
                     {data?.text && (
                         <BlocksTypography
@@ -76,9 +72,7 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
 
                                 {/* Copy */}
                                 <Box sx={{ minWidth: 0 }}>
-                                    <Typography variant="subtitle1">
-                                        {goal?.title}
-                                    </Typography>
+                                    <Typography variant="subtitle1">{goal?.title}</Typography>
 
                                     <Typography
                                         variant="body1"

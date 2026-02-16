@@ -18,9 +18,11 @@ export const Home = () => {
 
     const { data: certData, loading: certLoading } = useQuery(CertificatesDocument);
 
-    console.log(certData);
     const brands = data?.brands?.filter((b): b is NonNullable<typeof b> => !!b) ?? [];
-    const certificates = certData?.certificates?.filter((c): c is NonNullable<typeof c> => !!c) ?? [];
+    const certificates =
+        certData?.certificates?.filter((c): c is NonNullable<typeof c> => !!c) ?? [];
+    const homepage = data?.homepage;
+    const qualityMarketing = homepage?.qualityMarketing;
 
     if (loading || certLoading) {
         return (
@@ -40,16 +42,16 @@ export const Home = () => {
 
     return (
         <Box>
-            <HomeHero />
+            <HomeHero data={homepage?.hero} />
 
             <Box>
-                <QualityMarketing />
+                <QualityMarketing data={qualityMarketing} />
 
                 <Brands brands={brands} />
 
                 <Certifications certificates={certificates} />
 
-                <CustomersMap />
+                <CustomersMap data={homepage?.map} />
             </Box>
         </Box>
     );

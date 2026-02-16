@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, type ReactNode } from "react";
 import { useBreakpoints } from "../hooks/useBreakpoints";
 
@@ -17,20 +18,16 @@ interface BreakpointContextProps {
 
 const BreakpointContext = createContext<BreakpointContextProps | undefined>(undefined);
 
-export const BreakpointProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const breakpoints = useBreakpoints();
-
-    return (
-        <BreakpointContext.Provider value={breakpoints}>
-            {children}
-        </BreakpointContext.Provider>
-    );
-};
-
 export const useGlobalBreakpoints = () => {
     const context = useContext(BreakpointContext);
     if (context === undefined) {
         throw new Error("useGlobalBreakpoints must be used within a BreakpointProvider");
     }
     return context;
+};
+
+export const BreakpointProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const breakpoints = useBreakpoints();
+
+    return <BreakpointContext.Provider value={breakpoints}>{children}</BreakpointContext.Provider>;
 };

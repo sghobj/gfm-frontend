@@ -15,7 +15,9 @@ type SectionLayoutProps = {
     leftSx?: SxProps;
     reverse?: boolean | Partial<Record<"xs" | "sm" | "md" | "lg" | "xl", boolean>>;
     spacing?: ResponsiveStyleValue<number>;
-    alignItems?: ResponsiveStyleValue<"flex-start" | "center" | "flex-end" | "stretch" | "baseline">;
+    alignItems?: ResponsiveStyleValue<
+        "flex-start" | "center" | "flex-end" | "stretch" | "baseline"
+    >;
 };
 
 export const SectionLayout: React.FC<SectionLayoutProps> = ({

@@ -16,13 +16,9 @@ export function WhyUs({ data }: WhyUsSectionProps) {
             className="why-us"
             left={
                 <Stack spacing={2}>
-                    <SectionTitle>
-                        {data?.general?.title}
-                    </SectionTitle>
+                    <SectionTitle>{data?.general?.title}</SectionTitle>
 
-                    <SectionSubtitle>
-                        {data?.general?.subtitle}
-                    </SectionSubtitle>
+                    <SectionSubtitle>{data?.general?.subtitle}</SectionSubtitle>
                 </Stack>
             }
             right={

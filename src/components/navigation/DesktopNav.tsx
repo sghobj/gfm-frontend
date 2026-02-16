@@ -35,10 +35,10 @@ export function DesktopNav() {
     const navItems: NavItem[] = useMemo(
         () => [
             { label: t("nav.home"), to: "/" },
+            { label: t("nav.products"), to: "/products" },
+            { label: t("nav.certificates"), to: "/certificates" },
             { label: t("nav.about"), to: "/about-us" },
             { label: t("nav.contact"), to: "/contact-us" },
-            { label: t("nav.products"), to: "/products" },
-            { label: "Certifications", to: "/certificates" },
         ],
         [t],
     );
