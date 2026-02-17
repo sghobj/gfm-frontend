@@ -1,11 +1,12 @@
-export function resolveStrapiMediaUrl(url?: string | undefined) {
-    if (!url) return undefined;
+const STRAPI_BASE_URL = (import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337").replace(
+    /\/$/,
+    "",
+);
 
-    // already absolute (Cloudinary, CDN, etc.)
-    if (/^https?:\/\//i.test(url)) return url;
-
-    const base = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337";
-    return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
+export function resolveStrapiMediaUrl(url?: string) {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url; // Cloudinary / absolute
+    return `${STRAPI_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`; // Local / relative
 }
 
 export function toSearchableText(value: unknown): string {
