@@ -1,13 +1,26 @@
-const STRAPI_BASE_URL = (import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337").replace(
-    /\/$/,
-    "",
-);
+const STRAPI_BASE_URL = (import.meta.env.VITE_STRAPI_URL ?? "").replace(/\/$/, "");
 
-export function resolveStrapiMediaUrl(url?: string) {
+// url can be "/uploads/..", "uploads/..", "https://..", or even "//res.cloudinary.com/.."
+export function resolveStrapiMediaUrl(url?: string | null) {
     if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url; // Cloudinary / absolute
-    return `${STRAPI_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`; // Local / relative
+
+    const trimmed = url.trim();
+
+    // absolute or protocol-relative → return as-is (protocol-relative gets https)
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (trimmed.startsWith("//")) return `https:${trimmed}`;
+
+    // relative → must have base URL
+    if (!STRAPI_BASE_URL) {
+        // this is the #1 cause of "still wrong url" in prod
+        console.error("VITE_STRAPI_URL is not set. Cannot resolve relative media URL:", trimmed);
+        return trimmed; // return raw so you see what's happening
+    }
+
+    const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    return `${STRAPI_BASE_URL}${path}`;
 }
+
 
 export function toSearchableText(value: unknown): string {
     if (!value) return "";
