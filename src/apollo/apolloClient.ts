@@ -2,8 +2,10 @@ import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/clien
 import { SetContextLink } from "@apollo/client/link/context";
 import i18n from "i18next";
 
+const baseUrl = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337";
+
 const httpLink = new HttpLink({
-    uri: `${import.meta.env.VITE_STRAPI_URL}/graphql`,
+    uri: `${baseUrl.replace(/\/$/, "")}/graphql`,
 });
 
 const localeLink = new SetContextLink((prevContext) => {
