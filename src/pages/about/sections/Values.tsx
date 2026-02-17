@@ -20,7 +20,7 @@ export const ValuesSection = ({ data }: ValuesSectionProps) => {
     return (
         <SectionLayout
             schemeId={1}
-            reverse={{ xs: false, lg: true }}
+            reverse={{ xs: false, lg: false }}
             left={
                 <Stack>
                     <SectionTitle>{data?.general?.title}</SectionTitle>

@@ -9,7 +9,6 @@ import {
     Link,
     Stack,
     Typography,
-    CircularProgress,
     Avatar,
 } from "@mui/material";
 
@@ -25,6 +24,7 @@ import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { useQuery } from "@apollo/client/react";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
 import { useEffect, useMemo, useState } from "react";
+import { LoadingState } from "../../components/state/LoadingState";
 
 function initials(name: string) {
     return name
@@ -66,11 +66,7 @@ export const ProductDetails = () => {
     }, [images]);
 
     if (loading) {
-        return (
-            <Box sx={{ py: 20, textAlign: "center" }}>
-                <CircularProgress />
-            </Box>
-        );
+        return <LoadingState message="Loading product… Thanks for your patience." />;
     }
 
     if (error || !offering) {

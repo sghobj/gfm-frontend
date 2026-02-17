@@ -9,7 +9,6 @@ import {
     Stack,
     TextField,
     Typography,
-    CircularProgress,
     Dialog,
     DialogContent,
     DialogTitle,
@@ -31,6 +30,7 @@ import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../gql/gr
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
+import { LoadingState } from "../../components/state/LoadingState";
 
 // ----------------------------
 // GraphQL Query
@@ -208,12 +208,7 @@ export function Products() {
             {/* Content */}
             <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 } }}>
                 {loading ? (
-                    <Box sx={{ py: 10, textAlign: "center" }}>
-                        <CircularProgress />
-                        <Typography sx={{ mt: 2 }} color="text.secondary">
-                            Gathering the finest harvest...
-                        </Typography>
-                    </Box>
+                    <LoadingState message="Loading products… Thanks for your patience." />
                 ) : error ? (
                     <Box sx={{ py: 10, textAlign: "center" }}>
                         <Typography variant="h5" color="error" fontWeight={900}>

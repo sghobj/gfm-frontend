@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { HomeHero } from "./sections/HomeHero";
 import { QualityMarketing } from "./sections/QualityMarketing";
 import { CustomersMap } from "./sections/CustomersMap";
@@ -8,6 +8,7 @@ import { useQuery } from "@apollo/client/react";
 import { useTranslation } from "react-i18next";
 import { toStrapiLocale } from "../../apollo/apolloClient";
 import { GetHomeDataDocument, CertificatesDocument } from "../../gql/graphql";
+import { LoadingState } from "../../components/state/LoadingState";
 
 export const Home = () => {
     const { i18n } = useTranslation();
@@ -25,11 +26,7 @@ export const Home = () => {
     const qualityMarketing = homepage?.qualityMarketing;
 
     if (loading || certLoading) {
-        return (
-            <Box sx={{ py: 20, textAlign: "center" }}>
-                <CircularProgress />
-            </Box>
-        );
+        return <LoadingState message="Preparing the homepage… This may take a moment." />;
     }
 
     if (error) {
@@ -42,14 +39,14 @@ export const Home = () => {
 
     return (
         <Box>
-            <HomeHero data={homepage?.hero} />
+            {homepage?.hero && <HomeHero data={homepage?.hero} />}
 
             <Box>
-                <QualityMarketing data={qualityMarketing} />
+                {qualityMarketing && <QualityMarketing data={qualityMarketing} />}
 
-                <Brands brands={brands} />
+                {brands && <Brands brands={brands} />}
 
-                <Certifications certificates={certificates} />
+                {certificates && <Certifications certificates={certificates} />}
 
                 <CustomersMap data={homepage?.map} />
             </Box>

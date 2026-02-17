@@ -194,7 +194,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
             />
 
             <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
-                <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 4, md: 6 }}>
+                <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 4, lg: 10 }}>
                     {/* Left column */}
                     <Stack
                         spacing={2.5}

@@ -7,7 +7,6 @@ import {
     Stack,
     TextField,
     Typography,
-    CircularProgress,
     Dialog,
     DialogContent,
     DialogTitle,
@@ -29,6 +28,7 @@ import { resolveStrapiMediaUrl, toSearchableText } from "../../utils/strapiMedia
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
+import { LoadingState } from "../../components/state/LoadingState";
 
 // ----------------------------
 // UI Types (derived from GQL)
@@ -123,12 +123,7 @@ export function CertificatesPage() {
             {/* Content */}
             <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 }, maxWidth: "1440px" }}>
                 {loading ? (
-                    <Box sx={{ py: 10, textAlign: "center" }}>
-                        <CircularProgress />
-                        <Typography sx={{ mt: 2 }} color="text.secondary">
-                            Loading certifications...
-                        </Typography>
-                    </Box>
+                    <LoadingState message="Loading certifications… Thanks for your patience." />
                 ) : error ? (
                     <Box sx={{ py: 10, textAlign: "center" }}>
                         <Typography variant="h5" color="error" fontWeight={900}>
@@ -149,8 +144,8 @@ export function CertificatesPage() {
                         ) : (
                             filteredCertificates.map((cert) => (
                                 <Box key={cert.documentId}>
-                                    <Grid container spacing={{ xs: 4, md: 10 }} alignItems="center">
-                                        <Grid size={{ xs: 12, md: 4 }}>
+                                    <Grid container spacing={{ xs: 4, lg: 10 }} alignItems="center">
+                                        <Grid size={{ xs: 12, lg: 4 }}>
                                             <Box
                                                 sx={{
                                                     bgcolor: "white",
@@ -182,7 +177,7 @@ export function CertificatesPage() {
                                                 />
                                             </Box>
                                         </Grid>
-                                        <Grid size={{ xs: 12, md: 8 }}>
+                                        <Grid size={{ xs: 12, lg: 8 }}>
                                             <Stack spacing={4}>
                                                 <Stack spacing={2}>
                                                     <Typography

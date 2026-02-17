@@ -33,17 +33,41 @@ export const About = () => {
 
     return (
         <Box className={"section about"} dir={isRtl ? "rtl" : "ltr"}>
-            {aboutData?.landing ? <Landing data={aboutData?.landing} /> : null}
+            {aboutData?.landing ? (
+                <Box id="landing">
+                    <Landing data={aboutData?.landing} />
+                </Box>
+            ) : null}
 
-            {aboutData?.mission ? <Mission data={aboutData?.mission} /> : null}
+            {aboutData?.mission ? (
+                <Box id="mission">
+                    <Mission data={aboutData?.mission} />
+                </Box>
+            ) : null}
 
-            {aboutData?.vision ? <VisionSection data={aboutData?.vision} /> : null}
+            {aboutData?.vision ? (
+                <Box id="vision">
+                    <VisionSection data={aboutData?.vision} />
+                </Box>
+            ) : null}
 
-            {aboutData?.values ? <ValuesSection data={aboutData?.values} /> : null}
+            {aboutData?.values ? (
+                <Box id="values">
+                    <ValuesSection data={aboutData?.values} />
+                </Box>
+            ) : null}
 
-            {aboutData?.whyUs ? <WhyUs data={aboutData.whyUs} /> : null}
+            {aboutData?.whyUs ? (
+                <Box id="why-us">
+                    <WhyUs data={aboutData.whyUs} />
+                </Box>
+            ) : null}
 
-            {aboutData?.csr ? <CsrSection data={aboutData?.csr} /> : null}
+            {aboutData?.csr ? (
+                <Box id="csr">
+                    <CsrSection data={aboutData?.csr} />
+                </Box>
+            ) : null}
         </Box>
     );
 };
