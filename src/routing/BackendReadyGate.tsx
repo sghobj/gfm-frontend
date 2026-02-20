@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const BACKEND_READY_QUERY = gql`
     query BackendReady {
@@ -20,14 +21,20 @@ type BackendReadyGateProps = {
 export function BackendReadyGate({
     loadingMessage = "Loading. Waiting for backend...",
 }: BackendReadyGateProps) {
+    const [isBackendReady, setIsBackendReady] = useState(false);
+
     const { data } = useQuery<BackendReadyData>(BACKEND_READY_QUERY, {
         fetchPolicy: "no-cache",
         nextFetchPolicy: "no-cache",
-        pollInterval: 3000,
+        pollInterval: isBackendReady ? 0 : 3000,
         notifyOnNetworkStatusChange: true,
     });
 
-    const isBackendReady = data?.__typename === "Query";
+    useEffect(() => {
+        if (data?.__typename === "Query") {
+            setIsBackendReady(true);
+        }
+    }, [data?.__typename]);
 
     if (!isBackendReady) {
         return (
