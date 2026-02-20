@@ -11,13 +11,20 @@ import { AdminLoginPage } from "./pages/admin/AdminLoginPage.tsx";
 import { AdminOrderLinksPage } from "./pages/admin/AdminOrderLinksPage.tsx";
 import { OrderSubmitPage } from "./pages/order/OrderSubmitPage.tsx";
 import { RequireAdminAuth } from "./auth/RequireAdminAuth.tsx";
+import { BackendReadyGate } from "./routing/BackendReadyGate.tsx";
 
 function App() {
     return (
         <Routes>
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route element={<RequireAdminAuth />}>
-                <Route path="/admin/order-links" element={<AdminOrderLinksPage />} />
+            <Route
+                element={
+                    <BackendReadyGate loadingMessage="Admin is loading. Waiting for backend..." />
+                }
+            >
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route element={<RequireAdminAuth />}>
+                    <Route path="/admin/order-links" element={<AdminOrderLinksPage />} />
+                </Route>
             </Route>
 
             <Route element={<Layout />}>
@@ -27,7 +34,13 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                  <Route path="/certificates" element={<CertificatesPage />} />
-                <Route path="/order/submit" element={<OrderSubmitPage />} />
+                <Route
+                    element={
+                        <BackendReadyGate loadingMessage="Loading secure order form. Waiting for backend..." />
+                    }
+                >
+                    <Route path="/order/submit" element={<OrderSubmitPage />} />
+                </Route>
             </Route>
         </Routes>
     );
