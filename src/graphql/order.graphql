@@ -1,0 +1,75 @@
+mutation SubmitOrder($data: OrderSubmissionInput!) {
+  submitOrder(data: $data) {
+    documentId
+    orderNumber
+    status
+    customer {
+        documentId
+        email
+    }
+  }
+}
+
+mutation GenerateOrderInvitation($input: CreateOrderInvitationInput!) {
+  generateOrderInvitation(input: $input) {
+    documentId
+    token
+    expiresAt
+    customerEmail
+    customerName
+    customerCompany
+    offering {
+      documentId
+      product {
+        name
+      }
+      brand {
+        name
+      }
+    }
+  }
+}
+
+query GetInvitation($token: String!) {
+  getInvitation(token: $token) {
+    documentId
+    token
+    expiresAt
+    customerEmail
+    customerName
+    customerCompany
+    grade
+    size
+    packaging
+    quantity
+    isUsed
+    usedAt
+    offering {
+      documentId
+      isMedjoolDate
+      product {
+        documentId
+        name
+        image {
+          url
+        }
+      }
+      brand {
+        documentId
+        name
+      }
+      dateSpecifications {
+        grade
+        sizes
+        pack_options {
+          documentId
+          displayLabel
+        }
+      }
+      pack_options {
+        documentId
+        displayLabel
+      }
+    }
+  }
+}

@@ -19,7 +19,7 @@ export const Mission = ({ data }: MissionProps) => {
         <SectionLayout
             schemeId={1}
             className={"section"}
-            reverse={{ xs: false, lg: true }}
+            reverse={{ xs: false, lg: false }}
             right={
                 <Box
                     sx={{

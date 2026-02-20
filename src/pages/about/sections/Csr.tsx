@@ -1,6 +1,5 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import type { AboutQuery } from "../../../gql/graphql";
-import { StrapiMuiIcon } from "../../../components/icon/MuiIcon";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography";
 import { SectionLayout } from "../../../components/layout/SectionLayout";
 import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography";
@@ -18,7 +17,7 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
         <SectionLayout
             schemeId={1}
             className="section csr"
-            reverse={{ xs: false, lg: true }}
+            reverse={{ xs: false, lg: false }}
             left={
                 <Stack>
                     <SectionTitle>{data?.title}</SectionTitle>
@@ -39,9 +38,7 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
                         <Box key={goal?.id ?? idx} sx={{ position: "relative" }}>
                             <Box
                                 sx={{
-                                    display: "grid",
-                                    gridTemplateColumns: { xs: "1fr", sm: "56px 1fr" },
-                                    gap: 2,
+                                    display: "block",
                                     py: { xs: 1.6, sm: 2 },
                                     px: { xs: 0.5, sm: 1 },
                                     borderRadius: 3,
@@ -52,25 +49,6 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
                                     },
                                 }}
                             >
-                                {/* Icon badge */}
-                                <Box
-                                    sx={{
-                                        width: 44,
-                                        height: 44,
-                                        borderRadius: "14px",
-                                        display: "grid",
-                                        placeItems: "center",
-                                        border: "1px solid",
-                                        borderColor: "divider",
-                                        background:
-                                            "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.65) 100%)",
-                                        boxShadow: "0 10px 26px rgba(0,0,0,0.06)",
-                                    }}
-                                >
-                                    <StrapiMuiIcon iconName={goal?.icon} />
-                                </Box>
-
-                                {/* Copy */}
                                 <Box sx={{ minWidth: 0 }}>
                                     <Typography variant="subtitle1">{goal?.title}</Typography>
 

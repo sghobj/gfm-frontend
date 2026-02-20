@@ -28,7 +28,7 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
                         px: { xs: 2, sm: 4, md: 6 },
                     }}
                 >
-                    <Grid container spacing={8} alignItems="center">
+                    <Grid container spacing={{ xs: 4, lg: 10 }} alignItems="center">
                         <Grid size={{ xs: 12, lg: 5 }}>
                             <Stack spacing={3}>
                                 <Typography

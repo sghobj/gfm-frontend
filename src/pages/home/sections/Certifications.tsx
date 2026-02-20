@@ -43,7 +43,6 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                     position: "relative",
                     overflow: "hidden",
                     display: "flex",
-                    justifyContent: "center",
                 }}
             >
                 {/* Background Gradient similar to Brands/CustomersMap */}
@@ -51,10 +50,6 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                     sx={{
                         position: "absolute",
                         inset: 0,
-                        // background:
-                        //     "radial-gradient(800px 400px at 90% 80%, rgba(99,102,241,0.04), transparent 70%)," +
-                        //     "radial-gradient(600px 400px at 10% 20%, rgba(16,185,129,0.04), transparent 70%)," +
-                        //     "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,250,252,1) 100%)",
                         zIndex: 0,
                     }}
                 />
@@ -110,7 +105,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                 sx={{
                                     display: "flex",
                                     flexDirection: "column",
-                                    alignItems: "center",
+                                    alignItems: "flex-start",
                                     gap: 6,
                                 }}
                             >
@@ -119,7 +114,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                         display: "flex",
                                         flexWrap: "wrap",
                                         gap: { xs: 3, md: 4 },
-                                        justifyContent: "center",
+                                        justifyContent: "flex-start",
                                         alignItems: "center",
                                         width: "100%",
                                     }}
