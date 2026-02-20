@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/client";
 import { SetContextLink } from "@apollo/client/link/context";
 import i18n from "i18next";
+import { getAdminJwtToken } from "../auth/adminSession";
 
 const baseUrl = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337";
 
@@ -20,8 +21,26 @@ const localeLink = new SetContextLink((prevContext) => {
     };
 });
 
+const authLink = new SetContextLink((prevContext) => {
+    const jwt = getAdminJwtToken();
+    if (!jwt) {
+        return {
+            headers: {
+                ...(prevContext.headers ?? {}),
+            },
+        };
+    }
+
+    return {
+        headers: {
+            ...(prevContext.headers ?? {}),
+            Authorization: `Bearer ${jwt}`,
+        },
+    };
+});
+
 export const apolloClient = new ApolloClient({
-    link: ApolloLink.from([localeLink, httpLink]),
+    link: ApolloLink.from([authLink, localeLink, httpLink]),
     cache: new InMemoryCache(),
 });
 

@@ -18,6 +18,11 @@ import EmailIcon from "@mui/icons-material/Email";
 import type { GetOfferingQuery } from "../../gql/graphql";
 import { StrapiImage } from "../image/StrapiImage";
 import { useForm, Controller, useWatch } from "react-hook-form";
+import {
+    formatApproxPackageCount,
+    getApproxPackageCount,
+    type PackagingApproxInput,
+} from "../../utils/packagingMath";
 
 type Offering = NonNullable<GetOfferingQuery["offering"]>;
 
@@ -31,7 +36,7 @@ interface OrderFormValues {
     grade: string;
     size: string;
     packOption: string;
-    quantity: number;
+    quantityKg: number;
     name: string;
     email: string;
     company: string;
@@ -105,7 +110,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
             grade: "",
             size: "",
             packOption: "",
-            quantity: 1,
+            quantityKg: 1,
             name: "",
             email: "",
             company: "",
@@ -116,6 +121,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
     const selectedGrade = useWatch({ control, name: "grade" });
     const selectedSize = useWatch({ control, name: "size" });
     const selectedPackOption = useWatch({ control, name: "packOption" });
+    const quantityKg = Number(useWatch({ control, name: "quantityKg" }) ?? 0);
 
     // Clear date-only fields when switching to non-dates flow
     useEffect(() => {
@@ -225,6 +231,22 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
         return nonDatePackOptions[idx] ?? null;
     }, [isDatesFlow, selectedSize, nonDatePackOptions]);
 
+    const selectedDatePackForEstimate = useMemo(() => {
+        if (!isDatesFlow) return null;
+        return (
+            availableDatePackOptions.find((option) => option.documentId === selectedPackOption) ?? null
+        );
+    }, [isDatesFlow, availableDatePackOptions, selectedPackOption]);
+
+    const selectedPackForEstimate = useMemo<PackagingApproxInput | null>(() => {
+        if (isDatesFlow) return selectedDatePackForEstimate;
+        return selectedNonDatePack;
+    }, [isDatesFlow, selectedDatePackForEstimate, selectedNonDatePack]);
+
+    const approxPackages = useMemo(() => {
+        return getApproxPackageCount(quantityKg, selectedPackForEstimate);
+    }, [quantityKg, selectedPackForEstimate]);
+
     // ----- Submit handlers -----
     const onSubmitEmail = (data: OrderFormValues) => {
         const selectedDatePack = isDatesFlow
@@ -238,12 +260,18 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
               ? formatNonDatePackOption(selectedNonDatePack)
               : data.size;
 
+        const approxPackagesForMessage = getApproxPackageCount(
+            Number(data.quantityKg),
+            (isDatesFlow ? selectedDatePack : selectedNonDatePack) ?? null,
+        );
+
         const subject = `Inquiry: ${offering.product?.name} - ${offering.brand?.name}`;
         const body = `Hello, I am interested in:
 Product: ${offering.product?.name}
 Brand: ${offering.brand?.name}
 ${isDatesFlow ? `Grade: ${data.grade}\nSize: ${data.size}\n` : ""}Packaging: ${packLabel}
-Quantity: ${data.quantity}
+Quantity (Kg): ${data.quantityKg}
+Approx. Number of Packages: ${formatApproxPackageCount(approxPackagesForMessage) || "N/A"}
 
 My Details:
 Name: ${data.name}
@@ -270,11 +298,17 @@ ${data.message}`;
               ? formatNonDatePackOption(selectedNonDatePack)
               : data.size;
 
+        const approxPackagesForMessage = getApproxPackageCount(
+            Number(data.quantityKg),
+            (isDatesFlow ? selectedDatePack : selectedNonDatePack) ?? null,
+        );
+
         const text = `Hello, I am interested in:
 *Product:* ${offering.product?.name}
 *Brand:* ${offering.brand?.name}
 ${isDatesFlow ? `*Grade:* ${data.grade}\n*Size:* ${data.size}\n` : ""}*Packaging:* ${packLabel}
-*Quantity:* ${data.quantity}
+*Quantity (Kg):* ${data.quantityKg}
+*Approx. Number of Packages:* ${formatApproxPackageCount(approxPackagesForMessage) || "N/A"}
 
 *My Details:*
 *Name:* ${data.name}
@@ -412,22 +446,35 @@ ${data.message}`;
                         )}
 
                         <Controller
-                            name="quantity"
+                            name="quantityKg"
                             control={control}
                             rules={{
-                                required: "Quantity is required",
-                                min: { value: 1, message: "Min quantity is 1" },
+                                required: "Quantity in Kg is required",
+                                min: { value: 0.1, message: "Min quantity is 0.1 Kg" },
                             }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     type="number"
                                     fullWidth
-                                    label="Desired Quantity"
-                                    error={!!errors.quantity}
-                                    helperText={errors.quantity?.message}
+                                    label="Desired Quantity (Kg)"
+                                    inputProps={{ min: 0.1, step: 0.1 }}
+                                    error={!!errors.quantityKg}
+                                    helperText={errors.quantityKg?.message}
                                 />
                             )}
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Approx. Number of Packages"
+                            value={
+                                approxPackages
+                                    ? `${formatApproxPackageCount(approxPackages)} packages`
+                                    : "Select packaging option"
+                            }
+                            InputProps={{ readOnly: true }}
+                            helperText="Approximation uses selected amount/unit. For L/ml options, a 1L ≈ 1Kg estimate is used."
                         />
 
                         <Divider sx={{ my: 1 }} />
