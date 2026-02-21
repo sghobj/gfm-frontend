@@ -23,7 +23,9 @@ const resolveRepresentativeAmount = (input: PackagingApproxInput): number | null
 };
 
 export const normalizeUnit = (unit: string | null | undefined): string =>
-    String(unit ?? "").trim().toLowerCase();
+    String(unit ?? "")
+        .trim()
+        .toLowerCase();
 
 export const toKgPerPackage = (input: PackagingApproxInput): number | null => {
     const amount = resolveRepresentativeAmount(input);

@@ -19,7 +19,10 @@ const STORAGE_KEY = "b2b_admin_session_v1";
 const ADMIN_ROLE_KEY = "b2b-admin";
 
 const canUseStorage = () => typeof window !== "undefined";
-const normalize = (value: unknown) => String(value ?? "").trim().toLowerCase();
+const normalize = (value: unknown) =>
+    String(value ?? "")
+        .trim()
+        .toLowerCase();
 
 export const isB2BAdminRole = (role: AdminRole): boolean => {
     const roleType = normalize(role?.type);

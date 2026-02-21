@@ -177,11 +177,14 @@ export function OrderSubmitPage() {
     const [searchParams] = useSearchParams();
     const token = (searchParams.get("token") ?? "").trim();
 
-    const { data, loading, error } = useQuery<GetInvitationData, GetInvitationVars>(GET_INVITATION, {
-        variables: { token },
-        skip: !token,
-        fetchPolicy: "no-cache",
-    });
+    const { data, loading, error } = useQuery<GetInvitationData, GetInvitationVars>(
+        GET_INVITATION,
+        {
+            variables: { token },
+            skip: !token,
+            fetchPolicy: "no-cache",
+        },
+    );
     const [submitOrder] = useMutation<SubmitOrderData, SubmitOrderVars>(SUBMIT_ORDER);
 
     const invitation = data?.getInvitation ?? null;
@@ -247,14 +250,19 @@ export function OrderSubmitPage() {
         const candidates: PackOption[] = [];
         for (const spec of dateSpecs) {
             if (spec.grade !== selectedGrade) continue;
-            const packOptions = (spec.pack_options ?? []).filter(
-                (option): option is PackOption => Boolean(option),
+            const packOptions = (spec.pack_options ?? []).filter((option): option is PackOption =>
+                Boolean(option),
             );
             candidates.push(...packOptions);
         }
 
         const deduped = Array.from(
-            candidates.reduce((map, option) => map.set(option.documentId, option), new Map<string, PackOption>()).values(),
+            candidates
+                .reduce(
+                    (map, option) => map.set(option.documentId, option),
+                    new Map<string, PackOption>(),
+                )
+                .values(),
         );
 
         if (!selectedSize) return deduped;
@@ -272,7 +280,9 @@ export function OrderSubmitPage() {
                 datePackOptions.find((option) => option.documentId === selectedPackOption) ?? null
             );
         }
-        return nonDatePackOptions.find((option) => option.documentId === selectedPackOption) ?? null;
+        return (
+            nonDatePackOptions.find((option) => option.documentId === selectedPackOption) ?? null
+        );
     }, [isDatesFlow, datePackOptions, nonDatePackOptions, selectedPackOption]);
 
     const approxPackages = useMemo(() => {
@@ -311,7 +321,10 @@ export function OrderSubmitPage() {
             setSelectedPackOption(datePackOptions[0].documentId);
             return;
         }
-        if (selectedPackOption && !datePackOptions.some((option) => option.documentId === selectedPackOption)) {
+        if (
+            selectedPackOption &&
+            !datePackOptions.some((option) => option.documentId === selectedPackOption)
+        ) {
             setSelectedPackOption("");
         }
     }, [isDatesFlow, selectedPackOption, datePackOptions]);
@@ -346,7 +359,8 @@ export function OrderSubmitPage() {
                 if (!selectedPackOption) throw new Error("Packaging option is required.");
 
                 const selectedOption =
-                    datePackOptions.find((option) => option.documentId === selectedPackOption) ?? null;
+                    datePackOptions.find((option) => option.documentId === selectedPackOption) ??
+                    null;
 
                 grade = selectedGrade;
                 size = selectedSize;
@@ -355,7 +369,8 @@ export function OrderSubmitPage() {
                 selectedOptionForSubmit = selectedOption;
             } else {
                 const selectedOption =
-                    nonDatePackOptions.find((option) => option.documentId === selectedPackOption) ?? null;
+                    nonDatePackOptions.find((option) => option.documentId === selectedPackOption) ??
+                    null;
                 if (nonDatePackOptions.length > 0) {
                     if (!selectedOption) {
                         throw new Error("Packaging option is required.");
@@ -413,7 +428,8 @@ export function OrderSubmitPage() {
                 clearTimeout(timeoutHandle);
             });
 
-            const orderId = submitResponse?.submitOrder?.orderNumber ?? submitResponse?.submitOrder?.documentId;
+            const orderId =
+                submitResponse?.submitOrder?.orderNumber ?? submitResponse?.submitOrder?.documentId;
             setSuccessOrderNumber(orderId ?? "created");
         } catch (err: any) {
             const rawMessage = String(err?.message ?? "");
@@ -477,7 +493,8 @@ export function OrderSubmitPage() {
                             Secure B2B Order
                         </Typography>
                         <Typography color="text.secondary">
-                            {offering.product?.name || "Product"} - {offering.brand?.name || "Brand"}
+                            {offering.product?.name || "Product"} -{" "}
+                            {offering.brand?.name || "Brand"}
                         </Typography>
                     </Box>
 
@@ -536,14 +553,22 @@ export function OrderSubmitPage() {
                                     value={selectedPackOption}
                                     onChange={(event) => setSelectedPackOption(event.target.value)}
                                     fullWidth
-                                    required={(isDatesFlow && datePackOptions.length > 0) || nonDatePackOptions.length > 0}
+                                    required={
+                                        (isDatesFlow && datePackOptions.length > 0) ||
+                                        nonDatePackOptions.length > 0
+                                    }
                                     disabled={isDatesFlow ? !selectedGrade : false}
                                 >
-                                    {(isDatesFlow ? datePackOptions : nonDatePackOptions).map((option) => (
-                                        <MenuItem key={option.documentId} value={option.documentId}>
-                                            {formatPackOptionLabel(option)}
-                                        </MenuItem>
-                                    ))}
+                                    {(isDatesFlow ? datePackOptions : nonDatePackOptions).map(
+                                        (option) => (
+                                            <MenuItem
+                                                key={option.documentId}
+                                                value={option.documentId}
+                                            >
+                                                {formatPackOptionLabel(option)}
+                                            </MenuItem>
+                                        ),
+                                    )}
                                 </TextField>
                             )}
 

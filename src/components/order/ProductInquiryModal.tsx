@@ -234,7 +234,8 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
     const selectedDatePackForEstimate = useMemo(() => {
         if (!isDatesFlow) return null;
         return (
-            availableDatePackOptions.find((option) => option.documentId === selectedPackOption) ?? null
+            availableDatePackOptions.find((option) => option.documentId === selectedPackOption) ??
+            null
         );
     }, [isDatesFlow, availableDatePackOptions, selectedPackOption]);
 

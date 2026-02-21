@@ -15,7 +15,9 @@ export function AdminOrderLinksPage() {
     return (
         <Container maxWidth="md" sx={{ py: 6 }}>
             <Stack spacing={3}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Box
+                    sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                >
                     <Box>
                         <Typography variant="h4" fontWeight={800}>
                             B2B Order Links

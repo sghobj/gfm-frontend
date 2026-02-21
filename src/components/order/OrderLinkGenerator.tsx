@@ -30,6 +30,7 @@ const CREATE_ORDER_INVITATION = gql`
 
 type OfferingOption = {
     documentId: string;
+    availability?: string | null;
     product?: {
         name?: string | null;
     } | null;
@@ -86,7 +87,10 @@ export function OrderLinkGenerator() {
 
     const offerings = useMemo<OfferingOption[]>(() => {
         const raw = (data?.offerings ?? []) as Array<OfferingOption | null | undefined>;
-        return raw.filter((item): item is OfferingOption => Boolean(item));
+        return raw.filter(
+            (item): item is OfferingOption =>
+                Boolean(item) && String(item?.availability ?? "").toLowerCase() !== "no",
+        );
     }, [data?.offerings]);
 
     const [offeringId, setOfferingId] = useState("");

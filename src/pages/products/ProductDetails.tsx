@@ -45,6 +45,7 @@ export const ProductDetails = () => {
     });
 
     const offering = data?.offering;
+    const isUnavailable = String(offering?.availability ?? "").toLowerCase() === "no";
 
     const images = useMemo(() => {
         const list = [];
@@ -69,11 +70,25 @@ export const ProductDetails = () => {
         return <LoadingState message="Loading product… Thanks for your patience." />;
     }
 
-    if (error || !offering) {
+    if (error || !offering || isUnavailable) {
+        const title = error
+            ? "Failed to load product"
+            : isUnavailable
+              ? "Coming soon.."
+              : "Product not found";
+        const subtitle = error
+            ? error.message
+            : isUnavailable
+              ? "This offering is currently unavailable."
+              : "The requested offering does not exist.";
+
         return (
             <Container maxWidth="xl" sx={{ py: 10, textAlign: "center" }}>
                 <Typography variant="h5" color="error" fontWeight={900}>
-                    {error ? "Failed to load product" : "Product not found"}
+                    {title}
+                </Typography>
+                <Typography color="text.secondary" sx={{ mt: 1 }}>
+                    {subtitle}
                 </Typography>
                 <Button onClick={() => navigate("/products")} sx={{ mt: 2 }}>
                     Back to Products

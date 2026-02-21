@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    Container,
-    Paper,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 
@@ -30,8 +21,9 @@ export function AdminLoginPage() {
         return <Navigate to="/admin/order-links" replace />;
     }
 
-    const redirectTarget =
-        ((location.state as LocationState | null)?.from ?? "/admin/order-links").toString();
+    const redirectTarget = (
+        (location.state as LocationState | null)?.from ?? "/admin/order-links"
+    ).toString();
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
