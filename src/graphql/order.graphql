@@ -3,10 +3,6 @@ mutation SubmitOrder($data: OrderSubmissionInput!) {
     documentId
     orderNumber
     status
-    customer {
-        documentId
-        email
-    }
   }
 }
 

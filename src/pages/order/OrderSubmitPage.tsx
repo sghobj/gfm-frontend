@@ -75,10 +75,6 @@ const SUBMIT_ORDER = gql`
             documentId
             orderNumber
             status
-            customer {
-                documentId
-                email
-            }
         }
     }
 `;
@@ -157,6 +153,7 @@ type SubmitOrderVars = {
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();
+const SUBMIT_ORDER_TIMEOUT_MS = 20000;
 
 const formatPackOptionLabel = (option: PackOption | null | undefined): string => {
     if (!option) return "";
@@ -321,6 +318,7 @@ export function OrderSubmitPage() {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        if (busy) return;
         setBusy(true);
         setSubmitError(null);
 
@@ -386,6 +384,11 @@ export function OrderSubmitPage() {
                 ? `${message.trim()}\n\n${appendedApproxNote}`
                 : appendedApproxNote;
 
+            const abortController = new AbortController();
+            const timeoutHandle = setTimeout(() => {
+                abortController.abort();
+            }, SUBMIT_ORDER_TIMEOUT_MS);
+
             const { data: submitResponse } = await submitOrder({
                 variables: {
                     data: {
@@ -401,12 +404,24 @@ export function OrderSubmitPage() {
                         customerCompany: customerCompany.trim() || undefined,
                     },
                 },
+                context: {
+                    fetchOptions: {
+                        signal: abortController.signal,
+                    },
+                },
+            }).finally(() => {
+                clearTimeout(timeoutHandle);
             });
 
             const orderId = submitResponse?.submitOrder?.orderNumber ?? submitResponse?.submitOrder?.documentId;
             setSuccessOrderNumber(orderId ?? "created");
         } catch (err: any) {
-            setSubmitError(err?.message ?? "Unable to submit order.");
+            const rawMessage = String(err?.message ?? "");
+            if (err?.name === "AbortError" || rawMessage.toLowerCase().includes("abort")) {
+                setSubmitError("Order submission timed out. Please try again.");
+            } else {
+                setSubmitError(rawMessage || "Unable to submit order.");
+            }
         } finally {
             setBusy(false);
         }
