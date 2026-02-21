@@ -33,7 +33,7 @@ function App() {
                 <Route path="/contact-us" element={<ContactUs />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
-                 <Route path="/certificates" element={<CertificatesPage />} />
+                <Route path="/certificates" element={<CertificatesPage />} />
                 <Route
                     element={
                         <BackendReadyGate loadingMessage="Loading secure order form. Waiting for backend..." />

@@ -66,9 +66,26 @@ export function Products() {
     const navigate = useNavigate();
     const { data, loading, error } = useQuery(GET_ALL_OFFERINGS);
 
+    const hasAnyAvailableOfferings = useMemo(() => {
+        if (!data?.offerings) return false;
+        return data.offerings.some(
+            (o) =>
+                !!o &&
+                !!o.brand &&
+                !!o.product &&
+                String(o.availability ?? "").toLowerCase() !== "no",
+        );
+    }, [data?.offerings]);
+
     const offerings: GQLOffering[] = useMemo(() => {
         if (!data?.offerings) return [];
-        return data.offerings.filter((o): o is GQLOffering => !!o && !!o.brand && !!o.product);
+        return data.offerings.filter(
+            (o): o is GQLOffering =>
+                !!o &&
+                !!o.brand &&
+                !!o.product &&
+                String(o.availability ?? "").toLowerCase() !== "no",
+        );
     }, [data]);
 
     // Filters
@@ -455,12 +472,20 @@ export function Products() {
                         {productsList.length === 0 && (
                             <Box sx={{ py: 10, textAlign: "center" }}>
                                 <Typography variant="h5" fontWeight={900}>
-                                    No results found
+                                    {hasAnyAvailableOfferings
+                                        ? "No results found"
+                                        : "Coming soon.."}
                                 </Typography>
-                                <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                    Try adjusting your search or filters to find what you&apos;re
-                                    looking for.
-                                </Typography>
+                                {hasAnyAvailableOfferings ? (
+                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                        Try adjusting your search or filters to find what
+                                        you&apos;re looking for.
+                                    </Typography>
+                                ) : (
+                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                        New offerings will be available soon.
+                                    </Typography>
+                                )}
                             </Box>
                         )}
                     </Stack>

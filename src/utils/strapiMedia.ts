@@ -21,7 +21,6 @@ export function resolveStrapiMediaUrl(url?: string | null) {
     return `${STRAPI_BASE_URL}${path}`;
 }
 
-
 export function toSearchableText(value: unknown): string {
     if (!value) return "";
     if (typeof value === "string") return value;
