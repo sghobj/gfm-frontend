@@ -1,12 +1,14 @@
-query GetAllOfferings {
-    offerings {
+query GetAllOfferings($locale: I18NLocaleCode) {
+    offerings(locale: $locale) {
         documentId
+        locale
         availability
         isMedjoolDate
         pack_options {
             amount
             documentId
             displayLabel
+            locale
             unit
         }
 
@@ -14,6 +16,7 @@ query GetAllOfferings {
             name
             slug
             documentId
+            locale
             logo {
                 documentId
                 alternativeText
@@ -24,6 +27,7 @@ query GetAllOfferings {
 
         product {
             documentId
+            locale
             name
             description
             category {
@@ -51,6 +55,7 @@ query GetAllOfferings {
             pack_options {
                 documentId
                 displayLabel
+                locale
                 amount
                 unit
                 amountMin
@@ -62,9 +67,10 @@ query GetAllOfferings {
     }
 }
 
-query GetOffering($id: ID!) {
-    offering(documentId: $id) {
+query GetOffering($id: ID!, $locale: I18NLocaleCode) {
+    offering(documentId: $id, locale: $locale) {
         documentId
+        locale
         availability
         isMedjoolDate
 
@@ -73,12 +79,14 @@ query GetOffering($id: ID!) {
             displayLabel
             unit
             documentId
+            locale
         }
 
         brand {
             name
             slug
             documentId
+            locale
             logo {
                 documentId
                 alternativeText
@@ -89,6 +97,7 @@ query GetOffering($id: ID!) {
 
         product {
             documentId
+            locale
             name
             description
             category {
@@ -115,6 +124,7 @@ query GetOffering($id: ID!) {
             pack_options {
                 documentId
                 displayLabel
+                locale
                 amount
                 unit
                 amountMin

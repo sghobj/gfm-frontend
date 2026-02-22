@@ -8,6 +8,7 @@ import type { GetHomeDataQuery } from "../../../gql/graphql";
 // Import Swiper styles
 import "swiper/swiper-bundle.css";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
+import { hasNonEmptyText } from "../../../utils/localizedContent";
 
 type HeroData = NonNullable<GetHomeDataQuery["homepage"]>["hero"];
 
@@ -30,20 +31,37 @@ interface SlideData {
 export const HomeHero = ({ data }: HomeHeroProps) => {
     const navigate = useNavigate();
 
-    const SLIDES: SlideData[] =
-        data && data.length > 0
-            ? data.map((item, index) => ({
-                  id: item?.id ?? index,
-                  title: item?.title ?? "",
-                  subtitle: item?.subtitle ?? "",
-                  description: item?.description ?? "",
-                  image: item?.image?.url ?? "/assets/bg1.jpg",
-                  ctaPrimary: item?.ctaPrimary ?? "Explore Products",
-                  ctaSecondary: item?.ctaSecondary ?? "Our Story",
-                  primaryLink: item?.primaryLink ?? "/products",
-                  secondaryLink: item?.secondaryLink ?? "/about-us",
-              }))
-            : [];
+    const SLIDES: SlideData[] = (data ?? []).flatMap((item, index) => {
+        if (
+            !item ||
+            !hasNonEmptyText(item.title) ||
+            !hasNonEmptyText(item.subtitle) ||
+            !hasNonEmptyText(item.description) ||
+            !hasNonEmptyText(item.image?.url) ||
+            !hasNonEmptyText(item.ctaPrimary) ||
+            !hasNonEmptyText(item.ctaSecondary) ||
+            !hasNonEmptyText(item.primaryLink) ||
+            !hasNonEmptyText(item.secondaryLink)
+        ) {
+            return [];
+        }
+
+        return [
+            {
+                id: item.id ?? index,
+                title: item.title,
+                subtitle: item.subtitle,
+                description: item.description,
+                image: item.image.url,
+                ctaPrimary: item.ctaPrimary,
+                ctaSecondary: item.ctaSecondary,
+                primaryLink: item.primaryLink,
+                secondaryLink: item.secondaryLink,
+            },
+        ];
+    });
+
+    if (SLIDES.length === 0) return null;
 
     return (
         <Box
@@ -162,7 +180,8 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                         </Box>
                                         <Stack
                                             direction={{ xs: "column", sm: "row" }}
-                                            spacing={2.5}
+                                            useFlexGap
+                                            gap={2.5}
                                         >
                                             <Button
                                                 variant="contained"

@@ -2,6 +2,7 @@ import { Box, Typography, Container, Grid, Stack, Card, CardContent } from "@mui
 import { Scheme } from "../../../components/scheme/Scheme";
 import type { GetHomeDataQuery } from "../../../gql/graphql";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
+import { hasAnyLocalizedContent, hasNonEmptyText } from "../../../utils/localizedContent";
 
 type QualityMarketingData = NonNullable<GetHomeDataQuery["homepage"]>["qualityMarketing"];
 
@@ -10,7 +11,21 @@ interface QualityMarketingProps {
 }
 
 export const QualityMarketing = ({ data }: QualityMarketingProps) => {
-    const points = data?.points ?? [];
+    const points =
+        data?.points?.filter(
+            (point): point is NonNullable<typeof point> =>
+                !!point && hasNonEmptyText(point.title) && hasNonEmptyText(point.subtitle),
+        ) ?? [];
+    const general = data?.general;
+    const hasGeneralContent =
+        !!general &&
+        hasNonEmptyText(general.title) &&
+        hasNonEmptyText(general.subtitle) &&
+        hasAnyLocalizedContent(general.text);
+
+    if (!hasGeneralContent || points.length === 0) {
+        return null;
+    }
 
     return (
         <Scheme id={1}>
@@ -37,22 +52,19 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
                                     fontWeight={800}
                                     sx={{ letterSpacing: 3 }}
                                 >
-                                    {data?.general?.subtitle ?? "WHY CHOOSE US"}
+                                    {general.subtitle}
                                 </Typography>
                                 <Typography variant="h2" fontWeight={900} sx={{ lineHeight: 1.1 }}>
-                                    {data?.general?.title ? (
-                                        data.general.title.split(",").map((part, i) => (
-                                            <span key={i}>
-                                                {part}
-                                                {data.general?.title &&
-                                                    data.general?.title.includes(",") && <br />}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <>
-                                            Pure Harvest, <br /> Professional Excellence
-                                        </>
-                                    )}
+                                    {general.title
+                                        ? general.title.split(",").map((part, i) => (
+                                              <span key={i}>
+                                                  {part}
+                                                  {general.title && general.title.includes(",") && (
+                                                      <br />
+                                                  )}
+                                              </span>
+                                          ))
+                                        : general.title}
                                 </Typography>
                                 <Typography
                                     variant="h6"
@@ -60,11 +72,7 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
                                     color="text.secondary"
                                     sx={{ fontWeight: 400 }}
                                 >
-                                    {data?.general?.text ? (
-                                        <BlocksRenderer content={data.general.text} />
-                                    ) : (
-                                        "At Good Food Mood Co., we believe that the best food comes from a deep respect for nature and a commitment to professional excellence in every step of the supply chain."
-                                    )}
+                                    <BlocksRenderer content={general.text} />
                                 </Typography>
                             </Stack>
                         </Grid>

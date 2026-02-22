@@ -679,6 +679,24 @@ export type ContactUsInput = {
     publishedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
 };
 
+export type CreateOrderInvitationInput = {
+    customerCompany?: InputMaybe<Scalars["String"]["input"]>;
+    customerEmail: Scalars["String"]["input"];
+    customerName?: InputMaybe<Scalars["String"]["input"]>;
+    expiresAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+    grade?: InputMaybe<Scalars["String"]["input"]>;
+    offeringDocumentId: Scalars["ID"]["input"];
+    packaging?: InputMaybe<Scalars["String"]["input"]>;
+    quantity?: InputMaybe<Scalars["Int"]["input"]>;
+    size?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CurrentUserRole = {
+    __typename?: "CurrentUserRole";
+    name?: Maybe<Scalars["String"]["output"]>;
+    type?: Maybe<Scalars["String"]["output"]>;
+};
+
 export type Customer = {
     __typename?: "Customer";
     company?: Maybe<Scalars["String"]["output"]>;
@@ -1004,6 +1022,7 @@ export type GenericMorph =
     | I18NLocale
     | Offering
     | Order
+    | OrderInvitation
     | PackOption
     | Product
     | ReviewWorkflowsWorkflow
@@ -1159,6 +1178,7 @@ export type Mutation = {
     createDateGrade?: Maybe<DateGrade>;
     createOffering?: Maybe<Offering>;
     createOrder?: Maybe<Order>;
+    createOrderInvitation?: Maybe<OrderInvitation>;
     createPackOption?: Maybe<PackOption>;
     createProduct?: Maybe<Product>;
     createReviewWorkflowsWorkflow?: Maybe<ReviewWorkflowsWorkflow>;
@@ -1178,6 +1198,7 @@ export type Mutation = {
     deleteHomepage?: Maybe<DeleteMutationResponse>;
     deleteOffering?: Maybe<DeleteMutationResponse>;
     deleteOrder?: Maybe<DeleteMutationResponse>;
+    deleteOrderInvitation?: Maybe<DeleteMutationResponse>;
     deletePackOption?: Maybe<DeleteMutationResponse>;
     deleteProduct?: Maybe<DeleteMutationResponse>;
     deleteReviewWorkflowsWorkflow?: Maybe<DeleteMutationResponse>;
@@ -1191,11 +1212,13 @@ export type Mutation = {
     emailConfirmation?: Maybe<UsersPermissionsLoginPayload>;
     /** Request a reset password token */
     forgotPassword?: Maybe<UsersPermissionsPasswordPayload>;
+    generateOrderInvitation?: Maybe<OrderInvitation>;
     login: UsersPermissionsLoginPayload;
     /** Register a user */
     register: UsersPermissionsLoginPayload;
     /** Reset user password. Confirm with a code (resetToken from forgotPassword) */
     resetPassword?: Maybe<UsersPermissionsLoginPayload>;
+    submitOrder?: Maybe<Order>;
     updateAbout?: Maybe<About>;
     updateBrand?: Maybe<Brand>;
     updateCategory?: Maybe<Category>;
@@ -1207,6 +1230,7 @@ export type Mutation = {
     updateHomepage?: Maybe<Homepage>;
     updateOffering?: Maybe<Offering>;
     updateOrder?: Maybe<Order>;
+    updateOrderInvitation?: Maybe<OrderInvitation>;
     updatePackOption?: Maybe<PackOption>;
     updateProduct?: Maybe<Product>;
     updateReviewWorkflowsWorkflow?: Maybe<ReviewWorkflowsWorkflow>;
@@ -1259,6 +1283,11 @@ export type MutationCreateOfferingArgs = {
 
 export type MutationCreateOrderArgs = {
     data: OrderInput;
+    status?: InputMaybe<PublicationStatus>;
+};
+
+export type MutationCreateOrderInvitationArgs = {
+    data: OrderInvitationInput;
     status?: InputMaybe<PublicationStatus>;
 };
 
@@ -1335,6 +1364,10 @@ export type MutationDeleteOrderArgs = {
     documentId: Scalars["ID"]["input"];
 };
 
+export type MutationDeleteOrderInvitationArgs = {
+    documentId: Scalars["ID"]["input"];
+};
+
 export type MutationDeletePackOptionArgs = {
     documentId: Scalars["ID"]["input"];
     locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
@@ -1373,6 +1406,10 @@ export type MutationForgotPasswordArgs = {
     email: Scalars["String"]["input"];
 };
 
+export type MutationGenerateOrderInvitationArgs = {
+    input: CreateOrderInvitationInput;
+};
+
 export type MutationLoginArgs = {
     input: UsersPermissionsLoginInput;
 };
@@ -1385,6 +1422,10 @@ export type MutationResetPasswordArgs = {
     code: Scalars["String"]["input"];
     password: Scalars["String"]["input"];
     passwordConfirmation: Scalars["String"]["input"];
+};
+
+export type MutationSubmitOrderArgs = {
+    data: OrderSubmissionInput;
 };
 
 export type MutationUpdateAboutArgs = {
@@ -1451,6 +1492,12 @@ export type MutationUpdateOfferingArgs = {
 
 export type MutationUpdateOrderArgs = {
     data: OrderInput;
+    documentId: Scalars["ID"]["input"];
+    status?: InputMaybe<PublicationStatus>;
+};
+
+export type MutationUpdateOrderInvitationArgs = {
+    data: OrderInvitationInput;
     documentId: Scalars["ID"]["input"];
     status?: InputMaybe<PublicationStatus>;
 };
@@ -1657,24 +1704,80 @@ export type OrderFiltersInput = {
 };
 
 export type OrderInput = {
-    customer?: InputMaybe<Scalars["ID"]["input"]>;
+    publishedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+    status?: InputMaybe<Enum_Order_Status>;
+};
+
+export type OrderInvitation = {
+    __typename?: "OrderInvitation";
+    createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+    customerCompany?: Maybe<Scalars["String"]["output"]>;
+    customerEmail: Scalars["String"]["output"];
+    customerName?: Maybe<Scalars["String"]["output"]>;
+    documentId: Scalars["ID"]["output"];
+    expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
+    grade?: Maybe<Scalars["String"]["output"]>;
+    isUsed?: Maybe<Scalars["Boolean"]["output"]>;
+    offering?: Maybe<Offering>;
+    order?: Maybe<Order>;
+    packaging?: Maybe<Scalars["String"]["output"]>;
+    publishedAt?: Maybe<Scalars["DateTime"]["output"]>;
+    quantity?: Maybe<Scalars["Int"]["output"]>;
+    size?: Maybe<Scalars["String"]["output"]>;
+    token: Scalars["String"]["output"];
+    updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
+    usedAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
+export type OrderInvitationEntityResponseCollection = {
+    __typename?: "OrderInvitationEntityResponseCollection";
+    nodes: Array<OrderInvitation>;
+    pageInfo: Pagination;
+};
+
+export type OrderInvitationFiltersInput = {
+    and?: InputMaybe<Array<InputMaybe<OrderInvitationFiltersInput>>>;
+    createdAt?: InputMaybe<DateTimeFilterInput>;
+    customerCompany?: InputMaybe<StringFilterInput>;
+    customerEmail?: InputMaybe<StringFilterInput>;
+    customerName?: InputMaybe<StringFilterInput>;
+    documentId?: InputMaybe<IdFilterInput>;
+    expiresAt?: InputMaybe<DateTimeFilterInput>;
+    grade?: InputMaybe<StringFilterInput>;
+    isUsed?: InputMaybe<BooleanFilterInput>;
+    not?: InputMaybe<OrderInvitationFiltersInput>;
+    offering?: InputMaybe<OfferingFiltersInput>;
+    or?: InputMaybe<Array<InputMaybe<OrderInvitationFiltersInput>>>;
+    order?: InputMaybe<OrderFiltersInput>;
+    packaging?: InputMaybe<StringFilterInput>;
+    publishedAt?: InputMaybe<DateTimeFilterInput>;
+    quantity?: InputMaybe<IntFilterInput>;
+    size?: InputMaybe<StringFilterInput>;
+    token?: InputMaybe<StringFilterInput>;
+    updatedAt?: InputMaybe<DateTimeFilterInput>;
+    usedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type OrderInvitationInput = {
     customerCompany?: InputMaybe<Scalars["String"]["input"]>;
     customerEmail?: InputMaybe<Scalars["String"]["input"]>;
     customerName?: InputMaybe<Scalars["String"]["input"]>;
+    expiresAt?: InputMaybe<Scalars["DateTime"]["input"]>;
     grade?: InputMaybe<Scalars["String"]["input"]>;
-    isMedjoolDate?: InputMaybe<Scalars["Boolean"]["input"]>;
-    message?: InputMaybe<Scalars["String"]["input"]>;
-    numberOfPackages?: InputMaybe<Scalars["Int"]["input"]>;
+    isUsed?: InputMaybe<Scalars["Boolean"]["input"]>;
     offering?: InputMaybe<Scalars["ID"]["input"]>;
-    orderNumber?: InputMaybe<Scalars["String"]["input"]>;
-    packOption?: InputMaybe<Scalars["ID"]["input"]>;
+    order?: InputMaybe<Scalars["ID"]["input"]>;
     packaging?: InputMaybe<Scalars["String"]["input"]>;
     publishedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
     quantity?: InputMaybe<Scalars["Int"]["input"]>;
     size?: InputMaybe<Scalars["String"]["input"]>;
-    status?: InputMaybe<Enum_Order_Status>;
-    totalPrice?: InputMaybe<Scalars["Float"]["input"]>;
-    totalShipmentSize?: InputMaybe<Scalars["Float"]["input"]>;
+    token?: InputMaybe<Scalars["String"]["input"]>;
+    usedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+};
+
+export type OrderRelationResponseCollection = {
+    __typename?: "OrderRelationResponseCollection";
+    nodes: Array<Order>;
 };
 
 export type OrderSubmissionInput = {
@@ -1682,17 +1785,13 @@ export type OrderSubmissionInput = {
     customerEmail: Scalars["String"]["input"];
     customerName: Scalars["String"]["input"];
     grade?: InputMaybe<Scalars["String"]["input"]>;
+    invitationToken: Scalars["String"]["input"];
     message?: InputMaybe<Scalars["String"]["input"]>;
-    offering: Scalars["ID"]["input"];
+    offering?: InputMaybe<Scalars["ID"]["input"]>;
     packOption?: InputMaybe<Scalars["ID"]["input"]>;
     packaging?: InputMaybe<Scalars["String"]["input"]>;
     quantity: Scalars["Int"]["input"];
     size?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type OrderRelationResponseCollection = {
-    __typename?: "OrderRelationResponseCollection";
-    nodes: Array<Order>;
 };
 
 export type PackOption = {
@@ -1888,6 +1987,7 @@ export type Query = {
     certificates: Array<Maybe<Certificate>>;
     certificates_connection?: Maybe<CertificateEntityResponseCollection>;
     contactUs?: Maybe<ContactUs>;
+    currentUserRole?: Maybe<CurrentUserRole>;
     customer?: Maybe<Customer>;
     customers: Array<Maybe<Customer>>;
     customers_connection?: Maybe<CustomerEntityResponseCollection>;
@@ -1895,6 +1995,7 @@ export type Query = {
     dateGrades: Array<Maybe<DateGrade>>;
     dateGrades_connection?: Maybe<DateGradeEntityResponseCollection>;
     footer?: Maybe<Footer>;
+    getInvitation?: Maybe<OrderInvitation>;
     homepage?: Maybe<Homepage>;
     i18NLocale?: Maybe<I18NLocale>;
     i18NLocales: Array<Maybe<I18NLocale>>;
@@ -1904,6 +2005,9 @@ export type Query = {
     offerings: Array<Maybe<Offering>>;
     offerings_connection?: Maybe<OfferingEntityResponseCollection>;
     order?: Maybe<Order>;
+    orderInvitation?: Maybe<OrderInvitation>;
+    orderInvitations: Array<Maybe<OrderInvitation>>;
+    orderInvitations_connection?: Maybe<OrderInvitationEntityResponseCollection>;
     orders: Array<Maybe<Order>>;
     orders_connection?: Maybe<OrderEntityResponseCollection>;
     packOption?: Maybe<PackOption>;
@@ -2044,6 +2148,10 @@ export type QueryFooterArgs = {
     status?: InputMaybe<PublicationStatus>;
 };
 
+export type QueryGetInvitationArgs = {
+    token: Scalars["String"]["input"];
+};
+
 export type QueryHomepageArgs = {
     locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     status?: InputMaybe<PublicationStatus>;
@@ -2092,6 +2200,25 @@ export type QueryOfferings_ConnectionArgs = {
 
 export type QueryOrderArgs = {
     documentId: Scalars["ID"]["input"];
+    status?: InputMaybe<PublicationStatus>;
+};
+
+export type QueryOrderInvitationArgs = {
+    documentId: Scalars["ID"]["input"];
+    status?: InputMaybe<PublicationStatus>;
+};
+
+export type QueryOrderInvitationsArgs = {
+    filters?: InputMaybe<OrderInvitationFiltersInput>;
+    pagination?: InputMaybe<PaginationArg>;
+    sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+    status?: InputMaybe<PublicationStatus>;
+};
+
+export type QueryOrderInvitations_ConnectionArgs = {
+    filters?: InputMaybe<OrderInvitationFiltersInput>;
+    pagination?: InputMaybe<PaginationArg>;
+    sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
     status?: InputMaybe<PublicationStatus>;
 };
 
@@ -2802,6 +2929,7 @@ export type FooterQuery = {
     __typename?: "Query";
     footer?: {
         __typename?: "Footer";
+        locale?: string | null;
         brandName: string;
         brandDescription: string;
         address?: string | null;
@@ -2829,6 +2957,7 @@ export type GetHomeDataQuery = {
     brands: Array<{
         __typename?: "Brand";
         documentId: string;
+        locale?: string | null;
         name: string;
         slug: string;
         description?: any | null;
@@ -2836,6 +2965,7 @@ export type GetHomeDataQuery = {
     } | null>;
     homepage?: {
         __typename?: "Homepage";
+        locale?: string | null;
         qualityMarketing?: {
             __typename?: "ComponentAboutWhyChooseUs";
             points?: Array<{
@@ -2884,13 +3014,16 @@ export type GetHomeDataQuery = {
     } | null;
 };
 
-export type GetAllOfferingsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllOfferingsQueryVariables = Exact<{
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
+}>;
 
 export type GetAllOfferingsQuery = {
     __typename?: "Query";
     offerings: Array<{
         __typename?: "Offering";
         documentId: string;
+        locale?: string | null;
         availability?: Enum_Offering_Availability | null;
         isMedjoolDate?: boolean | null;
         pack_options: Array<{
@@ -2898,6 +3031,7 @@ export type GetAllOfferingsQuery = {
             amount?: number | null;
             documentId: string;
             displayLabel: string;
+            locale?: string | null;
             unit: Enum_Packoption_Unit;
         } | null>;
         brand?: {
@@ -2905,6 +3039,7 @@ export type GetAllOfferingsQuery = {
             name: string;
             slug: string;
             documentId: string;
+            locale?: string | null;
             logo?: {
                 __typename?: "UploadFile";
                 documentId: string;
@@ -2916,6 +3051,7 @@ export type GetAllOfferingsQuery = {
         product?: {
             __typename?: "Product";
             documentId: string;
+            locale?: string | null;
             name: string;
             description?: any | null;
             category?: { __typename?: "Category"; name?: string | null; documentId: string } | null;
@@ -2942,6 +3078,7 @@ export type GetAllOfferingsQuery = {
                 __typename?: "PackOption";
                 documentId: string;
                 displayLabel: string;
+                locale?: string | null;
                 amount?: number | null;
                 unit: Enum_Packoption_Unit;
                 amountMin?: number | null;
@@ -2955,6 +3092,7 @@ export type GetAllOfferingsQuery = {
 
 export type GetOfferingQueryVariables = Exact<{
     id: Scalars["ID"]["input"];
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
 }>;
 
 export type GetOfferingQuery = {
@@ -2962,6 +3100,7 @@ export type GetOfferingQuery = {
     offering?: {
         __typename?: "Offering";
         documentId: string;
+        locale?: string | null;
         availability?: Enum_Offering_Availability | null;
         isMedjoolDate?: boolean | null;
         pack_options: Array<{
@@ -2970,12 +3109,14 @@ export type GetOfferingQuery = {
             displayLabel: string;
             unit: Enum_Packoption_Unit;
             documentId: string;
+            locale?: string | null;
         } | null>;
         brand?: {
             __typename?: "Brand";
             name: string;
             slug: string;
             documentId: string;
+            locale?: string | null;
             logo?: {
                 __typename?: "UploadFile";
                 documentId: string;
@@ -2987,6 +3128,7 @@ export type GetOfferingQuery = {
         product?: {
             __typename?: "Product";
             documentId: string;
+            locale?: string | null;
             name: string;
             description?: any | null;
             category?: { __typename?: "Category"; name?: string | null } | null;
@@ -3013,6 +3155,7 @@ export type GetOfferingQuery = {
                 __typename?: "PackOption";
                 documentId: string;
                 displayLabel: string;
+                locale?: string | null;
                 amount?: number | null;
                 unit: Enum_Packoption_Unit;
                 amountMin?: number | null;
@@ -3021,21 +3164,6 @@ export type GetOfferingQuery = {
                 applicable_sizes?: Enum_Packoption_Applicable_Sizes | null;
             } | null>;
         } | null> | null;
-    } | null;
-};
-
-export type CreateOrderMutationVariables = Exact<{
-    data: OrderInput;
-}>;
-
-export type CreateOrderMutation = {
-    __typename?: "Mutation";
-    createOrder?: {
-        __typename?: "Order";
-        documentId: string;
-        orderNumber?: string | null;
-        status?: Enum_Order_Status | null;
-        customer?: { __typename?: "Customer"; documentId: string; email: string } | null;
     } | null;
 };
 
@@ -3050,7 +3178,79 @@ export type SubmitOrderMutation = {
         documentId: string;
         orderNumber?: string | null;
         status?: Enum_Order_Status | null;
-        customer?: { __typename?: "Customer"; documentId: string; email: string } | null;
+    } | null;
+};
+
+export type GenerateOrderInvitationMutationVariables = Exact<{
+    input: CreateOrderInvitationInput;
+}>;
+
+export type GenerateOrderInvitationMutation = {
+    __typename?: "Mutation";
+    generateOrderInvitation?: {
+        __typename?: "OrderInvitation";
+        documentId: string;
+        token: string;
+        expiresAt?: any | null;
+        customerEmail: string;
+        customerName?: string | null;
+        customerCompany?: string | null;
+        offering?: {
+            __typename?: "Offering";
+            documentId: string;
+            product?: { __typename?: "Product"; name: string } | null;
+            brand?: { __typename?: "Brand"; name: string } | null;
+        } | null;
+    } | null;
+};
+
+export type GetInvitationQueryVariables = Exact<{
+    token: Scalars["String"]["input"];
+}>;
+
+export type GetInvitationQuery = {
+    __typename?: "Query";
+    getInvitation?: {
+        __typename?: "OrderInvitation";
+        documentId: string;
+        token: string;
+        expiresAt?: any | null;
+        customerEmail: string;
+        customerName?: string | null;
+        customerCompany?: string | null;
+        grade?: string | null;
+        size?: string | null;
+        packaging?: string | null;
+        quantity?: number | null;
+        isUsed?: boolean | null;
+        usedAt?: any | null;
+        offering?: {
+            __typename?: "Offering";
+            documentId: string;
+            isMedjoolDate?: boolean | null;
+            product?: {
+                __typename?: "Product";
+                documentId: string;
+                name: string;
+                image?: { __typename?: "UploadFile"; url: string } | null;
+            } | null;
+            brand?: { __typename?: "Brand"; documentId: string; name: string } | null;
+            dateSpecifications?: Array<{
+                __typename?: "ComponentDatesBrandGradeSpec";
+                grade: Enum_Componentdatesbrandgradespec_Grade;
+                sizes: Enum_Componentdatesbrandgradespec_Sizes;
+                pack_options: Array<{
+                    __typename?: "PackOption";
+                    documentId: string;
+                    displayLabel: string;
+                } | null>;
+            } | null> | null;
+            pack_options: Array<{
+                __typename?: "PackOption";
+                documentId: string;
+                displayLabel: string;
+            } | null>;
+        } | null;
     } | null;
 };
 
@@ -3692,6 +3892,7 @@ export const FooterDocument = {
                         selectionSet: {
                             kind: "SelectionSet",
                             selections: [
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 { kind: "Field", name: { kind: "Name", value: "brandName" } },
                                 {
                                     kind: "Field",
@@ -3776,6 +3977,7 @@ export const GetHomeDataDocument = {
                             kind: "SelectionSet",
                             selections: [
                                 { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 { kind: "Field", name: { kind: "Name", value: "name" } },
                                 { kind: "Field", name: { kind: "Name", value: "slug" } },
                                 { kind: "Field", name: { kind: "Name", value: "description" } },
@@ -3799,9 +4001,20 @@ export const GetHomeDataDocument = {
                     {
                         kind: "Field",
                         name: { kind: "Name", value: "homepage" },
+                        arguments: [
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "locale" },
+                                value: {
+                                    kind: "Variable",
+                                    name: { kind: "Name", value: "locale" },
+                                },
+                            },
+                        ],
                         selectionSet: {
                             kind: "SelectionSet",
                             selections: [
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 {
                                     kind: "Field",
                                     name: { kind: "Name", value: "qualityMarketing" },
@@ -4007,16 +4220,34 @@ export const GetAllOfferingsDocument = {
             kind: "OperationDefinition",
             operation: "query",
             name: { kind: "Name", value: "GetAllOfferings" },
+            variableDefinitions: [
+                {
+                    kind: "VariableDefinition",
+                    variable: { kind: "Variable", name: { kind: "Name", value: "locale" } },
+                    type: { kind: "NamedType", name: { kind: "Name", value: "I18NLocaleCode" } },
+                },
+            ],
             selectionSet: {
                 kind: "SelectionSet",
                 selections: [
                     {
                         kind: "Field",
                         name: { kind: "Name", value: "offerings" },
+                        arguments: [
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "locale" },
+                                value: {
+                                    kind: "Variable",
+                                    name: { kind: "Name", value: "locale" },
+                                },
+                            },
+                        ],
                         selectionSet: {
                             kind: "SelectionSet",
                             selections: [
                                 { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 { kind: "Field", name: { kind: "Name", value: "availability" } },
                                 { kind: "Field", name: { kind: "Name", value: "isMedjoolDate" } },
                                 {
@@ -4036,6 +4267,10 @@ export const GetAllOfferingsDocument = {
                                             {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "displayLabel" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
                                             },
                                             {
                                                 kind: "Field",
@@ -4061,6 +4296,10 @@ export const GetAllOfferingsDocument = {
                                             {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "documentId" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
                                             },
                                             {
                                                 kind: "Field",
@@ -4105,6 +4344,10 @@ export const GetAllOfferingsDocument = {
                                             {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "documentId" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
                                             },
                                             {
                                                 kind: "Field",
@@ -4223,6 +4466,10 @@ export const GetAllOfferingsDocument = {
                                                                 kind: "Name",
                                                                 value: "displayLabel",
                                                             },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "locale" },
                                                         },
                                                         {
                                                             kind: "Field",
@@ -4287,6 +4534,11 @@ export const GetOfferingDocument = {
                         type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
                     },
                 },
+                {
+                    kind: "VariableDefinition",
+                    variable: { kind: "Variable", name: { kind: "Name", value: "locale" } },
+                    type: { kind: "NamedType", name: { kind: "Name", value: "I18NLocaleCode" } },
+                },
             ],
             selectionSet: {
                 kind: "SelectionSet",
@@ -4300,11 +4552,20 @@ export const GetOfferingDocument = {
                                 name: { kind: "Name", value: "documentId" },
                                 value: { kind: "Variable", name: { kind: "Name", value: "id" } },
                             },
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "locale" },
+                                value: {
+                                    kind: "Variable",
+                                    name: { kind: "Name", value: "locale" },
+                                },
+                            },
                         ],
                         selectionSet: {
                             kind: "SelectionSet",
                             selections: [
                                 { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 { kind: "Field", name: { kind: "Name", value: "availability" } },
                                 { kind: "Field", name: { kind: "Name", value: "isMedjoolDate" } },
                                 {
@@ -4329,6 +4590,10 @@ export const GetOfferingDocument = {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "documentId" },
                                             },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
+                                            },
                                         ],
                                     },
                                 },
@@ -4349,6 +4614,10 @@ export const GetOfferingDocument = {
                                             {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "documentId" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
                                             },
                                             {
                                                 kind: "Field",
@@ -4393,6 +4662,10 @@ export const GetOfferingDocument = {
                                             {
                                                 kind: "Field",
                                                 name: { kind: "Name", value: "documentId" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "locale" },
                                             },
                                             {
                                                 kind: "Field",
@@ -4507,6 +4780,10 @@ export const GetOfferingDocument = {
                                                         },
                                                         {
                                                             kind: "Field",
+                                                            name: { kind: "Name", value: "locale" },
+                                                        },
+                                                        {
+                                                            kind: "Field",
                                                             name: { kind: "Name", value: "amount" },
                                                         },
                                                         {
@@ -4552,67 +4829,6 @@ export const GetOfferingDocument = {
         },
     ],
 } as unknown as DocumentNode<GetOfferingQuery, GetOfferingQueryVariables>;
-export const CreateOrderDocument = {
-    kind: "Document",
-    definitions: [
-        {
-            kind: "OperationDefinition",
-            operation: "mutation",
-            name: { kind: "Name", value: "CreateOrder" },
-            variableDefinitions: [
-                {
-                    kind: "VariableDefinition",
-                    variable: { kind: "Variable", name: { kind: "Name", value: "data" } },
-                    type: {
-                        kind: "NonNullType",
-                        type: { kind: "NamedType", name: { kind: "Name", value: "OrderInput" } },
-                    },
-                },
-            ],
-            selectionSet: {
-                kind: "SelectionSet",
-                selections: [
-                    {
-                        kind: "Field",
-                        name: { kind: "Name", value: "createOrder" },
-                        arguments: [
-                            {
-                                kind: "Argument",
-                                name: { kind: "Name", value: "data" },
-                                value: { kind: "Variable", name: { kind: "Name", value: "data" } },
-                            },
-                        ],
-                        selectionSet: {
-                            kind: "SelectionSet",
-                            selections: [
-                                { kind: "Field", name: { kind: "Name", value: "documentId" } },
-                                { kind: "Field", name: { kind: "Name", value: "orderNumber" } },
-                                { kind: "Field", name: { kind: "Name", value: "status" } },
-                                {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "customer" },
-                                    selectionSet: {
-                                        kind: "SelectionSet",
-                                        selections: [
-                                            {
-                                                kind: "Field",
-                                                name: { kind: "Name", value: "documentId" },
-                                            },
-                                            {
-                                                kind: "Field",
-                                                name: { kind: "Name", value: "email" },
-                                            },
-                                        ],
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                ],
-            },
-        },
-    ],
-} as unknown as DocumentNode<CreateOrderMutation, CreateOrderMutationVariables>;
 export const SubmitOrderDocument = {
     kind: "Document",
     definitions: [
@@ -4652,9 +4868,59 @@ export const SubmitOrderDocument = {
                                 { kind: "Field", name: { kind: "Name", value: "documentId" } },
                                 { kind: "Field", name: { kind: "Name", value: "orderNumber" } },
                                 { kind: "Field", name: { kind: "Name", value: "status" } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SubmitOrderMutation, SubmitOrderMutationVariables>;
+export const GenerateOrderInvitationDocument = {
+    kind: "Document",
+    definitions: [
+        {
+            kind: "OperationDefinition",
+            operation: "mutation",
+            name: { kind: "Name", value: "GenerateOrderInvitation" },
+            variableDefinitions: [
+                {
+                    kind: "VariableDefinition",
+                    variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+                    type: {
+                        kind: "NonNullType",
+                        type: {
+                            kind: "NamedType",
+                            name: { kind: "Name", value: "CreateOrderInvitationInput" },
+                        },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: "SelectionSet",
+                selections: [
+                    {
+                        kind: "Field",
+                        name: { kind: "Name", value: "generateOrderInvitation" },
+                        arguments: [
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "input" },
+                                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: "SelectionSet",
+                            selections: [
+                                { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "token" } },
+                                { kind: "Field", name: { kind: "Name", value: "expiresAt" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerEmail" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerName" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerCompany" } },
                                 {
                                     kind: "Field",
-                                    name: { kind: "Name", value: "customer" },
+                                    name: { kind: "Name", value: "offering" },
                                     selectionSet: {
                                         kind: "SelectionSet",
                                         selections: [
@@ -4664,7 +4930,29 @@ export const SubmitOrderDocument = {
                                             },
                                             {
                                                 kind: "Field",
-                                                name: { kind: "Name", value: "email" },
+                                                name: { kind: "Name", value: "product" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "name" },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "brand" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "name" },
+                                                        },
+                                                    ],
+                                                },
                                             },
                                         ],
                                     },
@@ -4676,4 +4964,199 @@ export const SubmitOrderDocument = {
             },
         },
     ],
-} as unknown as DocumentNode<SubmitOrderMutation, SubmitOrderMutationVariables>;
+} as unknown as DocumentNode<
+    GenerateOrderInvitationMutation,
+    GenerateOrderInvitationMutationVariables
+>;
+export const GetInvitationDocument = {
+    kind: "Document",
+    definitions: [
+        {
+            kind: "OperationDefinition",
+            operation: "query",
+            name: { kind: "Name", value: "GetInvitation" },
+            variableDefinitions: [
+                {
+                    kind: "VariableDefinition",
+                    variable: { kind: "Variable", name: { kind: "Name", value: "token" } },
+                    type: {
+                        kind: "NonNullType",
+                        type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: "SelectionSet",
+                selections: [
+                    {
+                        kind: "Field",
+                        name: { kind: "Name", value: "getInvitation" },
+                        arguments: [
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "token" },
+                                value: { kind: "Variable", name: { kind: "Name", value: "token" } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: "SelectionSet",
+                            selections: [
+                                { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "token" } },
+                                { kind: "Field", name: { kind: "Name", value: "expiresAt" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerEmail" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerName" } },
+                                { kind: "Field", name: { kind: "Name", value: "customerCompany" } },
+                                { kind: "Field", name: { kind: "Name", value: "grade" } },
+                                { kind: "Field", name: { kind: "Name", value: "size" } },
+                                { kind: "Field", name: { kind: "Name", value: "packaging" } },
+                                { kind: "Field", name: { kind: "Name", value: "quantity" } },
+                                { kind: "Field", name: { kind: "Name", value: "isUsed" } },
+                                { kind: "Field", name: { kind: "Name", value: "usedAt" } },
+                                {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "offering" },
+                                    selectionSet: {
+                                        kind: "SelectionSet",
+                                        selections: [
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "documentId" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "isMedjoolDate" },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "product" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: {
+                                                                kind: "Name",
+                                                                value: "documentId",
+                                                            },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "name" },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "image" },
+                                                            selectionSet: {
+                                                                kind: "SelectionSet",
+                                                                selections: [
+                                                                    {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                            kind: "Name",
+                                                                            value: "url",
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "brand" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: {
+                                                                kind: "Name",
+                                                                value: "documentId",
+                                                            },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "name" },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "dateSpecifications" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "grade" },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "sizes" },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: {
+                                                                kind: "Name",
+                                                                value: "pack_options",
+                                                            },
+                                                            selectionSet: {
+                                                                kind: "SelectionSet",
+                                                                selections: [
+                                                                    {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                            kind: "Name",
+                                                                            value: "documentId",
+                                                                        },
+                                                                    },
+                                                                    {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                            kind: "Name",
+                                                                            value: "displayLabel",
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "pack_options" },
+                                                selectionSet: {
+                                                    kind: "SelectionSet",
+                                                    selections: [
+                                                        {
+                                                            kind: "Field",
+                                                            name: {
+                                                                kind: "Name",
+                                                                value: "documentId",
+                                                            },
+                                                        },
+                                                        {
+                                                            kind: "Field",
+                                                            name: {
+                                                                kind: "Name",
+                                                                value: "displayLabel",
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<GetInvitationQuery, GetInvitationQueryVariables>;

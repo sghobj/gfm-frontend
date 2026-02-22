@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 
 type LocationState = {
@@ -10,6 +11,7 @@ type LocationState = {
 export function AdminLoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation("common");
     const { login, isAuthenticated, isAdmin } = useAdminAuth();
 
     const [identifier, setIdentifier] = useState("");
@@ -34,7 +36,7 @@ export function AdminLoginPage() {
             await login({ identifier, password });
             navigate(redirectTarget, { replace: true });
         } catch (err: any) {
-            setError(err?.message ?? "Unable to sign in.");
+            setError(err?.message ?? t("adminLogin.errors.unableToSignIn"));
         } finally {
             setBusy(false);
         }
@@ -46,11 +48,9 @@ export function AdminLoginPage() {
                 <Stack spacing={3}>
                     <Box>
                         <Typography variant="h4" fontWeight={800}>
-                            Admin Login
+                            {t("adminLogin.title")}
                         </Typography>
-                        <Typography color="text.secondary">
-                            Sign in to generate protected B2B order links.
-                        </Typography>
+                        <Typography color="text.secondary">{t("adminLogin.subtitle")}</Typography>
                     </Box>
 
                     {error && <Alert severity="error">{error}</Alert>}
@@ -58,7 +58,7 @@ export function AdminLoginPage() {
                     <Box component="form" onSubmit={handleSubmit}>
                         <Stack spacing={2}>
                             <TextField
-                                label="Email or Username"
+                                label={t("adminLogin.fields.identifier")}
                                 value={identifier}
                                 onChange={(event) => setIdentifier(event.target.value)}
                                 autoComplete="username"
@@ -66,7 +66,7 @@ export function AdminLoginPage() {
                                 fullWidth
                             />
                             <TextField
-                                label="Password"
+                                label={t("adminLogin.fields.password")}
                                 type="password"
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
@@ -75,7 +75,9 @@ export function AdminLoginPage() {
                                 fullWidth
                             />
                             <Button type="submit" variant="contained" disabled={busy}>
-                                {busy ? "Signing in..." : "Sign in"}
+                                {busy
+                                    ? t("adminLogin.actions.signingIn")
+                                    : t("adminLogin.actions.signIn")}
                             </Button>
                         </Stack>
                     </Box>

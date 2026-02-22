@@ -2,12 +2,17 @@ import { Box, Stack, Divider, Typography } from "@mui/material";
 import type { AboutQuery } from "../../../gql/graphql";
 import { SectionLayout } from "../../../components/layout/SectionLayout";
 import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography";
+import { hasAnyLocalizedContent } from "../../../utils/localizedContent";
 
 type WhyUsType = NonNullable<AboutQuery["about"]>["whyUs"];
 type WhyUsSectionProps = { data: WhyUsType };
 
 export function WhyUs({ data }: WhyUsSectionProps) {
-    const points = data?.points ?? [];
+    const points =
+        data?.points?.filter(
+            (point): point is NonNullable<typeof point> =>
+                !!point && hasAnyLocalizedContent(point.title, point.subtitle),
+        ) ?? [];
     if (!data) return null;
 
     return (

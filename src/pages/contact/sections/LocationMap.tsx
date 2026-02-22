@@ -14,10 +14,11 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { Logo } from "../../../components/logo/Logo";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => {
     return (
-        <Stack direction="row" spacing={1.5} alignItems="flex-start">
+        <Stack direction="row" useFlexGap gap={1.5} alignItems="flex-start">
             <Box
                 sx={{
                     width: 22,
@@ -43,6 +44,7 @@ const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value
 };
 
 export const LocationMap = () => {
+    const { t } = useTranslation("common");
     return (
         <Box component="section" sx={{ py: { md: 1 } }}>
             <Grid container spacing={4}>
@@ -58,7 +60,11 @@ export const LocationMap = () => {
                     >
                         <CardHeader
                             avatar={<Logo width={100} />}
-                            title={<Typography variant={"h5"}>Good Food Mood Co.</Typography>}
+                            title={
+                                <Typography variant={"h5"}>
+                                    {t("contactPage.location.companyName")}
+                                </Typography>
+                            }
                         />
                         <Divider />
                         <CardContent
@@ -72,18 +78,18 @@ export const LocationMap = () => {
                             <Stack spacing={2}>
                                 <InfoRow
                                     icon={<EmailIcon fontSize="small" />}
-                                    label="Email"
+                                    label={t("contactPage.location.emailLabel")}
                                     value="hello@organicjordanian.com"
                                 />
                                 <InfoRow
                                     icon={<PhoneIcon fontSize="small" />}
-                                    label="Phone"
+                                    label={t("contactPage.location.phoneLabel")}
                                     value="+962 (6) 465-0000"
                                 />
                                 <InfoRow
                                     icon={<LocationOnIcon fontSize="small" />}
-                                    label="Office"
-                                    value="Amman, Jordan near downtown district"
+                                    label={t("contactPage.location.officeLabel")}
+                                    value={t("contactPage.location.officeValue")}
                                 />
                             </Stack>
                         </CardContent>

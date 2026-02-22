@@ -2,7 +2,7 @@
     "nav": {
         "home": "الرئيسية",
         "about": "من نحن",
-        "contact": "اتصل بنا",
+        "contact": "تواصل معنا",
         "products": "منتجاتنا",
         "certificates": "شهاداتنا"
     },
@@ -10,19 +10,265 @@
         "login": "تسجيل الدخول",
         "logout": "تسجيل الخروج"
     },
+    "app": {
+        "adminLoading": "جاري تحميل لوحة الإدارة. ننتظر جاهزية الخادم...",
+        "secureOrderLoading": "جاري تحميل نموذج الطلب الآمن. ننتظر جاهزية الخادم..."
+    },
+    "home": {
+        "loading": "جاري تجهيز الصفحة الرئيسية. قد يستغرق ذلك لحظات.",
+        "errorLoading": "حدث خطأ أثناء تحميل بيانات الصفحة الرئيسية",
+        "brands": {
+            "overline": "علاماتنا التجارية",
+            "title": "عالم من النكهات",
+            "subtitle": "من مجموعتنا الأساسية المميزة إلى العلامات المتخصصة، نجمع أفضل العلامات العضوية من الأردن.",
+            "logoAlt": "علامة تجارية"
+        },
+        "map": {
+            "countriesLabel": "الدول",
+            "continentsLabel": "القارات",
+            "searchPlaceholder": "ابحث في الأسواق...",
+            "moreLabel": "+{{count}} المزيد"
+        },
+        "certifications": {
+            "overline": "الشهادات",
+            "title": "التزامنا بالجودة",
+            "subtitle": "نلتزم بأعلى المعايير العالمية في سلامة الغذاء والزراعة العضوية، مدعومة بشهادات معترف بها دوليًا.",
+            "logoAlt": "شهادة",
+            "download": "تنزيل",
+            "noDocument": "لا يوجد مستند متاح لهذه الشهادة.",
+            "close": "إغلاق",
+            "moreDetails": "تفاصيل أكثر"
+        }
+    },
+    "products": {
+        "hero": {
+            "title": "منتجاتنا",
+            "subtitle": "اكتشف أجود المحاصيل العضوية من الأردن."
+        },
+        "filters": {
+            "searchPlaceholder": "ابحث في المنتجات والعلامات وخيارات التعبئة...",
+            "allBrands": "كل العلامات"
+        },
+        "loading": "جاري تحميل المنتجات. شكرًا لصبرك.",
+        "errorLoading": "تعذر تحميل المنتجات",
+        "labels": {
+            "other": "أخرى",
+            "showMore": "عرض تفاصيل أكثر ->"
+        },
+        "empty": {
+            "noResultsTitle": "لا توجد نتائج",
+            "noResultsSubtitle": "جرّب تعديل البحث أو الفلاتر للوصول لما تبحث عنه.",
+            "comingSoonTitle": "قريبًا..",
+            "comingSoonSubtitle": "ستتوفر عروض جديدة قريبًا."
+        },
+        "modal": {
+            "title": "نظرة عامة على المنتج",
+            "premiumHarvest": "حصاد مميز",
+            "by": "بواسطة",
+            "availablePackaging": "خيارات التعبئة المتاحة",
+            "option": "خيار",
+            "contactPackaging": "تواصل معنا لمعرفة تفاصيل التعبئة",
+            "authenticTitle": "منتجات عضوية أصيلة من الأردن",
+            "authenticSubtitle": "نضمن الطزاجة وأعلى معايير الجودة.",
+            "orderInquiry": "استفسار طلب",
+            "fullDetails": "التفاصيل الكاملة"
+        }
+    },
+    "productDetails": {
+        "loading": "جاري تحميل المنتج. شكرًا لصبرك.",
+        "errorLoading": "تعذر تحميل المنتج",
+        "comingSoonTitle": "قريبًا..",
+        "comingSoonSubtitle": "هذا العرض غير متاح حاليًا.",
+        "notFoundTitle": "المنتج غير موجود",
+        "notFoundSubtitle": "العرض المطلوب غير موجود.",
+        "backToProducts": "العودة إلى المنتجات",
+        "titleFallback": "تفاصيل المنتج",
+        "sections": {
+            "description": "وصف المنتج",
+            "specifications": "التوفر والمواصفات"
+        },
+        "noDescription": "لا يوجد وصف متاح لهذا العرض.",
+        "option": "خيار",
+        "contactPackaging": "تواصل معنا لمعرفة تفاصيل التعبئة.",
+        "authenticTitle": "منتجات عضوية أصلية",
+        "authenticSubtitle": "مأخوذة مباشرة من مزارع عضوية معتمدة في الأردن.",
+        "inquiryCta": "استفسار المنتج"
+    },
+    "certificates": {
+        "hero": {
+            "title": "شهاداتنا",
+            "subtitle": "نلتزم بأعلى المعايير الدولية في سلامة الغذاء والنزاهة العضوية.",
+            "searchPlaceholder": "ابحث في الشهادات..."
+        },
+        "loading": "جاري تحميل الشهادات. شكرًا لصبرك.",
+        "errorLoading": "تعذر تحميل الشهادات",
+        "empty": "لا توجد شهادات مطابقة لبحثك.",
+        "actions": {
+            "viewCertificate": "عرض الشهادة",
+            "auditReport": "تقرير التدقيق",
+            "officialValidation": "التحقق الرسمي",
+            "download": "تنزيل",
+            "auditReportFor": "{{name}} - تقرير التدقيق"
+        }
+    },
+    "adminLogin": {
+        "title": "تسجيل دخول الإدارة",
+        "subtitle": "سجّل الدخول لإنشاء روابط طلب B2B محمية.",
+        "fields": {
+            "identifier": "البريد الإلكتروني أو اسم المستخدم",
+            "password": "كلمة المرور"
+        },
+        "actions": {
+            "signIn": "تسجيل الدخول",
+            "signingIn": "جاري تسجيل الدخول..."
+        },
+        "errors": {
+            "unableToSignIn": "تعذر تسجيل الدخول."
+        }
+    },
+    "adminOrderLinks": {
+        "pageTitle": "روابط طلبات B2B",
+        "loggedInAs": "تم تسجيل الدخول باسم {{user}}",
+        "adminFallback": "مشرف",
+        "title": "إنشاء رابط طلب محمي",
+        "fields": {
+            "offering": "العرض",
+            "customerEmail": "بريد العميل",
+            "customerName": "اسم العميل (اختياري)",
+            "customerCompany": "شركة العميل (اختياري)",
+            "expiryDate": "تاريخ الانتهاء"
+        },
+        "labels": {
+            "unknownProduct": "منتج غير معروف",
+            "unknownBrand": "علامة غير معروفة"
+        },
+        "actions": {
+            "noExpiry": "بدون انتهاء",
+            "generate": "إنشاء الرابط",
+            "generating": "جاري الإنشاء...",
+            "reset": "إعادة تعيين",
+            "copyLink": "نسخ الرابط",
+            "sendByEmail": "إرسال عبر البريد"
+        },
+        "success": {
+            "linkGenerated": "تم إنشاء رابط الدعوة. يمكن استخدام هذا الرابط مرة واحدة."
+        },
+        "errors": {
+            "selectOffering": "يرجى اختيار عرض.",
+            "validCustomerEmail": "يرجى إدخال بريد عميل صحيح.",
+            "missingToken": "الخادم لم يُرجع رمزًا.",
+            "createFailed": "تعذر إنشاء رابط الطلب."
+        }
+    },
+    "orderSubmit": {
+        "title": "طلب B2B آمن",
+        "productFallback": "منتج",
+        "brandFallback": "علامة",
+        "validating": "جاري التحقق من الدعوة...",
+        "success": "تم إرسال الطلب بنجاح. المرجع: {{reference}}",
+        "orderCreatedFallback": "تم الإنشاء",
+        "fields": {
+            "grade": "الدرجة",
+            "size": "الحجم",
+            "packagingOption": "خيار التعبئة",
+            "packagingManualHelp": "لا توجد خيارات محددة مسبقًا. أدخل التعبئة يدويًا.",
+            "quantityKg": "الكمية (كغ)",
+            "approxPackages": "العدد التقريبي للعبوات",
+            "packagesCount": "{{value}} عبوة",
+            "selectPackagingOption": "اختر خيار التعبئة",
+            "approximationHelp": "الحساب التقريبي يعتمد على الكمية/الوحدة المختارة. في حالة L/ml يتم استخدام تقدير 1L ~= 1Kg.",
+            "fullName": "الاسم الكامل",
+            "email": "البريد الإلكتروني",
+            "company": "الشركة (اختياري)",
+            "message": "رسالة (اختياري)"
+        },
+        "actions": {
+            "submitting": "جاري الإرسال...",
+            "submit": "إرسال الطلب"
+        },
+        "summary": {
+            "requestedQuantity": "الكمية المطلوبة (كغ): {{quantity}}",
+            "approxPackages": "العدد التقريبي للعبوات: {{value}}"
+        },
+        "errors": {
+            "missingInvitationToken": "رمز الدعوة مفقود.",
+            "invalidInvitation": "الدعوة غير صالحة أو غير متاحة.",
+            "customerNameRequired": "اسم العميل مطلوب.",
+            "customerEmailRequired": "بريد العميل مطلوب.",
+            "customerEmailMustMatch": "يجب أن يطابق بريد العميل البريد الموجود في الدعوة.",
+            "quantityMin": "الكمية يجب ألا تقل عن 0.1 كغ.",
+            "gradeRequired": "الدرجة مطلوبة.",
+            "sizeRequired": "الحجم مطلوب.",
+            "packagingRequired": "خيار التعبئة مطلوب.",
+            "timeout": "انتهت مهلة إرسال الطلب. يرجى المحاولة مرة أخرى.",
+            "unableToSubmit": "تعذر إرسال الطلب.",
+            "missingTokenInUrl": "الرمز مفقود. استخدم رابط الدعوة الكامل.",
+            "invalidExpiredOrUsed": "هذه الدعوة غير صالحة أو منتهية أو تم استخدامها."
+        }
+    },
+    "inquiryModal": {
+        "title": "استفسار المنتج",
+        "sections": {
+            "specifications": "المواصفات",
+            "yourInformation": "بياناتك"
+        },
+        "fields": {
+            "grade": "الدرجة",
+            "size": "الحجم",
+            "option": "خيار",
+            "packagingOption": "خيار التعبئة",
+            "quantityKg": "الكمية المطلوبة (كغ)",
+            "approxPackages": "العدد التقريبي للعبوات",
+            "packagesCount": "{{value}} عبوة",
+            "selectPackaging": "اختر خيار التعبئة",
+            "approximationHelp": "الحساب التقريبي يعتمد على الكمية/الوحدة المختارة. في حالة L/ml يتم استخدام تقدير 1L ~= 1Kg.",
+            "fullName": "الاسم الكامل",
+            "email": "البريد الإلكتروني",
+            "company": "الشركة (اختياري)",
+            "additionalMessage": "رسالة إضافية"
+        },
+        "validation": {
+            "gradeRequired": "الدرجة مطلوبة",
+            "selectionRequired": "الاختيار مطلوب",
+            "packagingRequired": "خيار التعبئة مطلوب",
+            "quantityRequired": "الكمية بالكيلوغرام مطلوبة",
+            "quantityMin": "الحد الأدنى للكمية 0.1 كغ",
+            "nameRequired": "الاسم مطلوب",
+            "emailRequired": "البريد الإلكتروني مطلوب",
+            "invalidEmail": "البريد الإلكتروني غير صالح"
+        },
+        "actions": {
+            "email": "استفسار عبر البريد",
+            "whatsapp": "واتساب"
+        }
+    },
+    "contactPage": {
+        "hero": {
+            "title": "لنتحدث عن الطعام الجيد.",
+            "subtitle": "نحن هنا لمساعدتك في الطلبات والشراكات ومعلومات المنتجات. تواصل معنا وسنرد خلال 1-2 يوم عمل.",
+            "note": "مصنوع بعناية في الأردن. مكونات معتمدة الجودة دائمًا."
+        },
+        "location": {
+            "companyName": "شركة مزاج الغذاء الجيد",
+            "emailLabel": "البريد الإلكتروني",
+            "phoneLabel": "الهاتف",
+            "officeLabel": "المكتب",
+            "officeValue": "عمّان، الأردن - قرب منطقة وسط البلد"
+        }
+    },
     "contact": {
         "hero": {
             "title": "طلبات الجملة والشركات",
-            "subtitle": "احكيلنا عن نشاطك التجاري واحتياجاتك، وفريقنا رح يتواصل معك قريباً."
+            "subtitle": "أخبرنا قليلًا عن نشاطك التجاري وما تبحث عنه، وسيتواصل فريقنا معك قريبًا."
         },
         "form": {
             "name": "الاسم الكامل",
-            "namePh": "مثال: سارة غجوب",
+            "namePh": "مثال: سارة",
             "company": "اسم الشركة",
-            "companyPh": "مثال: سوق الغذاء الصحي",
-            "role": "المسمّى الوظيفي (اختياري)",
-            "rolePh": "مالك / مسؤول مشتريات / مدير",
-            "email": "البريد الإلكتروني للعمل",
+            "companyPh": "مثال: شركة الأسواق الغذائية",
+            "role": "الوظيفة (اختياري)",
+            "rolePh": "مالك / مشتريات / مدير",
+            "email": "بريد العمل",
             "emailPh": "name@company.com",
             "phone": "الهاتف / واتساب",
             "phonePh": "مثال: +962 7X XXX XXXX",
@@ -31,26 +277,26 @@
             "products": "المنتجات المطلوبة",
             "volume": "حجم الطلب الشهري المتوقع",
             "message": "الرسالة / التفاصيل",
-            "messagePh": "اكتب احتياجك (قائمة منتجات، كميات، منطقة التوصيل، الوقت المتوقع... إلخ)",
+            "messagePh": "اكتب ما تحتاجه (المنتجات، الكميات، التوصيل، المدة...)",
             "branches": "عدد الفروع",
             "branchesPh": "مثال: 1",
             "cuisine": "نوع المطبخ (اختياري)",
-            "cuisinePh": "مثال: كافيه صحي، لبناني، فطور",
-            "regions": "المناطق المغطّاة",
-            "coldStorage": "هل يتوفر مستودع / تبريد؟",
+            "cuisinePh": "مثال: صحي / لبناني / فطور",
+            "regions": "المناطق المغطاة",
+            "coldStorage": "هل يوجد مستودع / تبريد؟",
             "coldStorageYes": "نعم",
             "coldStorageNo": "لا",
-            "catalog": "أرسلوا لي الكاتالوج/قائمة الأسعار",
+            "catalog": "أرسل لي الكتالوج/قائمة الأسعار",
             "consent": "أوافق على التواصل معي بخصوص هذا الطلب.",
             "submit": "إرسال الطلب",
-            "success": "شكراً! تم استلام طلبك وسنتواصل معك قريباً.",
-            "error": "حدث خطأ. الرجاء المحاولة مرة أخرى."
+            "success": "شكرًا! تم استلام طلبك وسنتواصل معك قريبًا.",
+            "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
         },
         "options": {
             "businessTypes": {
                 "retail": "متجر / سوبرماركت",
-                "horeca": "كافيه / مطعم / فندق",
-                "distributor": "موزّع / تاجر جملة",
+                "horeca": "مقهى / مطعم / فندق",
+                "distributor": "موزع / تاجر جملة",
                 "corporate": "شركات / تموين مكاتب",
                 "online": "متجر إلكتروني",
                 "other": "أخرى"
@@ -71,18 +317,18 @@
                 "other": "أخرى"
             },
             "volumes": {
-                "lt200": "أقل من ٢٠٠ دينار",
-                "200_500": "٢٠٠–٥٠٠ دينار",
-                "500_1000": "٥٠٠–١٠٠٠ دينار",
-                "1000plus": "أكثر من ١٠٠٠ دينار"
+                "lt200": "أقل من 200 دينار",
+                "200_500": "200-500 دينار",
+                "500_1000": "500-1000 دينار",
+                "1000plus": "أكثر من 1000 دينار"
             },
             "products": {
-                "snacks": "سناكات عضوية",
-                "spreads": "سبريدز وزبدة مكسرات",
+                "snacks": "وجبات خفيفة عضوية",
+                "spreads": "سبريد وزبدة مكسرات",
                 "granola": "جرانولا وحبوب",
                 "honey": "عسل",
                 "oils": "زيت زيتون وزيوت",
-                "pickles": "مخللات ومونة",
+                "pickles": "مخللات ومؤن",
                 "spices": "بهارات وأعشاب",
                 "other": "أخرى"
             },
@@ -91,8 +337,29 @@
                 "central": "الوسط",
                 "south": "الجنوب",
                 "amman": "عمّان",
-                "nationwide": "كافة المحافظات"
+                "nationwide": "جميع المحافظات"
             }
+        }
+    },
+    "footer": {
+        "quickLinksTitle": "روابط سريعة",
+        "contactTitle": "التواصل",
+        "fallback": {
+            "brandName": "شركة مزاج الغذاء الجيد",
+            "brandDescription": "شريك تصدير عضوي موثوق من الأردن. بعض محتوى الموقع غير متاح مؤقتًا.",
+            "address": "عمّان، الأردن",
+            "email": "info@example.com",
+            "quickLinks": {
+                "home": "الرئيسية",
+                "products": "المنتجات",
+                "contact": "تواصل معنا"
+            },
+            "legalLinks": {
+                "privacy": "الخصوصية",
+                "terms": "الشروط"
+            },
+            "copyright": "© {{year}} {{brandName}}",
+            "unavailableNote": "بعض المحتوى غير متاح مؤقتًا."
         }
     }
 }

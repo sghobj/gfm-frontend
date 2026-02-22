@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { ThemeProvider, type Theme } from "@mui/material/styles";
+import { ThemeProvider, type Theme, useTheme } from "@mui/material/styles";
 import type { SxProps } from "@mui/material/styles";
 import type { SchemeId } from "../../theme/schemes";
 import { muiTheme } from "../../theme/muiTheme";
@@ -14,7 +14,9 @@ export const Scheme = ({
     sx?: SxProps<Theme>;
     children: ReactNode;
 }) => {
-    const theme = useMemo(() => muiTheme(id), [id]);
+    const parentTheme = useTheme();
+    const direction = parentTheme.direction === "rtl" ? "rtl" : "ltr";
+    const theme = useMemo(() => muiTheme(id, direction), [id, direction]);
 
     return (
         <ThemeProvider theme={theme}>

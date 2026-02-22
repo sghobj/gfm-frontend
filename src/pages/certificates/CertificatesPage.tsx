@@ -22,6 +22,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { useQuery } from "@apollo/client/react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
+import { useTranslation } from "react-i18next";
 
 import { CertificatesDocument, type CertificatesQuery } from "../../gql/graphql.ts";
 import { resolveStrapiMediaUrl, toSearchableText } from "../../utils/strapiMedia";
@@ -29,6 +30,7 @@ import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import { LoadingState } from "../../components/state/LoadingState";
+import { hasNonEmptyText } from "../../utils/localizedContent.ts";
 
 // ----------------------------
 // UI Types (derived from GQL)
@@ -37,6 +39,7 @@ type GQLCertificate = NonNullable<NonNullable<CertificatesQuery["certificates"]>
 
 // ---------- Component ----------
 export function CertificatesPage() {
+    const { t } = useTranslation("common");
     const { data, loading, error } = useQuery(CertificatesDocument);
 
     const [search, setSearch] = useState("");
@@ -46,7 +49,10 @@ export function CertificatesPage() {
 
     const certificates = useMemo(() => {
         if (!data?.certificates) return [];
-        return data.certificates.filter((c): c is GQLCertificate => !!c);
+        return data.certificates.filter(
+            (certificate): certificate is GQLCertificate =>
+                !!certificate && hasNonEmptyText(certificate.name),
+        );
     }, [data]);
 
     // Filtering
@@ -84,17 +90,14 @@ export function CertificatesPage() {
                     >
                         <Stack spacing={6}>
                             <Stack spacing={2} sx={{ color: "text.primary" }}>
-                                <SectionTitle>Our Certifications</SectionTitle>
-                                <SectionSubtitle>
-                                    Upholding the highest international standards for food safety
-                                    and organic integrity.
-                                </SectionSubtitle>
+                                <SectionTitle>{t("certificates.hero.title")}</SectionTitle>
+                                <SectionSubtitle>{t("certificates.hero.subtitle")}</SectionSubtitle>
                             </Stack>
 
-                            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                            <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={2}>
                                 <TextField
                                     size="small"
-                                    placeholder="Search certifications..."
+                                    placeholder={t("certificates.hero.searchPlaceholder")}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     sx={{
@@ -123,11 +126,11 @@ export function CertificatesPage() {
             {/* Content */}
             <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 }, maxWidth: "1440px" }}>
                 {loading ? (
-                    <LoadingState message="Loading certifications… Thanks for your patience." />
+                    <LoadingState message={t("certificates.loading")} />
                 ) : error ? (
                     <Box sx={{ py: 10, textAlign: "center" }}>
                         <Typography variant="h5" color="error" fontWeight={900}>
-                            Failed to load certifications
+                            {t("certificates.errorLoading")}
                         </Typography>
                         <Typography color="text.secondary" sx={{ mt: 1 }}>
                             {error.message}
@@ -138,7 +141,7 @@ export function CertificatesPage() {
                         {filteredCertificates.length === 0 ? (
                             <Box sx={{ py: 10, textAlign: "center" }}>
                                 <Typography variant="h6" color="text.secondary">
-                                    No certifications found matching your search.
+                                    {t("certificates.empty")}
                                 </Typography>
                             </Box>
                         ) : (
@@ -209,7 +212,8 @@ export function CertificatesPage() {
 
                                                 <Stack
                                                     direction={{ xs: "column", sm: "row" }}
-                                                    spacing={2}
+                                                    useFlexGap
+                                                    gap={2}
                                                 >
                                                     {cert.certificate?.url && (
                                                         <Button
@@ -229,7 +233,9 @@ export function CertificatesPage() {
                                                                 px: 3,
                                                             }}
                                                         >
-                                                            View Certificate
+                                                            {t(
+                                                                "certificates.actions.viewCertificate",
+                                                            )}
                                                         </Button>
                                                     )}
                                                     {cert.audit_report?.url && (
@@ -240,7 +246,10 @@ export function CertificatesPage() {
                                                             onClick={() =>
                                                                 setSelectedDoc({
                                                                     url: cert.audit_report!.url,
-                                                                    name: `${cert.name} - Audit Report`,
+                                                                    name: t(
+                                                                        "certificates.actions.auditReportFor",
+                                                                        { name: cert.name },
+                                                                    ),
                                                                 })
                                                             }
                                                             sx={{
@@ -250,7 +259,7 @@ export function CertificatesPage() {
                                                                 px: 3,
                                                             }}
                                                         >
-                                                            Audit Report
+                                                            {t("certificates.actions.auditReport")}
                                                         </Button>
                                                     )}
                                                     {/* Validation link placeholder - using a generic URL or if a field exists in future */}
@@ -270,7 +279,9 @@ export function CertificatesPage() {
                                                             "&:hover": { color: "primary.main" },
                                                         }}
                                                     >
-                                                        Official Validation
+                                                        {t(
+                                                            "certificates.actions.officialValidation",
+                                                        )}
                                                     </Button>
                                                 </Stack>
                                             </Stack>
@@ -305,9 +316,9 @@ export function CertificatesPage() {
                     <Typography component="span" variant="h6" fontWeight={800}>
                         {selectedDoc?.name}
                     </Typography>
-                    <Stack direction="row" spacing={1}>
+                    <Stack direction="row" useFlexGap gap={1}>
                         {selectedDoc && (
-                            <Tooltip title="Download">
+                            <Tooltip title={t("certificates.actions.download")}>
                                 <IconButton
                                     component="a"
                                     href={resolveStrapiMediaUrl(selectedDoc.url)}

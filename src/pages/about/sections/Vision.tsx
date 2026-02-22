@@ -7,6 +7,7 @@ import {
 } from "../../../components/typography/SectionTypography.tsx";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
+import { hasAnyLocalizedContent } from "../../../utils/localizedContent.ts";
 
 type VisionType = NonNullable<AboutQuery["about"]>["vision"];
 
@@ -15,6 +16,12 @@ type VisionSectionProps = {
 };
 
 export const VisionSection = ({ data }: VisionSectionProps) => {
+    const goals =
+        data?.goals?.filter(
+            (goal): goal is NonNullable<typeof goal> =>
+                !!goal && hasAnyLocalizedContent(goal.title, goal.value),
+        ) ?? [];
+
     return (
         <SectionLayout
             schemeId={4}
@@ -37,7 +44,7 @@ export const VisionSection = ({ data }: VisionSectionProps) => {
                         headingSx={{ mt: 2, mb: 1, fontWeight: 600 }}
                     />
 
-                    {data?.goals?.length && (
+                    {goals.length > 0 && (
                         <>
                             <Divider
                                 sx={{
@@ -47,7 +54,7 @@ export const VisionSection = ({ data }: VisionSectionProps) => {
                             />
 
                             <Stack spacing={1.2}>
-                                {data?.goals?.map((goal, idx) => (
+                                {goals.map((goal, idx) => (
                                     <Line
                                         key={goal?.id ?? `${goal?.title ?? "goal"}-${idx}`}
                                         label={goal?.title}

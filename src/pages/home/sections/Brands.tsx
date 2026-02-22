@@ -1,4 +1,5 @@
 import { Box, Container, Stack, Typography, Grid } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { Scheme } from "../../../components/scheme/Scheme";
 import { SectionSubtitle } from "../../../components/typography/SectionTypography";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia";
@@ -11,6 +12,7 @@ type BrandsProps = {
 };
 
 export const Brands = ({ brands }: BrandsProps) => {
+    const { t } = useTranslation("common");
     if (!brands || brands.length === 0) return null;
 
     const sortedBrands = [...brands].sort((a, b) => {
@@ -58,7 +60,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                     fontWeight={800}
                                     sx={{ letterSpacing: 3 }}
                                 >
-                                    OUR BRANDS
+                                    {t("home.brands.overline")}
                                 </Typography>
 
                                 <Typography
@@ -69,7 +71,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                         letterSpacing: -0.5,
                                     }}
                                 >
-                                    A World of Flavors
+                                    {t("home.brands.title")}
                                 </Typography>
 
                                 <SectionSubtitle
@@ -80,8 +82,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                         color: "text.secondary",
                                     }}
                                 >
-                                    From our flagship premium selection to specialized labels, we
-                                    bring together the best organic brands from Jordan.
+                                    {t("home.brands.subtitle")}
                                 </SectionSubtitle>
                             </Stack>
                         </Grid>
@@ -136,7 +137,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                                 alt={
                                                     brand?.logo?.alternativeText ??
                                                     brand?.name ??
-                                                    "Brand"
+                                                    t("home.brands.logoAlt")
                                                 }
                                                 loading="lazy"
                                                 sx={{

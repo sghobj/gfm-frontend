@@ -1,8 +1,10 @@
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { LocationMap } from "./sections/LocationMap.tsx";
 import { Box, Grid, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const ContactUs = () => {
+    const { t } = useTranslation("common");
     return (
         <Box className={"section contact about"}>
             <Box
@@ -18,15 +20,13 @@ export const ContactUs = () => {
                     <Grid container>
                         <Grid size={{ sm: 12 }} className={"text-area"}>
                             <Typography variant="h2" className={"section-heading"}>
-                                Let’s talk good food.
+                                {t("contactPage.hero.title")}
                             </Typography>
                             <Typography variant="h2" className={"subheader"}>
-                                We’re here to help with orders, partnerships, and product info.
-                                Reach out and we’ll respond within 1–2 business days.
+                                {t("contactPage.hero.subtitle")}
                             </Typography>
                             <Typography variant="body1" className={"landing"}>
-                                Made with care in Jordan. Certified-quality ingredients,
-                                always.{" "}
+                                {t("contactPage.hero.note")}
                             </Typography>
                         </Grid>
                     </Grid>

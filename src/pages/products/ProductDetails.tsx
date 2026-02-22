@@ -15,6 +15,7 @@ import {
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { HeroSection } from "../../components/section/HeroSection.tsx";
 import { resolveStrapiMediaUrl } from "../../utils/strapiMedia.ts";
 import { GetOfferingDocument } from "../../gql/graphql.ts";
@@ -25,6 +26,8 @@ import { useQuery } from "@apollo/client/react";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
 import { useEffect, useMemo, useState } from "react";
 import { LoadingState } from "../../components/state/LoadingState";
+import { toStrapiLocale } from "../../apollo/apolloClient.ts";
+import { isContentForLocale } from "../../utils/localizedContent.ts";
 
 function initials(name: string) {
     return name
@@ -38,13 +41,21 @@ function initials(name: string) {
 export const ProductDetails = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { i18n, t } = useTranslation("common");
+    const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
+    const activeLocale = locale as "en" | "ar";
 
     const { data, loading, error } = useQuery(GetOfferingDocument, {
-        variables: { id: id || "" },
+        variables: { id: id || "", locale },
         skip: !id,
     });
 
     const offering = data?.offering;
+    const hasMatchingLocale =
+        !!offering &&
+        isContentForLocale(offering.locale, activeLocale) &&
+        isContentForLocale(offering.brand?.locale, activeLocale) &&
+        isContentForLocale(offering.product?.locale, activeLocale);
     const isUnavailable = String(offering?.availability ?? "").toLowerCase() === "no";
 
     const images = useMemo(() => {
@@ -67,20 +78,20 @@ export const ProductDetails = () => {
     }, [images]);
 
     if (loading) {
-        return <LoadingState message="Loading product… Thanks for your patience." />;
+        return <LoadingState message={t("productDetails.loading")} />;
     }
 
-    if (error || !offering || isUnavailable) {
+    if (error || !offering || !hasMatchingLocale || isUnavailable) {
         const title = error
-            ? "Failed to load product"
+            ? t("productDetails.errorLoading")
             : isUnavailable
-              ? "Coming soon.."
-              : "Product not found";
+              ? t("productDetails.comingSoonTitle")
+              : t("productDetails.notFoundTitle");
         const subtitle = error
             ? error.message
             : isUnavailable
-              ? "This offering is currently unavailable."
-              : "The requested offering does not exist.";
+              ? t("productDetails.comingSoonSubtitle")
+              : t("productDetails.notFoundSubtitle");
 
         return (
             <Container maxWidth="xl" sx={{ py: 10, textAlign: "center" }}>
@@ -91,7 +102,7 @@ export const ProductDetails = () => {
                     {subtitle}
                 </Typography>
                 <Button onClick={() => navigate("/products")} sx={{ mt: 2 }}>
-                    Back to Products
+                    {t("productDetails.backToProducts")}
                 </Button>
             </Container>
         );
@@ -100,7 +111,7 @@ export const ProductDetails = () => {
     return (
         <>
             <HeroSection
-                title={offering.product?.name || "Product Details"}
+                title={offering.product?.name || t("productDetails.titleFallback")}
                 subtitle={offering.product?.category?.name || ""}
                 image={
                     resolveStrapiMediaUrl(images[0]?.url) ||
@@ -124,7 +135,7 @@ export const ProductDetails = () => {
                             "&:hover": { color: "white" },
                         }}
                     >
-                        Home
+                        {t("nav.home")}
                     </Link>
                     <Link
                         underline="hover"
@@ -135,7 +146,7 @@ export const ProductDetails = () => {
                             "&:hover": { color: "white" },
                         }}
                     >
-                        Products
+                        {t("nav.products")}
                     </Link>
                     <Typography sx={{ color: "white", fontWeight: 700 }}>
                         {offering.product?.name}
@@ -294,7 +305,7 @@ export const ProductDetails = () => {
                                                         color: "text.secondary",
                                                     }}
                                                 >
-                                                    Product Description
+                                                    {t("productDetails.sections.description")}
                                                 </Typography>
                                                 {offering.product?.description ? (
                                                     <BlocksTypography
@@ -308,7 +319,7 @@ export const ProductDetails = () => {
                                                         color="text.secondary"
                                                         sx={{ fontStyle: "italic" }}
                                                     >
-                                                        No description available for this offering.
+                                                        {t("productDetails.noDescription")}
                                                     </Typography>
                                                 )}
                                             </Box>
@@ -324,7 +335,7 @@ export const ProductDetails = () => {
                                                         color: "text.secondary",
                                                     }}
                                                 >
-                                                    Availability & Specifications
+                                                    {t("productDetails.sections.specifications")}
                                                 </Typography>
 
                                                 {offering.isMedjoolDate ? (
@@ -387,7 +398,9 @@ export const ProductDetails = () => {
                                                                                             null
                                                                                             ? `${opt.amountMin}-${opt.amountMax} ${opt.unit ?? ""}`.trim()
                                                                                             : `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim()) ||
-                                                                                        "Option";
+                                                                                        t(
+                                                                                            "productDetails.option",
+                                                                                        );
 
                                                                                     return (
                                                                                         <Chip
@@ -415,7 +428,9 @@ export const ProductDetails = () => {
                                                                 color="text.secondary"
                                                                 sx={{ fontStyle: "italic" }}
                                                             >
-                                                                Contact for packaging details.
+                                                                {t(
+                                                                    "productDetails.contactPackaging",
+                                                                )}
                                                             </Typography>
                                                         )}
                                                     </Stack>
@@ -436,7 +451,7 @@ export const ProductDetails = () => {
                                                                     const label =
                                                                         opt?.displayLabel ||
                                                                         `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim() ||
-                                                                        "Option";
+                                                                        t("productDetails.option");
 
                                                                     return (
                                                                         <Chip
@@ -452,7 +467,9 @@ export const ProductDetails = () => {
                                                                 color="text.secondary"
                                                                 sx={{ fontStyle: "italic" }}
                                                             >
-                                                                Contact for packaging details.
+                                                                {t(
+                                                                    "productDetails.contactPackaging",
+                                                                )}
                                                             </Typography>
                                                         )}
                                                     </Stack>
@@ -480,14 +497,13 @@ export const ProductDetails = () => {
                                                             color="primary.900"
                                                             fontWeight={800}
                                                         >
-                                                            Authentic Organic Produce
+                                                            {t("productDetails.authenticTitle")}
                                                         </Typography>
                                                         <Typography
                                                             variant="body2"
                                                             color="primary.800"
                                                         >
-                                                            Sourced directly from certified organic
-                                                            farms in Jordan.
+                                                            {t("productDetails.authenticSubtitle")}
                                                         </Typography>
                                                     </Box>
                                                 </Stack>
@@ -507,7 +523,7 @@ export const ProductDetails = () => {
                                                 }}
                                                 onClick={() => setOrderModalOpen(true)}
                                             >
-                                                Product Inquiry
+                                                {t("productDetails.inquiryCta")}
                                             </Button>
                                         </Stack>
                                     </Grid>

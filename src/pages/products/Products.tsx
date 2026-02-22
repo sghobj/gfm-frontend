@@ -21,6 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { StrapiImage } from "../../components/image/StrapiImage";
 import { useQuery } from "@apollo/client/react";
 
@@ -31,6 +32,8 @@ import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { LoadingState } from "../../components/state/LoadingState";
+import { toStrapiLocale } from "../../apollo/apolloClient.ts";
+import { isContentForLocale } from "../../utils/localizedContent.ts";
 
 // ----------------------------
 // GraphQL Query
@@ -64,7 +67,12 @@ function initials(name: string) {
 // ---------- Component ----------
 export function Products() {
     const navigate = useNavigate();
-    const { data, loading, error } = useQuery(GET_ALL_OFFERINGS);
+    const { i18n, t } = useTranslation("common");
+    const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
+    const activeLocale = locale as "en" | "ar";
+    const { data, loading, error } = useQuery(GET_ALL_OFFERINGS, {
+        variables: { locale },
+    });
 
     const hasAnyAvailableOfferings = useMemo(() => {
         if (!data?.offerings) return false;
@@ -73,9 +81,12 @@ export function Products() {
                 !!o &&
                 !!o.brand &&
                 !!o.product &&
+                isContentForLocale(o.locale, activeLocale) &&
+                isContentForLocale(o.brand.locale, activeLocale) &&
+                isContentForLocale(o.product.locale, activeLocale) &&
                 String(o.availability ?? "").toLowerCase() !== "no",
         );
-    }, [data?.offerings]);
+    }, [data?.offerings, activeLocale]);
 
     const offerings: GQLOffering[] = useMemo(() => {
         if (!data?.offerings) return [];
@@ -84,9 +95,12 @@ export function Products() {
                 !!o &&
                 !!o.brand &&
                 !!o.product &&
+                isContentForLocale(o.locale, activeLocale) &&
+                isContentForLocale(o.brand.locale, activeLocale) &&
+                isContentForLocale(o.product.locale, activeLocale) &&
                 String(o.availability ?? "").toLowerCase() !== "no",
         );
-    }, [data]);
+    }, [data, activeLocale]);
 
     // Filters
     const [search, setSearch] = useState("");
@@ -107,8 +121,8 @@ export function Products() {
                 return { slug, name };
             })
             .sort((a, b) => a.name.localeCompare(b.name));
-        return [{ slug: "all", name: "All brands" }, ...opts];
-    }, [offerings]);
+        return [{ slug: "all", name: t("products.filters.allBrands") }, ...opts];
+    }, [offerings, t]);
 
     // Grouping & Filtering
     const productsList = useMemo(() => {
@@ -164,18 +178,16 @@ export function Products() {
                     >
                         <Stack spacing={6}>
                             <Stack spacing={2}>
-                                <SectionTitle>Our Products</SectionTitle>
-                                <SectionSubtitle>
-                                    Experience the finest organic harvest from Jordan.
-                                </SectionSubtitle>
+                                <SectionTitle>{t("products.hero.title")}</SectionTitle>
+                                <SectionSubtitle>{t("products.hero.subtitle")}</SectionSubtitle>
                             </Stack>
 
                             <Stack spacing={3}>
                                 {/* Search & Brand Filters */}
-                                <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                                <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={2}>
                                     <TextField
                                         size="small"
-                                        placeholder="Search products, brands, pack formats…"
+                                        placeholder={t("products.filters.searchPlaceholder")}
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         sx={{
@@ -225,11 +237,11 @@ export function Products() {
             {/* Content */}
             <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 } }}>
                 {loading ? (
-                    <LoadingState message="Loading products… Thanks for your patience." />
+                    <LoadingState message={t("products.loading")} />
                 ) : error ? (
                     <Box sx={{ py: 10, textAlign: "center" }}>
                         <Typography variant="h5" color="error" fontWeight={900}>
-                            Failed to load products
+                            {t("products.errorLoading")}
                         </Typography>
                         <Typography color="text.secondary" sx={{ mt: 1 }}>
                             {error.message}
@@ -279,7 +291,8 @@ export function Products() {
                                                             opacity: 0.8,
                                                         }}
                                                     >
-                                                        {product.category?.name || "Other"}
+                                                        {product.category?.name ||
+                                                            t("products.labels.other")}
                                                     </Typography>
                                                     <Typography
                                                         variant="h4"
@@ -456,7 +469,7 @@ export function Products() {
                                                                     transition: "all 0.3s ease",
                                                                 }}
                                                             >
-                                                                Show more details →
+                                                                {t("products.labels.showMore")}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -473,17 +486,16 @@ export function Products() {
                             <Box sx={{ py: 10, textAlign: "center" }}>
                                 <Typography variant="h5" fontWeight={900}>
                                     {hasAnyAvailableOfferings
-                                        ? "No results found"
-                                        : "Coming soon.."}
+                                        ? t("products.empty.noResultsTitle")
+                                        : t("products.empty.comingSoonTitle")}
                                 </Typography>
                                 {hasAnyAvailableOfferings ? (
                                     <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                        Try adjusting your search or filters to find what
-                                        you&apos;re looking for.
+                                        {t("products.empty.noResultsSubtitle")}
                                     </Typography>
                                 ) : (
                                     <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                        New offerings will be available soon.
+                                        {t("products.empty.comingSoonSubtitle")}
                                     </Typography>
                                 )}
                             </Box>
@@ -514,7 +526,7 @@ export function Products() {
                             }}
                         >
                             <Typography variant="h6" fontWeight={900}>
-                                Product Overview
+                                {t("products.modal.title")}
                             </Typography>
                             <IconButton
                                 aria-label="close"
@@ -549,7 +561,7 @@ export function Products() {
                                                 sx={{ letterSpacing: 1.5 }}
                                             >
                                                 {selectedOffering.product?.category?.name ||
-                                                    "Premium Harvest"}
+                                                    t("products.modal.premiumHarvest")}
                                             </Typography>
                                             <Typography
                                                 variant="h4"
@@ -558,12 +570,17 @@ export function Products() {
                                             >
                                                 {selectedOffering.product?.name}
                                             </Typography>
-                                            <Stack direction="row" spacing={1} alignItems="center">
+                                            <Stack
+                                                direction="row"
+                                                useFlexGap
+                                                gap={1}
+                                                alignItems="center"
+                                            >
                                                 <Typography
                                                     variant="subtitle1"
                                                     color="text.secondary"
                                                 >
-                                                    by
+                                                    {t("products.modal.by")}
                                                 </Typography>
                                                 <Typography variant="subtitle1" fontWeight={700}>
                                                     {selectedOffering.brand?.name}
@@ -582,7 +599,7 @@ export function Products() {
                                                     color: "text.secondary",
                                                 }}
                                             >
-                                                Available Packaging
+                                                {t("products.modal.availablePackaging")}
                                             </Typography>
 
                                             {selectedOffering.isMedjoolDate ? (
@@ -641,7 +658,9 @@ export function Products() {
                                                                                         key={`${specIdx}-${idx}`}
                                                                                         label={
                                                                                             label ||
-                                                                                            "Option"
+                                                                                            t(
+                                                                                                "products.modal.option",
+                                                                                            )
                                                                                         }
                                                                                         variant="outlined"
                                                                                         size="small"
@@ -667,7 +686,7 @@ export function Products() {
                                                             color="text.secondary"
                                                             sx={{ fontStyle: "italic" }}
                                                         >
-                                                            Contact for packaging details
+                                                            {t("products.modal.contactPackaging")}
                                                         </Typography>
                                                     )}
                                                 </Stack>
@@ -688,7 +707,7 @@ export function Products() {
                                                                 const label =
                                                                     opt?.displayLabel ||
                                                                     `${opt?.amount ?? ""} ${opt?.unit ?? ""}`.trim() ||
-                                                                    "Option";
+                                                                    t("products.modal.option");
 
                                                                 return (
                                                                     <Chip
@@ -709,7 +728,7 @@ export function Products() {
                                                             color="text.secondary"
                                                             sx={{ fontStyle: "italic" }}
                                                         >
-                                                            Contact for packaging details
+                                                            {t("products.modal.contactPackaging")}
                                                         </Typography>
                                                     )}
                                                 </Stack>
@@ -730,14 +749,14 @@ export function Products() {
                                                 color="primary.900"
                                                 fontWeight={600}
                                             >
-                                                🌿 Authentic Organic Produce from Jordan
+                                                {t("products.modal.authenticTitle")}
                                             </Typography>
                                             <Typography variant="caption" color="primary.800">
-                                                Guaranteed freshness and premium quality standards.
+                                                {t("products.modal.authenticSubtitle")}
                                             </Typography>
                                         </Box>
 
-                                        <Stack direction="row" spacing={2}>
+                                        <Stack direction="row" useFlexGap gap={2}>
                                             <Button
                                                 variant="contained"
                                                 fullWidth
@@ -752,7 +771,7 @@ export function Products() {
                                                     boxShadow: 4,
                                                 }}
                                             >
-                                                Order Inquiry
+                                                {t("products.modal.orderInquiry")}
                                             </Button>
                                             <Button
                                                 variant="outlined"
@@ -773,7 +792,7 @@ export function Products() {
                                                     fontSize: "1.1rem",
                                                 }}
                                             >
-                                                Full Details
+                                                {t("products.modal.fullDetails")}
                                             </Button>
                                         </Stack>
                                     </Stack>

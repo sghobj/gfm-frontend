@@ -1,10 +1,12 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 import { OrderLinkGenerator } from "../../components/order/OrderLinkGenerator";
 
 export function AdminOrderLinksPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation("common");
     const { user, logout } = useAdminAuth();
 
     const handleLogout = () => {
@@ -20,14 +22,19 @@ export function AdminOrderLinksPage() {
                 >
                     <Box>
                         <Typography variant="h4" fontWeight={800}>
-                            B2B Order Links
+                            {t("adminOrderLinks.pageTitle")}
                         </Typography>
                         <Typography color="text.secondary">
-                            Logged in as {user?.email || user?.username || "admin"}
+                            {t("adminOrderLinks.loggedInAs", {
+                                user:
+                                    user?.email ||
+                                    user?.username ||
+                                    t("adminOrderLinks.adminFallback"),
+                            })}
                         </Typography>
                     </Box>
                     <Button variant="outlined" onClick={handleLogout}>
-                        Logout
+                        {t("actions.logout")}
                     </Button>
                 </Box>
 

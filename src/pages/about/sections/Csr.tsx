@@ -3,6 +3,7 @@ import type { AboutQuery } from "../../../gql/graphql";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography";
 import { SectionLayout } from "../../../components/layout/SectionLayout";
 import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography";
+import { hasAnyLocalizedContent } from "../../../utils/localizedContent";
 
 type CSRType = NonNullable<AboutQuery["about"]>["csr"];
 
@@ -11,7 +12,11 @@ type CSRSectionProps = {
 };
 
 export const CsrSection = ({ data }: CSRSectionProps) => {
-    const goals = data?.goals ?? [];
+    const goals =
+        data?.goals?.filter(
+            (goal): goal is NonNullable<typeof goal> =>
+                !!goal && hasAnyLocalizedContent(goal.title, goal.subtitle),
+        ) ?? [];
 
     return (
         <SectionLayout

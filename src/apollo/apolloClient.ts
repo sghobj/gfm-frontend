@@ -22,6 +22,17 @@ const localeLink = new SetContextLink((prevContext) => {
 });
 
 const authLink = new SetContextLink((prevContext) => {
+    const skipAuth = Boolean((prevContext as { skipAuth?: boolean })?.skipAuth);
+    if (skipAuth) {
+        const headers = { ...(prevContext.headers ?? {}) } as Record<string, string>;
+        // Ensure this request is treated as public even if an admin token exists in storage.
+        delete headers.Authorization;
+        delete headers.authorization;
+        return {
+            headers,
+        };
+    }
+
     const jwt = getAdminJwtToken();
     if (!jwt) {
         return {

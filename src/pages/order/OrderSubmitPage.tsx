@@ -14,6 +14,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
     formatApproxPackageCount,
     getApproxPackageCount,
@@ -164,7 +165,7 @@ const formatPackOptionLabel = (option: PackOption | null | undefined): string =>
     if (option.amount != null) {
         return `${option.amount} ${option.unit ?? ""}`.trim();
     }
-    return "Packaging";
+    return "";
 };
 
 const normalizeApplicableSizes = (value: unknown): string[] => {
@@ -174,6 +175,7 @@ const normalizeApplicableSizes = (value: unknown): string[] => {
 };
 
 export function OrderSubmitPage() {
+    const { t } = useTranslation("common");
     const [searchParams] = useSearchParams();
     const token = (searchParams.get("token") ?? "").trim();
 
@@ -336,15 +338,17 @@ export function OrderSubmitPage() {
         setSubmitError(null);
 
         try {
-            if (!token) throw new Error("Missing invitation token.");
-            if (!invitation || !offering) throw new Error("Invitation is invalid or unavailable.");
-            if (!customerName.trim()) throw new Error("Customer name is required.");
-            if (!customerEmail.trim()) throw new Error("Customer email is required.");
+            if (!token) throw new Error(t("orderSubmit.errors.missingInvitationToken"));
+            if (!invitation || !offering)
+                throw new Error(t("orderSubmit.errors.invalidInvitation"));
+            if (!customerName.trim()) throw new Error(t("orderSubmit.errors.customerNameRequired"));
+            if (!customerEmail.trim())
+                throw new Error(t("orderSubmit.errors.customerEmailRequired"));
             if (normalize(customerEmail) !== normalize(invitation.customerEmail ?? "")) {
-                throw new Error("Customer email must match the invited customer.");
+                throw new Error(t("orderSubmit.errors.customerEmailMustMatch"));
             }
             if (!Number.isFinite(quantityKg) || quantityKg < 0.1) {
-                throw new Error("Quantity in Kg must be at least 0.1.");
+                throw new Error(t("orderSubmit.errors.quantityMin"));
             }
 
             let grade: string | undefined;
@@ -354,9 +358,9 @@ export function OrderSubmitPage() {
             let selectedOptionForSubmit: PackagingApproxInput | null = null;
 
             if (isDatesFlow) {
-                if (!selectedGrade) throw new Error("Grade is required.");
-                if (!selectedSize) throw new Error("Size is required.");
-                if (!selectedPackOption) throw new Error("Packaging option is required.");
+                if (!selectedGrade) throw new Error(t("orderSubmit.errors.gradeRequired"));
+                if (!selectedSize) throw new Error(t("orderSubmit.errors.sizeRequired"));
+                if (!selectedPackOption) throw new Error(t("orderSubmit.errors.packagingRequired"));
 
                 const selectedOption =
                     datePackOptions.find((option) => option.documentId === selectedPackOption) ??
@@ -373,7 +377,7 @@ export function OrderSubmitPage() {
                     null;
                 if (nonDatePackOptions.length > 0) {
                     if (!selectedOption) {
-                        throw new Error("Packaging option is required.");
+                        throw new Error(t("orderSubmit.errors.packagingRequired"));
                     }
 
                     packOption = selectedOption.documentId;
@@ -382,7 +386,7 @@ export function OrderSubmitPage() {
                 } else {
                     const customPackaging = manualPackaging.trim();
                     if (!customPackaging) {
-                        throw new Error("Packaging option is required.");
+                        throw new Error(t("orderSubmit.errors.packagingRequired"));
                     }
                     packOption = undefined;
                     packaging = customPackaging;
@@ -392,12 +396,14 @@ export function OrderSubmitPage() {
             const approxCount = getApproxPackageCount(quantityKg, selectedOptionForSubmit);
             const quantityPackages = Math.max(1, Math.ceil(approxCount ?? quantityKg));
             const approxText = formatApproxPackageCount(approxCount);
-            const appendedApproxNote = `Requested Quantity (Kg): ${quantityKg}${
-                approxText ? `\nApprox. Number of Packages: ${approxText}` : ""
-            }`;
+            const appendedApproxNote = `${t("orderSubmit.summary.requestedQuantity", {
+                quantity: quantityKg,
+            })}${approxText ? `\n${t("orderSubmit.summary.approxPackages", { value: approxText })}` : ""}
+            `;
+            const finalSummaryNote = appendedApproxNote.trimEnd();
             const finalMessage = message.trim()
-                ? `${message.trim()}\n\n${appendedApproxNote}`
-                : appendedApproxNote;
+                ? `${message.trim()}\n\n${finalSummaryNote}`
+                : finalSummaryNote;
 
             const abortController = new AbortController();
             const timeoutHandle = setTimeout(() => {
@@ -430,13 +436,13 @@ export function OrderSubmitPage() {
 
             const orderId =
                 submitResponse?.submitOrder?.orderNumber ?? submitResponse?.submitOrder?.documentId;
-            setSuccessOrderNumber(orderId ?? "created");
+            setSuccessOrderNumber(orderId ?? t("orderSubmit.orderCreatedFallback"));
         } catch (err: any) {
             const rawMessage = String(err?.message ?? "");
             if (err?.name === "AbortError" || rawMessage.toLowerCase().includes("abort")) {
-                setSubmitError("Order submission timed out. Please try again.");
+                setSubmitError(t("orderSubmit.errors.timeout"));
             } else {
-                setSubmitError(rawMessage || "Unable to submit order.");
+                setSubmitError(rawMessage || t("orderSubmit.errors.unableToSubmit"));
             }
         } finally {
             setBusy(false);
@@ -446,7 +452,7 @@ export function OrderSubmitPage() {
     if (!token) {
         return (
             <Container maxWidth="sm" sx={{ py: 8 }}>
-                <Alert severity="error">Missing token. Use the full invitation URL.</Alert>
+                <Alert severity="error">{t("orderSubmit.errors.missingTokenInUrl")}</Alert>
             </Container>
         );
     }
@@ -457,7 +463,7 @@ export function OrderSubmitPage() {
                 <Paper sx={{ p: 4 }}>
                     <Stack spacing={2} alignItems="center">
                         <CircularProgress />
-                        <Typography>Validating invitation...</Typography>
+                        <Typography>{t("orderSubmit.validating")}</Typography>
                     </Stack>
                 </Paper>
             </Container>
@@ -467,9 +473,7 @@ export function OrderSubmitPage() {
     if (error || !invitation || !offering) {
         return (
             <Container maxWidth="sm" sx={{ py: 8 }}>
-                <Alert severity="error">
-                    This invitation is invalid, expired, or already used.
-                </Alert>
+                <Alert severity="error">{t("orderSubmit.errors.invalidExpiredOrUsed")}</Alert>
             </Container>
         );
     }
@@ -478,7 +482,7 @@ export function OrderSubmitPage() {
         return (
             <Container maxWidth="sm" sx={{ py: 8 }}>
                 <Alert severity="success">
-                    Order submitted successfully. Reference: {successOrderNumber}
+                    {t("orderSubmit.success", { reference: successOrderNumber })}
                 </Alert>
             </Container>
         );
@@ -490,11 +494,11 @@ export function OrderSubmitPage() {
                 <Stack spacing={2.5}>
                     <Box>
                         <Typography variant="h5" fontWeight={800}>
-                            Secure B2B Order
+                            {t("orderSubmit.title")}
                         </Typography>
                         <Typography color="text.secondary">
-                            {offering.product?.name || "Product"} -{" "}
-                            {offering.brand?.name || "Brand"}
+                            {offering.product?.name || t("orderSubmit.productFallback")} -{" "}
+                            {offering.brand?.name || t("orderSubmit.brandFallback")}
                         </Typography>
                     </Box>
 
@@ -505,7 +509,7 @@ export function OrderSubmitPage() {
                             {isDatesFlow && (
                                 <TextField
                                     select
-                                    label="Grade"
+                                    label={t("orderSubmit.fields.grade")}
                                     value={selectedGrade}
                                     onChange={(event) => setSelectedGrade(event.target.value)}
                                     fullWidth
@@ -522,7 +526,7 @@ export function OrderSubmitPage() {
                             {isDatesFlow && (
                                 <TextField
                                     select
-                                    label="Size"
+                                    label={t("orderSubmit.fields.size")}
                                     value={selectedSize}
                                     onChange={(event) => setSelectedSize(event.target.value)}
                                     fullWidth
@@ -539,17 +543,17 @@ export function OrderSubmitPage() {
 
                             {!isDatesFlow && nonDatePackOptions.length === 0 ? (
                                 <TextField
-                                    label="Packaging Option"
+                                    label={t("orderSubmit.fields.packagingOption")}
                                     value={manualPackaging}
                                     onChange={(event) => setManualPackaging(event.target.value)}
                                     fullWidth
                                     required
-                                    helperText="No predefined options found. Enter packaging manually."
+                                    helperText={t("orderSubmit.fields.packagingManualHelp")}
                                 />
                             ) : (
                                 <TextField
                                     select
-                                    label="Packaging Option"
+                                    label={t("orderSubmit.fields.packagingOption")}
                                     value={selectedPackOption}
                                     onChange={(event) => setSelectedPackOption(event.target.value)}
                                     fullWidth
@@ -573,7 +577,7 @@ export function OrderSubmitPage() {
                             )}
 
                             <TextField
-                                label="Quantity (Kg)"
+                                label={t("orderSubmit.fields.quantityKg")}
                                 type="number"
                                 value={quantityKg}
                                 onChange={(event) => setQuantityKg(Number(event.target.value || 0))}
@@ -583,19 +587,21 @@ export function OrderSubmitPage() {
                             />
 
                             <TextField
-                                label="Approx. Number of Packages"
+                                label={t("orderSubmit.fields.approxPackages")}
                                 value={
                                     approxPackages
-                                        ? `${formatApproxPackageCount(approxPackages)} packages`
-                                        : "Select packaging option"
+                                        ? t("orderSubmit.fields.packagesCount", {
+                                              value: formatApproxPackageCount(approxPackages),
+                                          })
+                                        : t("orderSubmit.fields.selectPackagingOption")
                                 }
                                 InputProps={{ readOnly: true }}
-                                helperText="Approximation uses selected amount/unit. For L/ml options, a 1L ≈ 1Kg estimate is used."
+                                helperText={t("orderSubmit.fields.approximationHelp")}
                                 fullWidth
                             />
 
                             <TextField
-                                label="Full Name"
+                                label={t("orderSubmit.fields.fullName")}
                                 value={customerName}
                                 onChange={(event) => setCustomerName(event.target.value)}
                                 required
@@ -603,7 +609,7 @@ export function OrderSubmitPage() {
                             />
 
                             <TextField
-                                label="Email"
+                                label={t("orderSubmit.fields.email")}
                                 value={customerEmail}
                                 type="email"
                                 required
@@ -612,14 +618,14 @@ export function OrderSubmitPage() {
                             />
 
                             <TextField
-                                label="Company (optional)"
+                                label={t("orderSubmit.fields.company")}
                                 value={customerCompany}
                                 onChange={(event) => setCustomerCompany(event.target.value)}
                                 fullWidth
                             />
 
                             <TextField
-                                label="Message (optional)"
+                                label={t("orderSubmit.fields.message")}
                                 value={message}
                                 onChange={(event) => setMessage(event.target.value)}
                                 fullWidth
@@ -628,7 +634,9 @@ export function OrderSubmitPage() {
                             />
 
                             <Button type="submit" variant="contained" disabled={busy}>
-                                {busy ? "Submitting..." : "Submit Order"}
+                                {busy
+                                    ? t("orderSubmit.actions.submitting")
+                                    : t("orderSubmit.actions.submit")}
                             </Button>
                         </Stack>
                     </Box>

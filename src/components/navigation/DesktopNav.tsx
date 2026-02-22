@@ -31,6 +31,8 @@ export function DesktopNav() {
         const nextLang = currentLang === "en" ? "ar" : "en";
         i18n.changeLanguage(nextLang);
     };
+    const languageLabel =
+        currentLang === "en" ? "\u0627\u0644\u0639\u0631\u0628\u064a\u0629" : "EN";
 
     const navItems: NavItem[] = useMemo(
         () => [
@@ -63,7 +65,7 @@ export function DesktopNav() {
                                 backdropFilter: "blur(10px)",
                             }}
                         >
-                            <Toolbar sx={{ minHeight: 64, px: 2, width: "100%" }}>
+                            <Toolbar dir="ltr" sx={{ minHeight: 64, px: 2, width: "100%" }}>
                                 {/* LEFT AREA (mobile): burger left, logo right */}
                                 <Box
                                     sx={{
@@ -136,10 +138,17 @@ export function DesktopNav() {
                                 </Box>
 
                                 {/* RIGHT: language toggle */}
-                                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                                <Box
+                                    sx={{
+                                        minWidth: { md: 120 },
+                                        display: "flex",
+                                        justifyContent: "flex-end",
+                                    }}
+                                >
                                     <Button
                                         onClick={toggleLanguage}
-                                        startIcon={<MdLanguage />}
+                                        dir="ltr"
+                                        endIcon={<MdLanguage />}
                                         sx={{
                                             textTransform: "none",
                                             color: "var(--app-text)",
@@ -149,7 +158,7 @@ export function DesktopNav() {
                                             display: { xs: "none", md: "inline-flex" },
                                         }}
                                     >
-                                        {currentLang === "en" ? "عربي" : "EN"}
+                                        {languageLabel}
                                     </Button>
                                 </Box>
                             </Toolbar>
@@ -205,7 +214,8 @@ export function DesktopNav() {
                     <Box sx={{ p: 2 }}>
                         <Button
                             onClick={toggleLanguage}
-                            startIcon={<MdLanguage />}
+                            dir="ltr"
+                            endIcon={<MdLanguage />}
                             fullWidth
                             sx={{
                                 textTransform: "none",
@@ -214,7 +224,7 @@ export function DesktopNav() {
                                 justifyContent: "flex-start",
                             }}
                         >
-                            {currentLang === "en" ? "عربي" : "EN"}
+                            {languageLabel}
                         </Button>
                     </Box>
                 </Drawer>
