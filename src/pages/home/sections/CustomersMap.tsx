@@ -16,8 +16,10 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { lighten } from "@mui/material/styles";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { useTranslation } from "react-i18next";
 import type { GetHomeDataQuery } from "../../../gql/graphql";
 import { countryToContinent, getFlagUrl, normalizeCountryName } from "../../../utils/countries.ts";
+import { hasNonEmptyText } from "../../../utils/localizedContent";
 
 type MapData = NonNullable<GetHomeDataQuery["homepage"]>["map"];
 
@@ -88,7 +90,7 @@ const CountryGeography = ({
         <Tooltip
             key={geo.rsmKey}
             title={
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" useFlexGap gap={1} alignItems="center">
                     {getFlagEmoji(countryName) ? (
                         <Box
                             component="img"
@@ -122,6 +124,7 @@ const CountryGeography = ({
 
 export const CustomersMap = ({ data }: CustomersMapProps) => {
     const theme = useTheme();
+    const { t } = useTranslation("common");
     const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
     const [query, setQuery] = useState("");
 
@@ -134,6 +137,17 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
             .map((c) => c.trim())
             .filter((c) => c !== "");
     }, [rawExportedCountries]);
+    const subtitle = data?.subtitle ?? "";
+    const title = data?.title ?? "";
+    const description = data?.description ?? "";
+    const hasMapContent =
+        hasNonEmptyText(subtitle) &&
+        hasNonEmptyText(title) &&
+        hasNonEmptyText(description) &&
+        Array.isArray(activeCountries) &&
+        activeCountries.length > 0;
+
+    if (!hasMapContent) return null;
 
     const getFlagEmoji = (countryName: string) => getFlagUrl(countryName);
 
@@ -194,7 +208,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
             />
 
             <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
-                <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 4, lg: 10 }}>
+                <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={{ xs: 4, lg: 10 }}>
                     {/* Left column */}
                     <Stack
                         spacing={2.5}
@@ -208,14 +222,14 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                                 color: theme.palette.primary.main,
                             }}
                         >
-                            {data?.subtitle ?? "GLOBAL REACH"}
+                            {subtitle}
                         </Typography>
 
                         <Typography
                             variant="h3"
                             sx={{ fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5 }}
                         >
-                            {data?.title ?? "Connecting Jordan to the world."}
+                            {title}
                         </Typography>
 
                         <Typography
@@ -223,12 +237,11 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                             color="text.secondary"
                             sx={{ maxWidth: 520, fontSize: "1.05rem" }}
                         >
-                            {data?.description ??
-                                "Premium organic produce trusted by partners across continents — bridging local heritage and global demand."}
+                            {description}
                         </Typography>
 
                         {/* Minimal stats */}
-                        <Stack direction="row" spacing={1.5} sx={{ pt: 1 }}>
+                        <Stack direction="row" useFlexGap gap={1.5} sx={{ pt: 1 }}>
                             <Paper
                                 elevation={0}
                                 sx={{
@@ -252,7 +265,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                                     color="text.secondary"
                                     fontWeight={700}
                                 >
-                                    COUNTRIES
+                                    {t("home.map.countriesLabel")}
                                 </Typography>
                             </Paper>
 
@@ -279,7 +292,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                                     color="text.secondary"
                                     fontWeight={700}
                                 >
-                                    CONTINENTS
+                                    {t("home.map.continentsLabel")}
                                 </Typography>
                             </Paper>
                         </Stack>
@@ -289,7 +302,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                         <TextField
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search markets…"
+                            placeholder={t("home.map.searchPlaceholder")}
                             size="small"
                             sx={{ maxWidth: 420 }}
                             InputProps={{
@@ -301,7 +314,7 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                             }}
                         />
 
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                        <Stack direction="row" useFlexGap gap={1} flexWrap="wrap">
                             {filteredCountries?.slice(0, 16).map((c) => (
                                 <Chip
                                     key={c}
@@ -314,7 +327,9 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                             ))}
                             {filteredCountries && filteredCountries.length > 16 && (
                                 <Chip
-                                    label={`+${filteredCountries.length - 16} more`}
+                                    label={t("home.map.moreLabel", {
+                                        count: filteredCountries.length - 16,
+                                    })}
                                     variant="outlined"
                                     sx={{ borderRadius: 999 }}
                                 />

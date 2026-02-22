@@ -4,10 +4,11 @@ import { COLORS } from "./colors";
 import { SCHEMES, type SchemeId } from "./schemes";
 import { alpha } from "@mui/material";
 
-export function muiTheme(schemeId: SchemeId) {
+export function muiTheme(schemeId: SchemeId, direction: "ltr" | "rtl" = "ltr") {
     const s = SCHEMES[schemeId] ?? SCHEMES[1];
 
     const theme = createTheme({
+        direction,
         palette: {
             primary: { main: COLORS.primary.main },
             secondary: { main: COLORS.secondary.main },
@@ -73,6 +74,33 @@ export function muiTheme(schemeId: SchemeId) {
         },
         shape: { borderRadius: 8 },
         components: {
+            MuiStack: {
+                // Use CSS gap instead of margin-based spacing so RTL/LTR behaves consistently.
+                defaultProps: {
+                    useFlexGap: true,
+                },
+            },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        display: "inline-flex",
+                        alignItems: "center",
+                    },
+                    // Keep icon/text spacing consistent in both LTR and RTL.
+                    startIcon: {
+                        marginInlineStart: 0,
+                        marginInlineEnd: 12,
+                        marginLeft: 0,
+                        marginRight: 0,
+                    },
+                    endIcon: {
+                        marginInlineStart: 12,
+                        marginInlineEnd: 0,
+                        marginLeft: 0,
+                        marginRight: 0,
+                    },
+                },
+            },
             MuiOutlinedInput: {
                 styleOverrides: {
                     root: ({ theme }) => ({

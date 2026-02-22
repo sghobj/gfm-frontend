@@ -10,10 +10,256 @@
         "login": "Login",
         "logout": "Logout"
     },
+    "app": {
+        "adminLoading": "Admin is loading. Waiting for backend...",
+        "secureOrderLoading": "Loading secure order form. Waiting for backend..."
+    },
+    "home": {
+        "loading": "Preparing the homepage. This may take a moment.",
+        "errorLoading": "Error loading homepage data",
+        "brands": {
+            "overline": "OUR BRANDS",
+            "title": "A World of Flavors",
+            "subtitle": "From our flagship premium selection to specialized labels, we bring together the best organic brands from Jordan.",
+            "logoAlt": "Brand"
+        },
+        "map": {
+            "countriesLabel": "COUNTRIES",
+            "continentsLabel": "CONTINENTS",
+            "searchPlaceholder": "Search markets...",
+            "moreLabel": "+{{count}} more"
+        },
+        "certifications": {
+            "overline": "CERTIFICATIONS",
+            "title": "Commitment to Quality",
+            "subtitle": "We uphold the highest international standards in food safety and organic farming, backed by globally recognized certifications.",
+            "logoAlt": "Certificate",
+            "download": "Download",
+            "noDocument": "No document available for this certification.",
+            "close": "Close",
+            "moreDetails": "More Details"
+        }
+    },
+    "products": {
+        "hero": {
+            "title": "Our Products",
+            "subtitle": "Experience the finest organic harvest from Jordan."
+        },
+        "filters": {
+            "searchPlaceholder": "Search products, brands, pack formats...",
+            "allBrands": "All brands"
+        },
+        "loading": "Loading products. Thanks for your patience.",
+        "errorLoading": "Failed to load products",
+        "labels": {
+            "other": "Other",
+            "showMore": "Show more details ->"
+        },
+        "empty": {
+            "noResultsTitle": "No results found",
+            "noResultsSubtitle": "Try adjusting your search or filters to find what you're looking for.",
+            "comingSoonTitle": "Coming soon..",
+            "comingSoonSubtitle": "New offerings will be available soon."
+        },
+        "modal": {
+            "title": "Product Overview",
+            "premiumHarvest": "Premium Harvest",
+            "by": "by",
+            "availablePackaging": "Available Packaging",
+            "option": "Option",
+            "contactPackaging": "Contact for packaging details",
+            "authenticTitle": "Authentic Organic Produce from Jordan",
+            "authenticSubtitle": "Guaranteed freshness and premium quality standards.",
+            "orderInquiry": "Order Inquiry",
+            "fullDetails": "Full Details"
+        }
+    },
+    "productDetails": {
+        "loading": "Loading product. Thanks for your patience.",
+        "errorLoading": "Failed to load product",
+        "comingSoonTitle": "Coming soon..",
+        "comingSoonSubtitle": "This offering is currently unavailable.",
+        "notFoundTitle": "Product not found",
+        "notFoundSubtitle": "The requested offering does not exist.",
+        "backToProducts": "Back to Products",
+        "titleFallback": "Product Details",
+        "sections": {
+            "description": "Product Description",
+            "specifications": "Availability & Specifications"
+        },
+        "noDescription": "No description available for this offering.",
+        "option": "Option",
+        "contactPackaging": "Contact for packaging details.",
+        "authenticTitle": "Authentic Organic Produce",
+        "authenticSubtitle": "Sourced directly from certified organic farms in Jordan.",
+        "inquiryCta": "Product Inquiry"
+    },
+    "certificates": {
+        "hero": {
+            "title": "Our Certifications",
+            "subtitle": "Upholding the highest international standards for food safety and organic integrity.",
+            "searchPlaceholder": "Search certifications..."
+        },
+        "loading": "Loading certifications. Thanks for your patience.",
+        "errorLoading": "Failed to load certifications",
+        "empty": "No certifications found matching your search.",
+        "actions": {
+            "viewCertificate": "View Certificate",
+            "auditReport": "Audit Report",
+            "officialValidation": "Official Validation",
+            "download": "Download",
+            "auditReportFor": "{{name}} - Audit Report"
+        }
+    },
+    "adminLogin": {
+        "title": "Admin Login",
+        "subtitle": "Sign in to generate protected B2B order links.",
+        "fields": {
+            "identifier": "Email or Username",
+            "password": "Password"
+        },
+        "actions": {
+            "signIn": "Sign in",
+            "signingIn": "Signing in..."
+        },
+        "errors": {
+            "unableToSignIn": "Unable to sign in."
+        }
+    },
+    "adminOrderLinks": {
+        "pageTitle": "B2B Order Links",
+        "loggedInAs": "Logged in as {{user}}",
+        "adminFallback": "admin",
+        "title": "Generate Protected Order Link",
+        "fields": {
+            "offering": "Offering",
+            "customerEmail": "Customer Email",
+            "customerName": "Customer Name (optional)",
+            "customerCompany": "Customer Company (optional)",
+            "expiryDate": "Expiry Date"
+        },
+        "labels": {
+            "unknownProduct": "Unknown product",
+            "unknownBrand": "Unknown brand"
+        },
+        "actions": {
+            "noExpiry": "No expiry",
+            "generate": "Generate Link",
+            "generating": "Generating...",
+            "reset": "Reset",
+            "copyLink": "Copy link",
+            "sendByEmail": "Send by email"
+        },
+        "success": {
+            "linkGenerated": "Invitation link generated. This link can be used once."
+        },
+        "errors": {
+            "selectOffering": "Select an offering.",
+            "validCustomerEmail": "Valid customer email is required.",
+            "missingToken": "Server did not return a token.",
+            "createFailed": "Unable to create order link."
+        }
+    },
+    "orderSubmit": {
+        "title": "Secure B2B Order",
+        "productFallback": "Product",
+        "brandFallback": "Brand",
+        "validating": "Validating invitation...",
+        "success": "Order submitted successfully. Reference: {{reference}}",
+        "orderCreatedFallback": "created",
+        "fields": {
+            "grade": "Grade",
+            "size": "Size",
+            "packagingOption": "Packaging Option",
+            "packagingManualHelp": "No predefined options found. Enter packaging manually.",
+            "quantityKg": "Quantity (Kg)",
+            "approxPackages": "Approx. Number of Packages",
+            "packagesCount": "{{value}} packages",
+            "selectPackagingOption": "Select packaging option",
+            "approximationHelp": "Approximation uses selected amount/unit. For L/ml options, a 1L ~= 1Kg estimate is used.",
+            "fullName": "Full Name",
+            "email": "Email",
+            "company": "Company (optional)",
+            "message": "Message (optional)"
+        },
+        "actions": {
+            "submitting": "Submitting...",
+            "submit": "Submit Order"
+        },
+        "summary": {
+            "requestedQuantity": "Requested Quantity (Kg): {{quantity}}",
+            "approxPackages": "Approx. Number of Packages: {{value}}"
+        },
+        "errors": {
+            "missingInvitationToken": "Missing invitation token.",
+            "invalidInvitation": "Invitation is invalid or unavailable.",
+            "customerNameRequired": "Customer name is required.",
+            "customerEmailRequired": "Customer email is required.",
+            "customerEmailMustMatch": "Customer email must match the invited customer.",
+            "quantityMin": "Quantity in Kg must be at least 0.1.",
+            "gradeRequired": "Grade is required.",
+            "sizeRequired": "Size is required.",
+            "packagingRequired": "Packaging option is required.",
+            "timeout": "Order submission timed out. Please try again.",
+            "unableToSubmit": "Unable to submit order.",
+            "missingTokenInUrl": "Missing token. Use the full invitation URL.",
+            "invalidExpiredOrUsed": "This invitation is invalid, expired, or already used."
+        }
+    },
+    "inquiryModal": {
+        "title": "Product Inquiry",
+        "sections": {
+            "specifications": "Specifications",
+            "yourInformation": "Your Information"
+        },
+        "fields": {
+            "grade": "Grade",
+            "size": "Size",
+            "option": "Option",
+            "packagingOption": "Packaging Option",
+            "quantityKg": "Desired Quantity (Kg)",
+            "approxPackages": "Approx. Number of Packages",
+            "packagesCount": "{{value}} packages",
+            "selectPackaging": "Select packaging option",
+            "approximationHelp": "Approximation uses selected amount/unit. For L/ml options, a 1L ~= 1Kg estimate is used.",
+            "fullName": "Full Name",
+            "email": "Email Address",
+            "company": "Company (Optional)",
+            "additionalMessage": "Additional Message"
+        },
+        "validation": {
+            "gradeRequired": "Grade is required",
+            "selectionRequired": "Selection is required",
+            "packagingRequired": "Packaging is required",
+            "quantityRequired": "Quantity in Kg is required",
+            "quantityMin": "Min quantity is 0.1 Kg",
+            "nameRequired": "Name is required",
+            "emailRequired": "Email is required",
+            "invalidEmail": "Invalid email"
+        },
+        "actions": {
+            "email": "Inquire via Email",
+            "whatsapp": "WhatsApp"
+        }
+    },
+    "contactPage": {
+        "hero": {
+            "title": "Let's talk good food.",
+            "subtitle": "We're here to help with orders, partnerships, and product info. Reach out and we'll respond within 1-2 business days.",
+            "note": "Made with care in Jordan. Certified-quality ingredients, always."
+        },
+        "location": {
+            "companyName": "Good Food Mood Co.",
+            "emailLabel": "Email",
+            "phoneLabel": "Phone",
+            "officeLabel": "Office",
+            "officeValue": "Amman, Jordan near downtown district"
+        }
+    },
     "contact": {
         "hero": {
             "title": "Wholesale & B2B Inquiries",
-            "subtitle": "Tell us a bit about your business and what you’re looking for. Our team will get back to you shortly."
+            "subtitle": "Tell us a bit about your business and what you're looking for. Our team will get back to you shortly."
         },
         "form": {
             "name": "Full name",
@@ -35,7 +281,7 @@
             "branches": "Number of branches",
             "branchesPh": "e.g., 1",
             "cuisine": "Cuisine type (optional)",
-            "cuisinePh": "e.g., Healthy café, Lebanese, Breakfast",
+            "cuisinePh": "e.g., Healthy cafe, Lebanese, Breakfast",
             "regions": "Regions covered",
             "coldStorage": "Warehousing / cold storage available?",
             "coldStorageYes": "Yes",
@@ -49,7 +295,7 @@
         "options": {
             "businessTypes": {
                 "retail": "Retail store / Supermarket",
-                "horeca": "Café / Restaurant / Hotel",
+                "horeca": "Cafe / Restaurant / Hotel",
                 "distributor": "Distributor / Wholesaler",
                 "corporate": "Corporate / Office pantry",
                 "online": "Online store",
@@ -72,8 +318,8 @@
             },
             "volumes": {
                 "lt200": "< 200 JOD",
-                "200_500": "200–500 JOD",
-                "500_1000": "500–1,000 JOD",
+                "200_500": "200-500 JOD",
+                "500_1000": "500-1,000 JOD",
                 "1000plus": "1,000+ JOD"
             },
             "products": {
@@ -93,6 +339,27 @@
                 "amman": "Amman",
                 "nationwide": "Nationwide"
             }
+        }
+    },
+    "footer": {
+        "quickLinksTitle": "Quick links",
+        "contactTitle": "Contact",
+        "fallback": {
+            "brandName": "Good Food Mood Co.",
+            "brandDescription": "Trusted organic export partner from Jordan. Some website content is temporarily unavailable.",
+            "address": "Amman, Jordan",
+            "email": "info@example.com",
+            "quickLinks": {
+                "home": "Home",
+                "products": "Products",
+                "contact": "Contact Us"
+            },
+            "legalLinks": {
+                "privacy": "Privacy",
+                "terms": "Terms"
+            },
+            "copyright": "© {{year}} {{brandName}}",
+            "unavailableNote": "Some content is temporarily unavailable."
         }
     }
 }

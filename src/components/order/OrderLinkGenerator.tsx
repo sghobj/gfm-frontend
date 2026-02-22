@@ -3,6 +3,9 @@ import { Alert, Box, Button, MenuItem, Paper, Stack, TextField, Typography } fro
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { GetAllOfferingsDocument } from "../../gql/graphql";
+import { useTranslation } from "react-i18next";
+import { toStrapiLocale } from "../../apollo/apolloClient";
+import { isContentForLocale } from "../../utils/localizedContent";
 
 const FRONTEND_URL = import.meta.env.VITE_APP_URL ?? window.location.origin;
 
@@ -30,11 +33,14 @@ const CREATE_ORDER_INVITATION = gql`
 
 type OfferingOption = {
     documentId: string;
+    locale?: string | null;
     availability?: string | null;
     product?: {
+        locale?: string | null;
         name?: string | null;
     } | null;
     brand?: {
+        locale?: string | null;
         name?: string | null;
     } | null;
 };
@@ -80,7 +86,12 @@ const expiryToIso = (value: string): string | null => {
 const looksLikeEmail = (value: string): boolean => /^\S+@\S+\.\S+$/.test(value);
 
 export function OrderLinkGenerator() {
-    const { data, loading } = useQuery(GetAllOfferingsDocument);
+    const { i18n, t } = useTranslation("common");
+    const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
+    const activeLocale = locale as "en" | "ar";
+    const { data, loading } = useQuery(GetAllOfferingsDocument, {
+        variables: { locale },
+    });
     const [createInvitation] = useMutation<CreateInvitationResult, CreateInvitationVars>(
         CREATE_ORDER_INVITATION,
     );
@@ -89,9 +100,13 @@ export function OrderLinkGenerator() {
         const raw = (data?.offerings ?? []) as Array<OfferingOption | null | undefined>;
         return raw.filter(
             (item): item is OfferingOption =>
-                Boolean(item) && String(item?.availability ?? "").toLowerCase() !== "no",
+                Boolean(item) &&
+                isContentForLocale(item?.locale, activeLocale) &&
+                isContentForLocale(item?.brand?.locale, activeLocale) &&
+                isContentForLocale(item?.product?.locale, activeLocale) &&
+                String(item?.availability ?? "").toLowerCase() !== "no",
         );
-    }, [data?.offerings]);
+    }, [data?.offerings, activeLocale]);
 
     const [offeringId, setOfferingId] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
@@ -115,9 +130,9 @@ export function OrderLinkGenerator() {
         setResultLink(null);
 
         try {
-            if (!offeringId) throw new Error("Select an offering.");
+            if (!offeringId) throw new Error(t("adminOrderLinks.errors.selectOffering"));
             if (!customerEmail || !looksLikeEmail(customerEmail)) {
-                throw new Error("Valid customer email is required.");
+                throw new Error(t("adminOrderLinks.errors.validCustomerEmail"));
             }
 
             const { data: response } = await createInvitation({
@@ -134,14 +149,14 @@ export function OrderLinkGenerator() {
             });
 
             const token = response?.generateOrderInvitation?.token;
-            if (!token) throw new Error("Server did not return a token.");
+            if (!token) throw new Error(t("adminOrderLinks.errors.missingToken"));
 
             const link = `${FRONTEND_URL.replace(/\/$/, "")}/order/submit?token=${encodeURIComponent(
                 token,
             )}`;
             setResultLink(link);
         } catch (err: any) {
-            setError(err?.message ?? "Unable to create order link.");
+            setError(err?.message ?? t("adminOrderLinks.errors.createFailed"));
         } finally {
             setBusy(false);
         }
@@ -156,14 +171,14 @@ export function OrderLinkGenerator() {
         <Paper sx={{ p: 3 }}>
             <Stack spacing={2.5}>
                 <Typography variant="h6" fontWeight={800}>
-                    Generate Protected Order Link
+                    {t("adminOrderLinks.title")}
                 </Typography>
 
                 {error && <Alert severity="error">{error}</Alert>}
 
                 <TextField
                     select
-                    label="Offering"
+                    label={t("adminOrderLinks.fields.offering")}
                     value={offeringId}
                     onChange={(event) => setOfferingId(event.target.value)}
                     disabled={loading}
@@ -171,16 +186,17 @@ export function OrderLinkGenerator() {
                 >
                     {offerings.map((offering) => (
                         <MenuItem key={offering.documentId} value={offering.documentId}>
-                            {(offering.product?.name || "Unknown product") +
+                            {(offering.product?.name ||
+                                t("adminOrderLinks.labels.unknownProduct")) +
                                 " - " +
-                                (offering.brand?.name || "Unknown brand")}
+                                (offering.brand?.name || t("adminOrderLinks.labels.unknownBrand"))}
                         </MenuItem>
                     ))}
                 </TextField>
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} useFlexGap gap={2}>
                     <TextField
-                        label="Customer Email"
+                        label={t("adminOrderLinks.fields.customerEmail")}
                         type="email"
                         required
                         fullWidth
@@ -188,7 +204,7 @@ export function OrderLinkGenerator() {
                         onChange={(event) => setCustomerEmail(event.target.value)}
                     />
                     <TextField
-                        label="Customer Name (optional)"
+                        label={t("adminOrderLinks.fields.customerName")}
                         fullWidth
                         value={customerName}
                         onChange={(event) => setCustomerName(event.target.value)}
@@ -196,15 +212,20 @@ export function OrderLinkGenerator() {
                 </Stack>
 
                 <TextField
-                    label="Customer Company (optional)"
+                    label={t("adminOrderLinks.fields.customerCompany")}
                     fullWidth
                     value={customerCompany}
                     onChange={(event) => setCustomerCompany(event.target.value)}
                 />
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    useFlexGap
+                    gap={2}
+                    alignItems="center"
+                >
                     <TextField
-                        label="Expiry Date"
+                        label={t("adminOrderLinks.fields.expiryDate")}
                         type="date"
                         value={expiryDate}
                         onChange={(event) => setExpiryDate(event.target.value)}
@@ -216,13 +237,15 @@ export function OrderLinkGenerator() {
                         onClick={() => setExpiryDate("")}
                         sx={{ alignSelf: { xs: "flex-start", sm: "center" } }}
                     >
-                        No expiry
+                        {t("adminOrderLinks.actions.noExpiry")}
                     </Button>
                 </Stack>
 
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" useFlexGap gap={1.5}>
                     <Button variant="contained" onClick={handleCreate} disabled={busy}>
-                        {busy ? "Generating..." : "Generate Link"}
+                        {busy
+                            ? t("adminOrderLinks.actions.generating")
+                            : t("adminOrderLinks.actions.generate")}
                     </Button>
                     <Button
                         variant="outlined"
@@ -235,14 +258,14 @@ export function OrderLinkGenerator() {
                             setResultLink(null);
                         }}
                     >
-                        Reset
+                        {t("adminOrderLinks.actions.reset")}
                     </Button>
                 </Stack>
 
                 {resultLink && (
                     <Box>
                         <Alert severity="success" sx={{ mb: 1.5 }}>
-                            Invitation link generated. This link can be used once.
+                            {t("adminOrderLinks.success.linkGenerated")}
                         </Alert>
                         <TextField
                             fullWidth
@@ -250,9 +273,9 @@ export function OrderLinkGenerator() {
                             InputProps={{ readOnly: true }}
                             sx={{ mb: 1.5 }}
                         />
-                        <Stack direction="row" spacing={1.5}>
+                        <Stack direction="row" useFlexGap gap={1.5}>
                             <Button variant="outlined" onClick={handleCopy}>
-                                Copy link
+                                {t("adminOrderLinks.actions.copyLink")}
                             </Button>
                             <Button
                                 variant="contained"
@@ -264,7 +287,7 @@ export function OrderLinkGenerator() {
                                     )
                                 }
                             >
-                                Send by email
+                                {t("adminOrderLinks.actions.sendByEmail")}
                             </Button>
                         </Stack>
                     </Box>

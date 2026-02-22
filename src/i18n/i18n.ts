@@ -32,15 +32,25 @@ i18n.use(LanguageDetector)
         },
     });
 
-// Handle direction change (RTL / LTR)
-const updateHtmlDirection = (lng: string) => {
-    document.documentElement.setAttribute("lang", lng);
+const toDocumentDirection = (lng: string) => (lng?.startsWith("ar") ? "rtl" : "ltr");
+const toDocumentLanguage = (lng: string) => (lng?.startsWith("ar") ? "ar" : "en");
+
+// Keep global language and text direction in sync with i18n language.
+const updateDocumentLanguageAndDirection = (lng: string) => {
+    if (typeof document === "undefined") return;
+
+    const normalizedLang = toDocumentLanguage(lng);
+    const direction = toDocumentDirection(lng);
+
+    document.documentElement.setAttribute("lang", normalizedLang);
+    document.documentElement.setAttribute("dir", direction);
+    document.body?.setAttribute("dir", direction);
 };
 
-updateHtmlDirection(i18n.language);
+updateDocumentLanguageAndDirection(i18n.language);
 
 i18n.on("languageChanged", (lng) => {
-    updateHtmlDirection(lng);
+    updateDocumentLanguageAndDirection(lng);
 });
 
 export default i18n;

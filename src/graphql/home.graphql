@@ -1,6 +1,7 @@
 query GetHomeData($locale: I18NLocaleCode) {
     brands(locale: $locale) {
         documentId
+        locale
         name
         slug
         description
@@ -9,7 +10,8 @@ query GetHomeData($locale: I18NLocaleCode) {
             alternativeText
         }
     }
-    homepage {
+    homepage(locale: $locale) {
+        locale
         qualityMarketing {
             points {
                 iconName

@@ -7,6 +7,7 @@ import {
     SectionTitle,
 } from "../../../components/typography/SectionTypography.tsx";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
+import { hasAnyLocalizedContent } from "../../../utils/localizedContent.ts";
 
 type ValuesType = NonNullable<AboutQuery["about"]>["values"];
 
@@ -15,7 +16,11 @@ type ValuesSectionProps = {
 };
 
 export const ValuesSection = ({ data }: ValuesSectionProps) => {
-    const values = data?.values ?? [];
+    const values =
+        data?.values?.filter(
+            (item): item is NonNullable<typeof item> =>
+                !!item && hasAnyLocalizedContent(item.title, item.value),
+        ) ?? [];
 
     return (
         <SectionLayout

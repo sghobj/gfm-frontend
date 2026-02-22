@@ -18,6 +18,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import type { GetOfferingQuery } from "../../gql/graphql";
 import { StrapiImage } from "../image/StrapiImage";
 import { useForm, Controller, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
     formatApproxPackageCount,
     getApproxPackageCount,
@@ -48,7 +49,7 @@ type DatePackOption = NonNullable<NonNullable<DateSpec["pack_options"]>[number]>
 type NonDatePackOption = NonNullable<NonNullable<Offering["pack_options"]>[number]>;
 
 function formatNonDatePackOption(opt: NonDatePackOption): string {
-    return opt.displayLabel || `${opt.amount ?? ""} ${opt.unit ?? ""}`.trim() || "Option";
+    return opt.displayLabel || `${opt.amount ?? ""} ${opt.unit ?? ""}`.trim() || "";
 }
 
 function formatDatePackOption(opt: DatePackOption): string {
@@ -56,7 +57,7 @@ function formatDatePackOption(opt: DatePackOption): string {
     if (opt.amountMin != null && opt.amountMax != null)
         return `${opt.amountMin}-${opt.amountMax} ${opt.unit ?? ""}`.trim();
     if (opt.amount != null) return `${opt.amount} ${opt.unit ?? ""}`.trim();
-    return "Packaging";
+    return "";
 }
 
 function normalizeApplicableSizes(value: unknown): string[] {
@@ -87,6 +88,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
     onClose,
     offering,
 }) => {
+    const { t } = useTranslation("common");
     const specs = useMemo(() => {
         const raw = offering.dateSpecifications ?? [];
         return raw.filter((s): s is DateSpec => Boolean(s));
@@ -326,7 +328,7 @@ ${data.message}`;
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ m: 0, p: 2, pr: 6, fontWeight: 900 }}>
-                Product Inquiry
+                {t("inquiryModal.title")}
                 <IconButton
                     aria-label="close"
                     onClick={onClose}
@@ -369,20 +371,20 @@ ${data.message}`;
                         <Divider sx={{ my: 1 }} />
 
                         <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>
-                            Specifications
+                            {t("inquiryModal.sections.specifications")}
                         </Typography>
 
                         {isDatesFlow && (
                             <Controller
                                 name="grade"
                                 control={control}
-                                rules={{ required: "Grade is required" }}
+                                rules={{ required: t("inquiryModal.validation.gradeRequired") }}
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
                                         select
                                         fullWidth
-                                        label="Grade"
+                                        label={t("inquiryModal.fields.grade")}
                                         error={!!errors.grade}
                                         helperText={errors.grade?.message}
                                     >
@@ -400,13 +402,17 @@ ${data.message}`;
                         <Controller
                             name="size"
                             control={control}
-                            rules={{ required: "Selection is required" }}
+                            rules={{ required: t("inquiryModal.validation.selectionRequired") }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     select
                                     fullWidth
-                                    label={isDatesFlow ? "Size" : "Option"}
+                                    label={
+                                        isDatesFlow
+                                            ? t("inquiryModal.fields.size")
+                                            : t("inquiryModal.fields.option")
+                                    }
                                     disabled={isDatesFlow ? !selectedGrade : false}
                                     error={!!errors.size}
                                     helperText={errors.size?.message}
@@ -425,13 +431,13 @@ ${data.message}`;
                             <Controller
                                 name="packOption"
                                 control={control}
-                                rules={{ required: "Packaging is required" }}
+                                rules={{ required: t("inquiryModal.validation.packagingRequired") }}
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
                                         select
                                         fullWidth
-                                        label="Packaging Option"
+                                        label={t("inquiryModal.fields.packagingOption")}
                                         disabled={!selectedSize}
                                         error={!!errors.packOption}
                                         helperText={errors.packOption?.message}
@@ -450,15 +456,18 @@ ${data.message}`;
                             name="quantityKg"
                             control={control}
                             rules={{
-                                required: "Quantity in Kg is required",
-                                min: { value: 0.1, message: "Min quantity is 0.1 Kg" },
+                                required: t("inquiryModal.validation.quantityRequired"),
+                                min: {
+                                    value: 0.1,
+                                    message: t("inquiryModal.validation.quantityMin"),
+                                },
                             }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     type="number"
                                     fullWidth
-                                    label="Desired Quantity (Kg)"
+                                    label={t("inquiryModal.fields.quantityKg")}
                                     inputProps={{ min: 0.1, step: 0.1 }}
                                     error={!!errors.quantityKg}
                                     helperText={errors.quantityKg?.message}
@@ -468,52 +477,59 @@ ${data.message}`;
 
                         <TextField
                             fullWidth
-                            label="Approx. Number of Packages"
+                            label={t("inquiryModal.fields.approxPackages")}
                             value={
                                 approxPackages
-                                    ? `${formatApproxPackageCount(approxPackages)} packages`
-                                    : "Select packaging option"
+                                    ? t("inquiryModal.fields.packagesCount", {
+                                          value: formatApproxPackageCount(approxPackages),
+                                      })
+                                    : t("inquiryModal.fields.selectPackaging")
                             }
                             InputProps={{ readOnly: true }}
-                            helperText="Approximation uses selected amount/unit. For L/ml options, a 1L ≈ 1Kg estimate is used."
+                            helperText={t("inquiryModal.fields.approximationHelp")}
                         />
 
                         <Divider sx={{ my: 1 }} />
 
                         <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>
-                            Your Information
+                            {t("inquiryModal.sections.yourInformation")}
                         </Typography>
 
                         <TextField
-                            {...register("name", { required: "Name is required" })}
+                            {...register("name", {
+                                required: t("inquiryModal.validation.nameRequired"),
+                            })}
                             fullWidth
-                            label="Full Name"
+                            label={t("inquiryModal.fields.fullName")}
                             error={!!errors.name}
                             helperText={errors.name?.message}
                         />
 
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                        <Stack direction={{ xs: "column", sm: "row" }} useFlexGap gap={2}>
                             <TextField
                                 {...register("email", {
-                                    required: "Email is required",
-                                    pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
+                                    required: t("inquiryModal.validation.emailRequired"),
+                                    pattern: {
+                                        value: /^\S+@\S+$/i,
+                                        message: t("inquiryModal.validation.invalidEmail"),
+                                    },
                                 })}
                                 fullWidth
-                                label="Email Address"
+                                label={t("inquiryModal.fields.email")}
                                 error={!!errors.email}
                                 helperText={errors.email?.message}
                             />
                             <TextField
                                 {...register("company")}
                                 fullWidth
-                                label="Company (Optional)"
+                                label={t("inquiryModal.fields.company")}
                             />
                         </Stack>
 
                         <TextField
                             {...register("message")}
                             fullWidth
-                            label="Additional Message"
+                            label={t("inquiryModal.fields.additionalMessage")}
                             multiline
                             rows={3}
                         />
@@ -521,7 +537,7 @@ ${data.message}`;
                 </DialogContent>
 
                 <Box sx={{ p: 2, pt: 0 }}>
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction="row" useFlexGap gap={2}>
                         <Button
                             fullWidth
                             variant="contained"
@@ -530,7 +546,7 @@ ${data.message}`;
                             onClick={handleSubmit(onSubmitEmail)}
                             sx={{ fontWeight: 900, py: 1.5 }}
                         >
-                            Inquire via Email
+                            {t("inquiryModal.actions.email")}
                         </Button>
 
                         <Button
@@ -546,7 +562,7 @@ ${data.message}`;
                                 "&:hover": { bgcolor: "#128C7E" },
                             }}
                         >
-                            WhatsApp
+                            {t("inquiryModal.actions.whatsapp")}
                         </Button>
                     </Stack>
                 </Box>

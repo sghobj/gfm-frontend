@@ -16,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Scheme } from "../../../components/scheme/Scheme";
 import { SectionSubtitle } from "../../../components/typography/SectionTypography";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia";
@@ -29,6 +30,7 @@ type CertificationsProps = {
 
 export const Certifications = ({ certificates }: CertificationsProps) => {
     const navigate = useNavigate();
+    const { t } = useTranslation("common");
     const [selectedCert, setSelectedCert] = useState<CertificateType | null>(null);
 
     const handleClose = () => setSelectedCert(null);
@@ -72,7 +74,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                     fontWeight={800}
                                     sx={{ letterSpacing: 3 }}
                                 >
-                                    CERTIFICATIONS
+                                    {t("home.certifications.overline")}
                                 </Typography>
 
                                 <Typography
@@ -83,7 +85,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                         letterSpacing: -0.5,
                                     }}
                                 >
-                                    Commitment to Quality
+                                    {t("home.certifications.title")}
                                 </Typography>
 
                                 <SectionSubtitle
@@ -94,8 +96,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                         color: "text.secondary",
                                     }}
                                 >
-                                    We uphold the highest international standards in food safety and
-                                    organic farming, backed by globally recognized certifications.
+                                    {t("home.certifications.subtitle")}
                                 </SectionSubtitle>
                             </Stack>
                         </Grid>
@@ -147,7 +148,10 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                                 <Box
                                                     component="img"
                                                     src={resolveStrapiMediaUrl(cert?.logo?.url)}
-                                                    alt={cert?.name ?? "Certificate"}
+                                                    alt={
+                                                        cert?.name ??
+                                                        t("home.certifications.logoAlt")
+                                                    }
                                                     loading="lazy"
                                                     sx={{
                                                         // maxHeight: { xs: 70, md: 90 },
@@ -191,9 +195,9 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                     <Typography variant="h6" fontWeight={800}>
                         {selectedCert?.name}
                     </Typography>
-                    <Stack direction="row" spacing={1}>
+                    <Stack direction="row" useFlexGap gap={1}>
                         {selectedCert?.certificate?.url && (
-                            <Tooltip title="Download">
+                            <Tooltip title={t("home.certifications.download")}>
                                 <IconButton
                                     component="a"
                                     href={resolveStrapiMediaUrl(selectedCert.certificate.url)}
@@ -237,7 +241,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                     ) : (
                         <Box sx={{ p: 4, textAlign: "center" }}>
                             <Typography color="text.secondary">
-                                No document available for this certification.
+                                {t("home.certifications.noDocument")}
                             </Typography>
                         </Box>
                     )}
@@ -256,7 +260,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         onClick={handleClose}
                         sx={{ borderRadius: 2, fontWeight: 700 }}
                     >
-                        Close
+                        {t("home.certifications.close")}
                     </Button>
                     <Button
                         variant="contained"
@@ -267,7 +271,7 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                         }}
                         sx={{ borderRadius: 2, fontWeight: 700 }}
                     >
-                        More Details
+                        {t("home.certifications.moreDetails")}
                     </Button>
                 </Box>
             </Dialog>

@@ -12,15 +12,14 @@ import { AdminOrderLinksPage } from "./pages/admin/AdminOrderLinksPage.tsx";
 import { OrderSubmitPage } from "./pages/order/OrderSubmitPage.tsx";
 import { RequireAdminAuth } from "./auth/RequireAdminAuth.tsx";
 import { BackendReadyGate } from "./routing/BackendReadyGate.tsx";
+import { useTranslation } from "react-i18next";
 
 function App() {
+    const { t } = useTranslation("common");
+
     return (
         <Routes>
-            <Route
-                element={
-                    <BackendReadyGate loadingMessage="Admin is loading. Waiting for backend..." />
-                }
-            >
+            <Route element={<BackendReadyGate loadingMessage={t("app.adminLoading")} />}>
                 <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route element={<RequireAdminAuth />}>
                     <Route path="/admin/order-links" element={<AdminOrderLinksPage />} />
@@ -34,11 +33,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/certificates" element={<CertificatesPage />} />
-                <Route
-                    element={
-                        <BackendReadyGate loadingMessage="Loading secure order form. Waiting for backend..." />
-                    }
-                >
+                <Route element={<BackendReadyGate loadingMessage={t("app.secureOrderLoading")} />}>
                     <Route path="/order/submit" element={<OrderSubmitPage />} />
                 </Route>
             </Route>
