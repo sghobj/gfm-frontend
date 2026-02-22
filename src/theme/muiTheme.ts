@@ -6,6 +6,7 @@ import { alpha } from "@mui/material";
 
 export function muiTheme(schemeId: SchemeId, direction: "ltr" | "rtl" = "ltr") {
     const s = SCHEMES[schemeId] ?? SCHEMES[1];
+    const buttonIconGap = 12;
 
     const theme = createTheme({
         direction,
@@ -87,18 +88,26 @@ export function muiTheme(schemeId: SchemeId, direction: "ltr" | "rtl" = "ltr") {
                         alignItems: "center",
                     },
                     // Keep icon/text spacing consistent in both LTR and RTL.
-                    startIcon: {
-                        marginInlineStart: 0,
-                        marginInlineEnd: 12,
-                        marginLeft: 0,
-                        marginRight: 0,
-                    },
-                    endIcon: {
-                        marginInlineStart: 12,
-                        marginInlineEnd: 0,
-                        marginLeft: 0,
-                        marginRight: 0,
-                    },
+                    startIcon:
+                        direction === "rtl"
+                            ? {
+                                  marginLeft: buttonIconGap,
+                                  marginRight: 0,
+                              }
+                            : {
+                                  marginLeft: 0,
+                                  marginRight: buttonIconGap,
+                              },
+                    endIcon:
+                        direction === "rtl"
+                            ? {
+                                  marginLeft: 0,
+                                  marginRight: buttonIconGap,
+                              }
+                            : {
+                                  marginLeft: buttonIconGap,
+                                  marginRight: 0,
+                              },
                 },
             },
             MuiOutlinedInput: {

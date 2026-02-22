@@ -156,6 +156,10 @@ export function DesktopNav() {
                                                 color: "color-mix(in srgb, var(--app-highlight) 100%, transparent)",
                                             },
                                             display: { xs: "none", md: "inline-flex" },
+                                            "& .MuiButton-endIcon": {
+                                                marginInlineStart: "12px",
+                                                marginInlineEnd: 0,
+                                            },
                                         }}
                                     >
                                         {languageLabel}
@@ -222,6 +226,10 @@ export function DesktopNav() {
                                 border: "1px solid var(--app-border)",
                                 color: "var(--app-text)",
                                 justifyContent: "flex-start",
+                                "& .MuiButton-endIcon": {
+                                    marginInlineStart: "12px",
+                                    marginInlineEnd: 0,
+                                },
                             }}
                         >
                             {languageLabel}
