@@ -241,10 +241,25 @@ export type Certificate = {
     createdAt?: Maybe<Scalars["DateTime"]["output"]>;
     description?: Maybe<Scalars["JSON"]["output"]>;
     documentId: Scalars["ID"]["output"];
+    locale?: Maybe<Scalars["String"]["output"]>;
+    localizations: Array<Maybe<Certificate>>;
+    localizations_connection?: Maybe<CertificateRelationResponseCollection>;
     logo?: Maybe<UploadFile>;
     name: Scalars["String"]["output"];
     publishedAt?: Maybe<Scalars["DateTime"]["output"]>;
     updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
+export type CertificateLocalizationsArgs = {
+    filters?: InputMaybe<CertificateFiltersInput>;
+    pagination?: InputMaybe<PaginationArg>;
+    sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+};
+
+export type CertificateLocalizations_ConnectionArgs = {
+    filters?: InputMaybe<CertificateFiltersInput>;
+    pagination?: InputMaybe<PaginationArg>;
+    sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
 };
 
 export type CertificateEntityResponseCollection = {
@@ -258,6 +273,8 @@ export type CertificateFiltersInput = {
     createdAt?: InputMaybe<DateTimeFilterInput>;
     description?: InputMaybe<JsonFilterInput>;
     documentId?: InputMaybe<IdFilterInput>;
+    locale?: InputMaybe<StringFilterInput>;
+    localizations?: InputMaybe<CertificateFiltersInput>;
     name?: InputMaybe<StringFilterInput>;
     not?: InputMaybe<CertificateFiltersInput>;
     or?: InputMaybe<Array<InputMaybe<CertificateFiltersInput>>>;
@@ -272,6 +289,11 @@ export type CertificateInput = {
     logo?: InputMaybe<Scalars["ID"]["input"]>;
     name?: InputMaybe<Scalars["String"]["input"]>;
     publishedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+};
+
+export type CertificateRelationResponseCollection = {
+    __typename?: "CertificateRelationResponseCollection";
+    nodes: Array<Certificate>;
 };
 
 export type ComponentAboutCsr = {
@@ -1262,6 +1284,7 @@ export type MutationCreateCategoryArgs = {
 
 export type MutationCreateCertificateArgs = {
     data: CertificateInput;
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     status?: InputMaybe<PublicationStatus>;
 };
 
@@ -1337,6 +1360,7 @@ export type MutationDeleteCategoryArgs = {
 
 export type MutationDeleteCertificateArgs = {
     documentId: Scalars["ID"]["input"];
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
 };
 
 export type MutationDeleteCustomerArgs = {
@@ -1451,6 +1475,7 @@ export type MutationUpdateCategoryArgs = {
 export type MutationUpdateCertificateArgs = {
     data: CertificateInput;
     documentId: Scalars["ID"]["input"];
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     status?: InputMaybe<PublicationStatus>;
 };
 
@@ -2084,11 +2109,13 @@ export type QueryCategoryArgs = {
 
 export type QueryCertificateArgs = {
     documentId: Scalars["ID"]["input"];
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     status?: InputMaybe<PublicationStatus>;
 };
 
 export type QueryCertificatesArgs = {
     filters?: InputMaybe<CertificateFiltersInput>;
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     pagination?: InputMaybe<PaginationArg>;
     sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
     status?: InputMaybe<PublicationStatus>;
@@ -2096,6 +2123,7 @@ export type QueryCertificatesArgs = {
 
 export type QueryCertificates_ConnectionArgs = {
     filters?: InputMaybe<CertificateFiltersInput>;
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
     pagination?: InputMaybe<PaginationArg>;
     sort?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
     status?: InputMaybe<PublicationStatus>;
@@ -2888,13 +2916,16 @@ export type AboutQuery = {
     } | null;
 };
 
-export type CertificatesQueryVariables = Exact<{ [key: string]: never }>;
+export type CertificatesQueryVariables = Exact<{
+    locale?: InputMaybe<Scalars["I18NLocaleCode"]["input"]>;
+}>;
 
 export type CertificatesQuery = {
     __typename?: "Query";
     certificates: Array<{
         __typename?: "Certificate";
         documentId: string;
+        locale?: string | null;
         description?: any | null;
         name: string;
         audit_report?: {
@@ -3773,12 +3804,29 @@ export const CertificatesDocument = {
             kind: "OperationDefinition",
             operation: "query",
             name: { kind: "Name", value: "Certificates" },
+            variableDefinitions: [
+                {
+                    kind: "VariableDefinition",
+                    variable: { kind: "Variable", name: { kind: "Name", value: "locale" } },
+                    type: { kind: "NamedType", name: { kind: "Name", value: "I18NLocaleCode" } },
+                },
+            ],
             selectionSet: {
                 kind: "SelectionSet",
                 selections: [
                     {
                         kind: "Field",
                         name: { kind: "Name", value: "certificates" },
+                        arguments: [
+                            {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "locale" },
+                                value: {
+                                    kind: "Variable",
+                                    name: { kind: "Name", value: "locale" },
+                                },
+                            },
+                        ],
                         selectionSet: {
                             kind: "SelectionSet",
                             selections: [
@@ -3827,6 +3875,7 @@ export const CertificatesDocument = {
                                     },
                                 },
                                 { kind: "Field", name: { kind: "Name", value: "documentId" } },
+                                { kind: "Field", name: { kind: "Name", value: "locale" } },
                                 { kind: "Field", name: { kind: "Name", value: "description" } },
                                 {
                                     kind: "Field",

@@ -1,5 +1,5 @@
-query Certificates {
-    certificates {
+query Certificates($locale: I18NLocaleCode) {
+    certificates(locale: $locale) {
         audit_report {
             alternativeText
             caption
@@ -13,6 +13,7 @@ query Certificates {
             url
         }
         documentId
+        locale
         description
         logo {
             alternativeText
