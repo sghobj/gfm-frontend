@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Container,
     Grid,
     Stack,
@@ -263,9 +264,9 @@ export function Footer() {
                                     {t("subscription.footerCtaTitle")}
                                 </Typography>
                                 <Typography variant="body2" sx={{ opacity: 0.78 }}>
-                            {t("subscription.footerCtaDescription")}
-                        </Typography>
-                    </Box>
+                                    {t("subscription.footerCtaDescription")}
+                                </Typography>
+                            </Box>
                             <Button
                                 variant="outlined"
                                 href="/#b2b-subscribe"
