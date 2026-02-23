@@ -30,7 +30,8 @@ import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import { LoadingState } from "../../components/state/LoadingState";
-import { hasNonEmptyText } from "../../utils/localizedContent.ts";
+import { hasNonEmptyText, isContentForLocale } from "../../utils/localizedContent.ts";
+import { toStrapiLocale } from "../../apollo/apolloClient.ts";
 
 // ----------------------------
 // UI Types (derived from GQL)
@@ -39,8 +40,12 @@ type GQLCertificate = NonNullable<NonNullable<CertificatesQuery["certificates"]>
 
 // ---------- Component ----------
 export function CertificatesPage() {
-    const { t } = useTranslation("common");
-    const { data, loading, error } = useQuery(CertificatesDocument);
+    const { t, i18n } = useTranslation("common");
+    const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
+    const activeLocale = locale as "en" | "ar";
+    const { data, loading, error } = useQuery(CertificatesDocument, {
+        variables: { locale },
+    });
 
     const [search, setSearch] = useState("");
     const [selectedDoc, setSelectedDoc] = useState<{ url: string; name: string } | null>(null);
@@ -51,9 +56,12 @@ export function CertificatesPage() {
         if (!data?.certificates) return [];
         return data.certificates.filter(
             (certificate): certificate is GQLCertificate =>
-                !!certificate && hasNonEmptyText(certificate.name),
+                !!certificate &&
+                hasNonEmptyText(certificate.name) &&
+                hasNonEmptyText(certificate.logo?.url) &&
+                isContentForLocale(certificate.locale, activeLocale),
         );
-    }, [data]);
+    }, [data, activeLocale]);
 
     // Filtering
     const filteredCertificates = useMemo(() => {
@@ -203,8 +211,7 @@ export function CertificatesPage() {
                                                                 fontSize: "1.1rem",
                                                                 lineHeight: 1.6,
                                                                 color: "text.secondary",
-                                                                maxWidth: 700,
-                                                                textAlign: "left",
+                                                                width: "100%",
                                                             }}
                                                         />
                                                     )}

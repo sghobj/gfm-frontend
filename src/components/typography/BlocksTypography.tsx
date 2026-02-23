@@ -1,7 +1,7 @@
 import React from "react";
 import { BlocksRenderer, type BlocksContent } from "@strapi/blocks-react-renderer";
 import { Typography } from "@mui/material";
-import type { SxProps, Theme } from "@mui/material/styles";
+import { useTheme, type SxProps, type Theme } from "@mui/material/styles";
 
 type BlocksTypographyProps = {
     content: BlocksContent;
@@ -18,6 +18,9 @@ export const BlocksTypography: React.FC<BlocksTypographyProps> = ({
     paragraphClassName,
     headingClassName,
 }) => {
+    const theme = useTheme();
+    const isRtl = theme.direction === "rtl";
+
     return (
         <BlocksRenderer
             content={content}
@@ -26,7 +29,12 @@ export const BlocksTypography: React.FC<BlocksTypographyProps> = ({
                     <Typography
                         className={paragraphClassName}
                         variant="body1"
-                        sx={{ textAlign: "justify", ...paragraphSx }}
+                        sx={{
+                            ...(paragraphSx as Record<string, unknown>),
+                            direction: isRtl ? "rtl" : "ltr",
+                            textAlign: "justify",
+                            textAlignLast: isRtl ? "right" : "left",
+                        }}
                     >
                         {children}
                     </Typography>
@@ -45,7 +53,15 @@ export const BlocksTypography: React.FC<BlocksTypographyProps> = ({
                                     ? "h5"
                                     : "h6";
                     return (
-                        <Typography className={headingClassName} variant={variant} sx={headingSx}>
+                        <Typography
+                            className={headingClassName}
+                            variant={variant}
+                            sx={{
+                                ...(headingSx as Record<string, unknown>),
+                                direction: isRtl ? "rtl" : "ltr",
+                                textAlign: isRtl ? "right" : "left",
+                            }}
+                        >
                             {children}
                         </Typography>
                     );
