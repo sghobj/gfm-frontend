@@ -7,15 +7,54 @@ import {
     loadAdminSession,
     saveAdminSession,
 } from "./adminSession";
-import type { AdminSession } from "./adminSession";
-import {
-    AdminLoginDocument,
-    CurrentUserRoleDocument,
-    type AdminLoginMutation,
-    type AdminLoginMutationVariables,
-    type CurrentUserRoleQuery,
-} from "../graphql/gql/graphql";
+import type { AdminSession, AdminUser } from "./adminSession";
 
+type LoginMutationData = {
+    login?: {
+        jwt?: string | null;
+        user?: AdminUser;
+    } | null;
+};
+
+type LoginMutationVars = {
+    input: {
+        identifier: string;
+        password: string;
+    };
+};
+
+type CurrentUserRoleData = {
+    currentUserRole?: {
+        name?: string | null;
+        type?: string | null;
+    } | null;
+};
+
+const LOGIN_MUTATION = gql`
+    mutation AdminLogin($input: UsersPermissionsLoginInput!) {
+        login(input: $input) {
+            jwt
+            user {
+                id
+                username
+                email
+                role {
+                    name
+                    type
+                }
+            }
+        }
+    }
+`;
+
+const CURRENT_USER_ROLE_QUERY = gql`
+    query CurrentUserRole {
+        currentUserRole {
+            name
+            type
+        }
+    }
+`;
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
     const client = useApolloClient();
     const [session, setSession] = useState<AdminSession | null>(() => loadAdminSession());
