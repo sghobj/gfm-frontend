@@ -118,3 +118,4 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
         </Scheme>
     );
 };
+

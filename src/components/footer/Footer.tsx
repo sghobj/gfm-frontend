@@ -350,3 +350,4 @@ export function Footer() {
         </Scheme>
     );
 }
+

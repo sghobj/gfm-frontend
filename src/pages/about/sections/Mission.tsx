@@ -55,3 +55,4 @@ export const Mission = ({ data }: MissionProps) => {
         />
     );
 };
+

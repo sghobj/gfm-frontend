@@ -807,3 +807,4 @@ export function Products() {
         </Box>
     );
 }
+

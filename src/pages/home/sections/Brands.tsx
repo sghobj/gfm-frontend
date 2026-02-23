@@ -229,3 +229,4 @@ export const Brands = ({ brands }: BrandsProps) => {
         </Scheme>
     );
 };
+
