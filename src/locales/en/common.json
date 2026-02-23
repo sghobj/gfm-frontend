@@ -225,7 +225,8 @@
             "fullName": "Full Name",
             "email": "Email Address",
             "company": "Company (Optional)",
-            "additionalMessage": "Additional Message"
+            "additionalMessage": "Additional Message",
+            "subscribeToUpdates": "Send me updates about this product and availability"
         },
         "validation": {
             "gradeRequired": "Grade is required",
@@ -341,12 +342,50 @@
             }
         }
     },
+    "subscription": {
+        "badge": "B2B SUBSCRIPTIONS",
+        "title": "Get Offers and Availability Updates",
+        "subtitle": "Subscribe with your work email to receive promotional offers and updates on product availability.",
+        "footerTitle": "Stay Updated",
+        "footerSubtitle": "B2B offers and stock updates for your company inbox.",
+        "footerCtaTitle": "B2B offers and stock alerts",
+        "footerCtaDescription": "Get updates in your company inbox.",
+        "footerCtaButton": "Subscribe",
+        "heroCtaButton": "Get B2B Updates",
+        "fields": {
+            "workEmail": "Work email",
+            "workEmailPlaceholder": "name@company.com",
+            "workEmailHint": "Please use your company email address.",
+            "company": "Company",
+            "companyPlaceholder": "Your company name",
+            "fullNameOptional": "Full name (Optional)",
+            "fullNamePlaceholder": "John Doe",
+            "phoneOptional": "Phone (Optional)",
+            "phonePlaceholder": "+962 7X XXX XXXX",
+            "products": "Products of interest"
+        },
+        "validation": {
+            "emailRequired": "Work email is required.",
+            "emailInvalid": "Please enter a valid email address.",
+            "companyRequired": "Company name is required.",
+            "consentRequired": "Please confirm your consent to subscribe.",
+            "productsRequired": "Select at least one product."
+        },
+        "consent": "I agree to receive B2B promotional emails and product availability updates.",
+        "submit": "Subscribe",
+        "submitting": "Subscribing...",
+        "success": "Thanks. Please check your inbox to confirm your subscription.",
+        "error": "We could not process your subscription right now. Please try again.",
+        "privacy": "B2B only. You can unsubscribe at any time.",
+        "productsLoading": "Loading products...",
+        "productsUnavailable": "Product interests are temporarily unavailable."
+    },
     "footer": {
         "quickLinksTitle": "Quick links",
         "contactTitle": "Contact",
         "fallback": {
             "brandName": "Good Food Mood Co.",
-            "brandDescription": "Trusted organic export partner from Jordan. Some website content is temporarily unavailable.",
+            "brandDescription": "Trusted organic export partner from Jordan.",
             "address": "Amman, Jordan",
             "email": "info@example.com",
             "quickLinks": {
@@ -358,8 +397,7 @@
                 "privacy": "Privacy",
                 "terms": "Terms"
             },
-            "copyright": "© {{year}} {{brandName}}",
-            "unavailableNote": "Some content is temporarily unavailable."
+            "copyright": "© {{year}} {{brandName}}"
         }
     }
 }

@@ -51,14 +51,13 @@ export const LocationMap = () => {
     return (
         <Box component="section">
             <Grid container spacing={4}>
-                <Grid size={{ lg: 4, md: 6, xs: 12 }} alignItems= "center"
-                alignContent= "center">
+                <Grid size={{ lg: 4, md: 6, xs: 12 }} alignItems="center" alignContent="center">
                     <Card
                         sx={{
                             borderRadius: 3,
                             background: "white",
                             boxShadow: "none",
-                            margin: "auto 0"
+                            margin: "auto 0",
                         }}
                     >
                         <CardHeader

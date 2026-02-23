@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import {
+    Checkbox,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -11,10 +12,12 @@ import {
     Box,
     Divider,
     IconButton,
+    FormControlLabel,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
+import { useApolloClient } from "@apollo/client/react";
 import type { GetOfferingQuery } from "../../gql/graphql";
 import { StrapiImage } from "../image/StrapiImage";
 import { useForm, Controller, useWatch } from "react-hook-form";
@@ -24,6 +27,7 @@ import {
     getApproxPackageCount,
     type PackagingApproxInput,
 } from "../../utils/packagingMath";
+import { upsertSubscriberCustomer } from "../../services/subscription/upsertSubscriberCustomer";
 
 type Offering = NonNullable<GetOfferingQuery["offering"]>;
 
@@ -42,6 +46,7 @@ interface OrderFormValues {
     email: string;
     company: string;
     message: string;
+    subscribeToUpdates: boolean;
 }
 
 type DateSpec = NonNullable<NonNullable<Offering["dateSpecifications"]>[number]>;
@@ -88,6 +93,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
     onClose,
     offering,
 }) => {
+    const client = useApolloClient();
     const { t } = useTranslation("common");
     const specs = useMemo(() => {
         const raw = offering.dateSpecifications ?? [];
@@ -117,6 +123,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
             email: "",
             company: "",
             message: "",
+            subscribeToUpdates: false,
         },
     });
 
@@ -250,8 +257,28 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
         return getApproxPackageCount(quantityKg, selectedPackForEstimate);
     }, [quantityKg, selectedPackForEstimate]);
 
+    const maybeSubscribeFromInquiry = async (data: OrderFormValues) => {
+        if (!data.subscribeToUpdates) return;
+
+        try {
+            await upsertSubscriberCustomer(client, {
+                email: data.email,
+                name: data.name,
+                company: data.company,
+                source: "inquiry_modal",
+                subscribeGlobal: true,
+                productDocumentId: offering.product?.documentId ?? undefined,
+            });
+        } catch (error) {
+            // Do not block inquiry flow if subscription sync fails.
+            console.error("Subscription sync failed from inquiry modal:", error);
+        }
+    };
+
     // ----- Submit handlers -----
-    const onSubmitEmail = (data: OrderFormValues) => {
+    const onSubmitEmail = async (data: OrderFormValues) => {
+        await maybeSubscribeFromInquiry(data);
+
         const selectedDatePack = isDatesFlow
             ? (availableDatePackOptions.find((o) => o.documentId === data.packOption) ?? null)
             : null;
@@ -289,7 +316,9 @@ ${data.message}`;
         onClose();
     };
 
-    const onSubmitWhatsApp = (data: OrderFormValues) => {
+    const onSubmitWhatsApp = async (data: OrderFormValues) => {
+        await maybeSubscribeFromInquiry(data);
+
         const selectedDatePack = isDatesFlow
             ? (availableDatePackOptions.find((o) => o.documentId === data.packOption) ?? null)
             : null;
@@ -532,6 +561,14 @@ ${data.message}`;
                             label={t("inquiryModal.fields.additionalMessage")}
                             multiline
                             rows={3}
+                        />
+
+                        <FormControlLabel
+                            control={
+                                <Checkbox {...register("subscribeToUpdates")} color="primary" />
+                            }
+                            label={t("inquiryModal.fields.subscribeToUpdates")}
+                            sx={{ mt: -0.5 }}
                         />
                     </Stack>
                 </DialogContent>

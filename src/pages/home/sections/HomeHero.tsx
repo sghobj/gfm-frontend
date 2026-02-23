@@ -64,6 +64,28 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
 
     if (SLIDES.length === 0) return null;
 
+    const handleCtaNavigation = (rawLink: string) => {
+        const link = rawLink.trim();
+        if (!link) return;
+
+        if (
+            link.startsWith("http://") ||
+            link.startsWith("https://") ||
+            link.startsWith("mailto:") ||
+            link.startsWith("tel:")
+        ) {
+            window.location.assign(link);
+            return;
+        }
+
+        if (link.startsWith("#")) {
+            navigate(`/${link}`);
+            return;
+        }
+
+        navigate(link);
+    };
+
     return (
         <Box
             sx={{
@@ -199,7 +221,9 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                 variant="contained"
                                                 size="large"
                                                 endIcon={<ArrowForwardIcon />}
-                                                onClick={() => navigate(slide.primaryLink)}
+                                                onClick={() =>
+                                                    handleCtaNavigation(slide.primaryLink)
+                                                }
                                                 sx={{
                                                     px: 5,
                                                     py: 2,
@@ -215,7 +239,9 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                             <Button
                                                 variant="outlined"
                                                 size="large"
-                                                onClick={() => navigate(slide.secondaryLink)}
+                                                onClick={() =>
+                                                    handleCtaNavigation(slide.secondaryLink)
+                                                }
                                                 sx={{
                                                     px: 5,
                                                     py: 2,

@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Container,
     Grid,
     Stack,
@@ -38,7 +39,6 @@ type FooterFallbackContent = {
     quickLinks: FooterLink[];
     legalLinks: FooterLink[];
     copyrightText: string;
-    unavailableNote: string;
 };
 
 const buildFallbackFooter = (
@@ -65,7 +65,6 @@ const buildFallbackFooter = (
             year,
             brandName,
         }),
-        unavailableNote: translate("footer.fallback.unavailableNote"),
     };
 };
 
@@ -287,11 +286,45 @@ export function Footer() {
                         )}
                     </Grid>
 
-                    {shouldUseFallback && hasNonEmptyText(fallbackFooter.unavailableNote) && (
-                        <Typography sx={{ mt: 2.5, opacity: 0.65, fontSize: "0.85rem" }}>
-                            {fallbackFooter.unavailableNote}
-                        </Typography>
-                    )}
+                    <Box
+                        sx={{
+                            mt: { xs: 4, md: 5 },
+                            pt: { xs: 3, md: 4 },
+                            borderTop: "1px solid",
+                            borderColor: "divider",
+                        }}
+                    >
+                        <Stack
+                            direction={{ xs: "column", md: "row" }}
+                            useFlexGap
+                            gap={{ xs: 1.5, md: 2.5 }}
+                            alignItems={{ xs: "flex-start", md: "center" }}
+                            justifyContent="space-between"
+                        >
+                            <Box>
+                                <Typography sx={{ fontWeight: 700 }}>
+                                    {t("subscription.footerCtaTitle")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ opacity: 0.78 }}>
+                                    {t("subscription.footerCtaDescription")}
+                                </Typography>
+                            </Box>
+                            <Button
+                                variant="outlined"
+                                href="/#b2b-subscribe"
+                                sx={{
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    textTransform: "none",
+                                    px: 2.5,
+                                    py: 1,
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {t("subscription.footerCtaButton")}
+                            </Button>
+                        </Stack>
+                    </Box>
 
                     {showEffectiveBottomSection && (
                         <>
