@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
     Alert,
@@ -16,69 +15,16 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+    GetInvitationDocument,
+    SubmitOrderDocument,
+    type SubmitOrderMutation,
+    type SubmitOrderMutationVariables,
+} from "../../graphql/gql/graphql";
+import {
     formatApproxPackageCount,
     getApproxPackageCount,
     type PackagingApproxInput,
 } from "../../utils/packagingMath";
-
-const GET_INVITATION = gql`
-    query GetInvitation($token: String!) {
-        getInvitation(token: $token) {
-            documentId
-            token
-            customerEmail
-            customerName
-            customerCompany
-            grade
-            size
-            packaging
-            quantity
-            offering {
-                documentId
-                isMedjoolDate
-                product {
-                    documentId
-                    name
-                }
-                brand {
-                    documentId
-                    name
-                }
-                dateSpecifications {
-                    grade
-                    sizes
-                    pack_options {
-                        documentId
-                        displayLabel
-                        amount
-                        amountMin
-                        amountMax
-                        unit
-                        applicable_sizes
-                    }
-                }
-                pack_options {
-                    documentId
-                    displayLabel
-                    amount
-                    amountMin
-                    amountMax
-                    unit
-                }
-            }
-        }
-    }
-`;
-
-const SUBMIT_ORDER = gql`
-    mutation SubmitOrder($data: OrderSubmissionInput!) {
-        submitOrder(data: $data) {
-            documentId
-            orderNumber
-            status
-        }
-    }
-`;
 
 type PackOption = {
     documentId: string;
@@ -94,63 +40,6 @@ type DateSpec = {
     grade?: string | null;
     sizes?: string | null;
     pack_options?: Array<PackOption | null> | null;
-};
-
-type Invitation = {
-    documentId: string;
-    token: string;
-    customerEmail?: string | null;
-    customerName?: string | null;
-    customerCompany?: string | null;
-    grade?: string | null;
-    size?: string | null;
-    packaging?: string | null;
-    quantity?: number | null;
-    offering?: {
-        documentId: string;
-        isMedjoolDate?: boolean | null;
-        product?: {
-            documentId?: string | null;
-            name?: string | null;
-        } | null;
-        brand?: {
-            documentId?: string | null;
-            name?: string | null;
-        } | null;
-        dateSpecifications?: Array<DateSpec | null> | null;
-        pack_options?: Array<PackOption | null> | null;
-    } | null;
-};
-
-type GetInvitationData = {
-    getInvitation?: Invitation | null;
-};
-
-type GetInvitationVars = {
-    token: string;
-};
-
-type SubmitOrderData = {
-    submitOrder?: {
-        documentId: string;
-        orderNumber?: string | null;
-        status?: string | null;
-    } | null;
-};
-
-type SubmitOrderVars = {
-    data: {
-        invitationToken: string;
-        grade?: string;
-        size?: string;
-        packaging?: string;
-        packOption?: string;
-        quantity: number;
-        message?: string;
-        customerName: string;
-        customerEmail: string;
-        customerCompany?: string;
-    };
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();
@@ -179,15 +68,14 @@ export function OrderSubmitPage() {
     const [searchParams] = useSearchParams();
     const token = (searchParams.get("token") ?? "").trim();
 
-    const { data, loading, error } = useQuery<GetInvitationData, GetInvitationVars>(
-        GET_INVITATION,
-        {
-            variables: { token },
-            skip: !token,
-            fetchPolicy: "no-cache",
-        },
+    const { data, loading, error } = useQuery(GetInvitationDocument, {
+        variables: { token },
+        skip: !token,
+        fetchPolicy: "no-cache",
+    });
+    const [submitOrder] = useMutation<SubmitOrderMutation, SubmitOrderMutationVariables>(
+        SubmitOrderDocument,
     );
-    const [submitOrder] = useMutation<SubmitOrderData, SubmitOrderVars>(SUBMIT_ORDER);
 
     const invitation = data?.getInvitation ?? null;
     const offering = invitation?.offering ?? null;
@@ -646,3 +534,4 @@ export function OrderSubmitPage() {
         </Container>
     );
 }
+

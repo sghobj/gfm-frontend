@@ -1,5 +1,5 @@
 import { Box, Stack, Divider, Typography } from "@mui/material";
-import type { AboutQuery } from "../../../gql/graphql";
+import type { AboutQuery } from "../../../graphql/gql/graphql";
 import { SectionLayout } from "../../../components/layout/SectionLayout";
 import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography";
 import { hasAnyLocalizedContent } from "../../../utils/localizedContent";
@@ -56,3 +56,4 @@ export function WhyUs({ data }: WhyUsSectionProps) {
         />
     );
 }
+

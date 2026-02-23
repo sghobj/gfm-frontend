@@ -1,5 +1,5 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
-import type { AboutQuery } from "../../../gql/graphql";
+import type { AboutQuery } from "../../../graphql/gql/graphql";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography";
 import { SectionLayout } from "../../../components/layout/SectionLayout";
 import { SectionSubtitle, SectionTitle } from "../../../components/typography/SectionTypography";
@@ -85,3 +85,4 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
         />
     );
 };
+

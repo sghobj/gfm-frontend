@@ -2,7 +2,7 @@ import { Box, Container, Stack, Typography, Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Scheme } from "../../../components/scheme/Scheme";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia";
-import type { GetHomeDataQuery } from "../../../gql/graphql";
+import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type BrandType = NonNullable<GetHomeDataQuery["brands"]>[number];
@@ -229,3 +229,4 @@ export const Brands = ({ brands }: BrandsProps) => {
         </Scheme>
     );
 };
+

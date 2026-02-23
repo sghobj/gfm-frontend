@@ -1,105 +1,21 @@
-import { gql, type ApolloClient } from "@apollo/client";
-
-const UPSERT_CUSTOMER_SUBSCRIPTION = gql`
-    mutation UpsertCustomerSubscription($input: UpsertCustomerSubscriptionInput!) {
-        upsertCustomerSubscription(input: $input) {
-            ok
-            customerDocumentId
-            message
-        }
-    }
-`;
-
-const FIND_CUSTOMER_BY_EMAIL = gql`
-    query FindCustomerByEmail($email: String!) {
-        customers(filters: { email: { eqi: $email } }, pagination: { limit: 1 }) {
-            documentId
-            email
-            company
-            isSubscriber
-        }
-    }
-`;
-
-const CREATE_SUBSCRIBER_CUSTOMER = gql`
-    mutation CreateSubscriberCustomer($data: CustomerInput!) {
-        createCustomer(data: $data) {
-            documentId
-        }
-    }
-`;
-
-const UPDATE_SUBSCRIBER_CUSTOMER = gql`
-    mutation UpdateSubscriberCustomer($documentId: ID!, $data: CustomerInput!) {
-        updateCustomer(documentId: $documentId, data: $data) {
-            documentId
-        }
-    }
-`;
+import type { ApolloClient } from "@apollo/client";
+import {
+    CreateSubscriberCustomerDocument,
+    FindCustomerByEmailDocument,
+    UpdateSubscriberCustomerDocument,
+    UpsertCustomerSubscriptionDocument,
+    type CreateSubscriberCustomerMutation,
+    type CreateSubscriberCustomerMutationVariables,
+    type FindCustomerByEmailQuery,
+    type FindCustomerByEmailQueryVariables,
+    type UpdateSubscriberCustomerMutation,
+    type UpdateSubscriberCustomerMutationVariables,
+    type UpsertCustomerSubscriptionMutation,
+    type UpsertCustomerSubscriptionMutationVariables,
+} from "../../graphql/gql/graphql";
 
 type CustomerLookupRecord = {
     documentId: string;
-};
-
-type FindCustomerByEmailData = {
-    customers?: Array<CustomerLookupRecord | null> | null;
-};
-
-type FindCustomerByEmailVars = {
-    email: string;
-};
-
-type UpsertCustomerSubscriptionData = {
-    upsertCustomerSubscription?: {
-        ok?: boolean | null;
-        customerDocumentId?: string | null;
-        message?: string | null;
-    } | null;
-};
-
-type UpsertCustomerSubscriptionVars = {
-    input: {
-        email: string;
-        company?: string;
-        name?: string;
-        phone?: string;
-        source?: string;
-        subscribeGlobal: boolean;
-        productDocumentId?: string;
-    };
-};
-
-type CreateSubscriberCustomerData = {
-    createCustomer?: {
-        documentId: string;
-    } | null;
-};
-
-type CreateSubscriberCustomerVars = {
-    data: {
-        email: string;
-        company?: string;
-        name?: string;
-        phone?: string;
-        isSubscriber: boolean;
-    };
-};
-
-type UpdateSubscriberCustomerData = {
-    updateCustomer?: {
-        documentId: string;
-    } | null;
-};
-
-type UpdateSubscriberCustomerVars = {
-    documentId: string;
-    data: {
-        email: string;
-        company?: string;
-        name?: string;
-        phone?: string;
-        isSubscriber: boolean;
-    };
 };
 
 type CustomMutationAvailability = "unknown" | "supported" | "unsupported";
@@ -156,7 +72,7 @@ const buildLegacyCustomerData = (input: {
     phone?: string;
     subscribeGlobal: boolean;
 }) => {
-    const data: CreateSubscriberCustomerVars["data"] = {
+    const data: CreateSubscriberCustomerMutationVariables["data"] = {
         email: input.email,
         isSubscriber: input.subscribeGlobal,
     };
@@ -180,12 +96,14 @@ const upsertViaLegacyCustomerModel = async (
 ) => {
     const data = buildLegacyCustomerData(input);
 
-    const lookup = await client.query<FindCustomerByEmailData, FindCustomerByEmailVars>({
-        query: FIND_CUSTOMER_BY_EMAIL,
-        variables: { email: input.email },
-        fetchPolicy: "network-only",
-        context: { skipAuth: true },
-    });
+    const lookup = await client.query<FindCustomerByEmailQuery, FindCustomerByEmailQueryVariables>(
+        {
+            query: FindCustomerByEmailDocument,
+            variables: { email: input.email },
+            fetchPolicy: "network-only",
+            context: { skipAuth: true },
+        },
+    );
 
     const customers = (lookup.data?.customers ?? []) as Array<CustomerLookupRecord | null>;
     const existingCustomer = customers.find((record): record is CustomerLookupRecord =>
@@ -193,23 +111,27 @@ const upsertViaLegacyCustomerModel = async (
     );
 
     if (existingCustomer?.documentId) {
-        await client.mutate<UpdateSubscriberCustomerData, UpdateSubscriberCustomerVars>({
-            mutation: UPDATE_SUBSCRIBER_CUSTOMER,
-            variables: {
-                documentId: existingCustomer.documentId,
-                data,
+        await client.mutate<UpdateSubscriberCustomerMutation, UpdateSubscriberCustomerMutationVariables>(
+            {
+                mutation: UpdateSubscriberCustomerDocument,
+                variables: {
+                    documentId: existingCustomer.documentId,
+                    data,
+                },
+                context: { skipAuth: true },
             },
-            context: { skipAuth: true },
-        });
+        );
         return;
     }
 
     try {
-        await client.mutate<CreateSubscriberCustomerData, CreateSubscriberCustomerVars>({
-            mutation: CREATE_SUBSCRIBER_CUSTOMER,
-            variables: { data },
-            context: { skipAuth: true },
-        });
+        await client.mutate<CreateSubscriberCustomerMutation, CreateSubscriberCustomerMutationVariables>(
+            {
+                mutation: CreateSubscriberCustomerDocument,
+                variables: { data },
+                context: { skipAuth: true },
+            },
+        );
     } catch (error) {
         const firstErrorMessage = toErrorMessage(error);
         if (!looksLikeDuplicateError(firstErrorMessage)) {
@@ -217,8 +139,11 @@ const upsertViaLegacyCustomerModel = async (
         }
 
         // Handle create race by re-querying then updating.
-        const retryLookup = await client.query<FindCustomerByEmailData, FindCustomerByEmailVars>({
-            query: FIND_CUSTOMER_BY_EMAIL,
+        const retryLookup = await client.query<
+            FindCustomerByEmailQuery,
+            FindCustomerByEmailQueryVariables
+        >({
+            query: FindCustomerByEmailDocument,
             variables: { email: input.email },
             fetchPolicy: "network-only",
             context: { skipAuth: true },
@@ -233,14 +158,16 @@ const upsertViaLegacyCustomerModel = async (
             throw error;
         }
 
-        await client.mutate<UpdateSubscriberCustomerData, UpdateSubscriberCustomerVars>({
-            mutation: UPDATE_SUBSCRIBER_CUSTOMER,
-            variables: {
-                documentId: retryCustomer.documentId,
-                data,
+        await client.mutate<UpdateSubscriberCustomerMutation, UpdateSubscriberCustomerMutationVariables>(
+            {
+                mutation: UpdateSubscriberCustomerDocument,
+                variables: {
+                    documentId: retryCustomer.documentId,
+                    data,
+                },
+                context: { skipAuth: true },
             },
-            context: { skipAuth: true },
-        });
+        );
     }
 };
 
@@ -256,7 +183,7 @@ const upsertViaCustomMutation = async (
         productDocumentId?: string;
     },
 ) => {
-    const variables: UpsertCustomerSubscriptionVars = {
+    const variables: UpsertCustomerSubscriptionMutationVariables = {
         input: {
             email: input.email,
             subscribeGlobal: input.subscribeGlobal,
@@ -268,11 +195,13 @@ const upsertViaCustomMutation = async (
         },
     };
 
-    await client.mutate<UpsertCustomerSubscriptionData, UpsertCustomerSubscriptionVars>({
-        mutation: UPSERT_CUSTOMER_SUBSCRIPTION,
-        variables,
-        context: { skipAuth: true },
-    });
+    await client.mutate<UpsertCustomerSubscriptionMutation, UpsertCustomerSubscriptionMutationVariables>(
+        {
+            mutation: UpsertCustomerSubscriptionDocument,
+            variables,
+            context: { skipAuth: true },
+        },
+    );
 };
 
 export const upsertSubscriberCustomer = async (
@@ -341,3 +270,4 @@ export const upsertSubscriberCustomer = async (
         subscribeGlobal,
     });
 };
+

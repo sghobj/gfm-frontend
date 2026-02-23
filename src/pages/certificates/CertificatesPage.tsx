@@ -24,7 +24,7 @@ import { useQuery } from "@apollo/client/react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { useTranslation } from "react-i18next";
 
-import { CertificatesDocument, type CertificatesQuery } from "../../gql/graphql.ts";
+import { CertificatesDocument, type CertificatesQuery } from "../../graphql/gql/graphql.ts";
 import { resolveStrapiMediaUrl, toSearchableText } from "../../utils/strapiMedia";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
@@ -383,3 +383,4 @@ export function CertificatesPage() {
         </Box>
     );
 }
+

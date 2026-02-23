@@ -1,0 +1,137 @@
+query GetAllOfferings($locale: I18NLocaleCode) {
+    offerings(locale: $locale) {
+        documentId
+        locale
+        availability
+        isMedjoolDate
+        pack_options {
+            amount
+            documentId
+            displayLabel
+            locale
+            unit
+        }
+
+        brand {
+            name
+            slug
+            documentId
+            locale
+            logo {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        product {
+            documentId
+            locale
+            name
+            description
+            category {
+                name
+                documentId
+            }
+            image {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        images {
+            documentId
+            alternativeText
+            url
+            width
+        }
+
+        dateSpecifications {
+            grade
+            sizes
+            pack_options {
+                documentId
+                displayLabel
+                locale
+                amount
+                unit
+                amountMin
+                amountMax
+                note
+                applicable_sizes
+            }
+        }
+    }
+}
+
+query GetOffering($id: ID!, $locale: I18NLocaleCode) {
+    offering(documentId: $id, locale: $locale) {
+        documentId
+        locale
+        availability
+        isMedjoolDate
+
+        pack_options {
+            amount
+            displayLabel
+            unit
+            documentId
+            locale
+        }
+
+        brand {
+            name
+            slug
+            documentId
+            locale
+            logo {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        product {
+            documentId
+            locale
+            name
+            description
+            category {
+                name
+            }
+            image {
+                documentId
+                alternativeText
+                url
+                width
+            }
+        }
+
+        images {
+            documentId
+            alternativeText
+            url
+            width
+        }
+
+        dateSpecifications {
+            grade
+            sizes
+            pack_options {
+                documentId
+                displayLabel
+                locale
+                amount
+                unit
+                amountMin
+                amountMax
+                note
+                applicable_sizes
+            }
+        }
+    }
+}

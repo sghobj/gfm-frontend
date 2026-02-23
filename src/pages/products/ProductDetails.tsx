@@ -18,7 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { HeroSection } from "../../components/section/HeroSection.tsx";
 import { resolveStrapiMediaUrl } from "../../utils/strapiMedia.ts";
-import { GetOfferingDocument } from "../../gql/graphql.ts";
+import { GetOfferingDocument } from "../../graphql/gql/graphql.ts";
 import { StrapiImage } from "../../components/image/StrapiImage.tsx";
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
@@ -552,3 +552,4 @@ export const ProductDetails = () => {
         </>
     );
 };
+

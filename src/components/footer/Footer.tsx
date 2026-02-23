@@ -18,7 +18,7 @@ import { useQuery } from "@apollo/client/react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Scheme } from "../scheme/Scheme";
-import { FooterDocument } from "../../gql/graphql";
+import { FooterDocument } from "../../graphql/gql/graphql";
 import { toStrapiLocale } from "../../apollo/apolloClient";
 import {
     hasAnyLocalizedContent,
@@ -350,3 +350,4 @@ export function Footer() {
         </Scheme>
     );
 }
+

@@ -27,7 +27,7 @@ import { useQuery } from "@apollo/client/react";
 
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
-import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../gql/graphql.ts";
+import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../graphql/gql/graphql.ts";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
@@ -807,3 +807,4 @@ export function Products() {
         </Box>
     );
 }
+

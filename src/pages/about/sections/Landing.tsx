@@ -1,4 +1,4 @@
-import type { AboutQuery } from "../../../gql/graphql.ts";
+import type { AboutQuery } from "../../../graphql/gql/graphql.ts";
 import { Box, Stack } from "@mui/material";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
@@ -54,3 +54,4 @@ export const Landing = ({ data }: LandingProps) => {
         />
     );
 };
+

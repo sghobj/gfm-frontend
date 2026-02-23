@@ -1,0 +1,21 @@
+mutation AdminLogin($input: UsersPermissionsLoginInput!) {
+    login(input: $input) {
+        jwt
+        user {
+            id
+            username
+            email
+            role {
+                name
+                type
+            }
+        }
+    }
+}
+
+query CurrentUserRole {
+    currentUserRole {
+        name
+        type
+    }
+}

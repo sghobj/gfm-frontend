@@ -1,6 +1,6 @@
 import { Box, Typography, Container, Grid, Stack, Card, CardContent } from "@mui/material";
 import { Scheme } from "../../../components/scheme/Scheme";
-import type { GetHomeDataQuery } from "../../../gql/graphql";
+import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 import { hasAnyLocalizedContent, hasNonEmptyText } from "../../../utils/localizedContent";
 import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
@@ -118,3 +118,4 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
         </Scheme>
     );
 };
+

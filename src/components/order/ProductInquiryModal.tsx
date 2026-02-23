@@ -18,7 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
 import { useApolloClient } from "@apollo/client/react";
-import type { GetOfferingQuery } from "../../gql/graphql";
+import type { GetOfferingQuery } from "../../graphql/gql/graphql";
 import { StrapiImage } from "../image/StrapiImage";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -607,3 +607,4 @@ ${data.message}`;
         </Dialog>
     );
 };
+

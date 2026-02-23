@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Scheme } from "../../../components/scheme/Scheme";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia";
-import type { CertificatesQuery } from "../../../gql/graphql";
+import type { CertificatesQuery } from "../../../graphql/gql/graphql";
 import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type CertificateType = NonNullable<CertificatesQuery["certificates"]>[number];
@@ -316,3 +316,4 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
         </Scheme>
     );
 };
+

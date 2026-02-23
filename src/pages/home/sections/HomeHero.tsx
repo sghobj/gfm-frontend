@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import type { GetHomeDataQuery } from "../../../gql/graphql";
+import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 
 // Import Swiper styles
 import "swiper/swiper-bundle.css";
@@ -313,3 +313,4 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
         </Box>
     );
 };
+

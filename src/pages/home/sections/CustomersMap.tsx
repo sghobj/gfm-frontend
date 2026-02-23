@@ -17,7 +17,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { lighten } from "@mui/material/styles";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { useTranslation } from "react-i18next";
-import type { GetHomeDataQuery } from "../../../gql/graphql";
+import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 import { countryToContinent, getFlagUrl, normalizeCountryName } from "../../../utils/countries.ts";
 import { hasNonEmptyText } from "../../../utils/localizedContent";
 import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
@@ -391,3 +391,4 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
         </Box>
     );
 };
+

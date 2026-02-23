@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import {
     Alert,
@@ -17,6 +16,11 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toStrapiLocale } from "../../apollo/apolloClient";
+import {
+    SubscriptionProductsDocument,
+    type SubscriptionProductsQuery,
+    type SubscriptionProductsQueryVariables,
+} from "../../graphql/gql/graphql";
 import { upsertSubscriberCustomer } from "../../services/subscription/upsertSubscriberCustomer";
 
 type SubscribeFormValues = {
@@ -28,26 +32,6 @@ type SubscribeFormValues = {
     consent: boolean;
     website: string;
 };
-
-type SubscriptionProductsData = {
-    products?: Array<{
-        documentId: string;
-        name: string;
-    } | null> | null;
-};
-
-type SubscriptionProductsVars = {
-    locale: "en" | "ar";
-};
-
-const SUBSCRIPTION_PRODUCTS_QUERY = gql`
-    query SubscriptionProducts($locale: I18NLocaleCode) {
-        products(locale: $locale, pagination: { limit: 100 }, sort: ["name:asc"]) {
-            documentId
-            name
-        }
-    }
-`;
 
 export interface B2BSubscribeFormProps {
     variant: "homepage" | "footer";
@@ -68,9 +52,9 @@ export const B2BSubscribeForm = ({
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const { data: productsData, loading: productsLoading } = useQuery<
-        SubscriptionProductsData,
-        SubscriptionProductsVars
-    >(SUBSCRIPTION_PRODUCTS_QUERY, {
+        SubscriptionProductsQuery,
+        SubscriptionProductsQueryVariables
+    >(SubscriptionProductsDocument, {
         variables: { locale },
         context: { skipAuth: true },
     });
@@ -406,27 +390,38 @@ export const B2BSubscribeForm = ({
                     }}
                 />
 
-                <FormControl error={Boolean(errors.consent)} component="fieldset">
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                size={isCompact ? "small" : "medium"}
-                                color="primary"
-                                {...register("consent", {
-                                    required: t("subscription.validation.consentRequired"),
-                                })}
+                <Controller
+                    name="consent"
+                    control={control}
+                    rules={{
+                        validate: (value) =>
+                            value || t("subscription.validation.consentRequired"),
+                    }}
+                    render={({ field, fieldState }) => (
+                        <FormControl error={Boolean(fieldState.error)} component="fieldset">
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        size={isCompact ? "small" : "medium"}
+                                        color="primary"
+                                        checked={Boolean(field.value)}
+                                        onChange={(_event, checked) => field.onChange(checked)}
+                                        onBlur={field.onBlur}
+                                        inputRef={field.ref}
+                                    />
+                                }
+                                label={
+                                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                        {t("subscription.consent")}
+                                    </Typography>
+                                }
                             />
-                        }
-                        label={
-                            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                                {t("subscription.consent")}
-                            </Typography>
-                        }
-                    />
-                    {errors.consent?.message && (
-                        <FormHelperText>{errors.consent.message}</FormHelperText>
+                            {fieldState.error?.message && (
+                                <FormHelperText>{fieldState.error.message}</FormHelperText>
+                            )}
+                        </FormControl>
                     )}
-                </FormControl>
+                />
 
                 <Typography variant="caption" sx={{ opacity: 0.75 }}>
                     {t("subscription.privacy")}
@@ -465,3 +460,4 @@ export const B2BSubscribeForm = ({
         </Box>
     );
 };
+
