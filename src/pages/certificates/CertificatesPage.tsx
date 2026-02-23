@@ -386,3 +386,4 @@ export function CertificatesPage() {
         </Box>
     );
 }
+
