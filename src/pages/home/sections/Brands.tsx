@@ -127,7 +127,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                             sx={{
                                                 fontWeight: 800,
                                                 textAlign: "center",
-                                                color: "text.primary",
+                                                color: "primary.main",
                                                 textTransform: "uppercase",
                                                 letterSpacing: 1,
                                             }}
@@ -168,7 +168,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                                             transform: "scale(1.04)",
                                                         },
                                                         "& .brand-name": {
-                                                            color: "text.primary",
+                                                            color: "primary.main",
                                                             opacity: 1,
                                                         },
                                                     },
@@ -207,7 +207,7 @@ export const Brands = ({ brands }: BrandsProps) => {
                                                     sx={{
                                                         fontWeight: 700,
                                                         textAlign: "center",
-                                                        color: "text.primary",
+                                                        color: "text.secondary",
                                                         textTransform: "uppercase",
                                                         letterSpacing: 1,
                                                         fontSize: "0.68rem",
