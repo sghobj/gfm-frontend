@@ -232,7 +232,7 @@ export function OrderSubmitPage() {
         setSelectedSize(invitation.size ?? "");
         setSelectedPackOption("");
         setManualPackaging(invitation.packaging ?? "");
-    }, [invitation?.documentId]);
+    }, [invitation]);
 
     const filteredSizeOptions = useMemo<string[]>(() => {
         if (!isDatesFlow || !selectedGrade) return [];
@@ -437,9 +437,10 @@ export function OrderSubmitPage() {
             const orderId =
                 submitResponse?.submitOrder?.orderNumber ?? submitResponse?.submitOrder?.documentId;
             setSuccessOrderNumber(orderId ?? t("orderSubmit.orderCreatedFallback"));
-        } catch (err: any) {
-            const rawMessage = String(err?.message ?? "");
-            if (err?.name === "AbortError" || rawMessage.toLowerCase().includes("abort")) {
+        } catch (err: unknown) {
+            const rawMessage = err instanceof Error ? err.message : String(err ?? "");
+            const errorName = err instanceof Error ? err.name : "";
+            if (errorName === "AbortError" || rawMessage.toLowerCase().includes("abort")) {
                 setSubmitError(t("orderSubmit.errors.timeout"));
             } else {
                 setSubmitError(rawMessage || t("orderSubmit.errors.unableToSubmit"));

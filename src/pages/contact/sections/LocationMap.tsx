@@ -3,6 +3,7 @@ import {
     Card,
     CardContent,
     CardHeader,
+    CircularProgress,
     Divider,
     Grid,
     Paper,
@@ -13,7 +14,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { Logo } from "../../../components/logo/Logo";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => {
@@ -45,17 +46,19 @@ const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value
 
 export const LocationMap = () => {
     const { t } = useTranslation("common");
+    const [isMapLoading, setIsMapLoading] = useState(true);
+
     return (
-        <Box component="section" sx={{ py: { md: 1 } }}>
+        <Box component="section">
             <Grid container spacing={4}>
-                <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+                <Grid size={{ lg: 4, md: 6, xs: 12 }} alignItems= "center"
+                alignContent= "center">
                     <Card
                         sx={{
                             borderRadius: 3,
                             background: "white",
                             boxShadow: "none",
-                            height: "100%",
-                            p: { lg: 4 },
+                            margin: "auto 0"
                         }}
                     >
                         <CardHeader
@@ -100,12 +103,29 @@ export const LocationMap = () => {
                     <Paper
                         elevation={0}
                         sx={{
+                            position: "relative",
                             borderRadius: 3,
                             overflow: "hidden",
                             border: "1px solid rgba(0,0,0,0.08)",
                             boxShadow: "0 12px 30px rgba(0,0,0,0.06)",
                         }}
                     >
+                        {isMapLoading && (
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    zIndex: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    bgcolor: "rgba(255,255,255,0.84)",
+                                    backdropFilter: "blur(1px)",
+                                }}
+                            >
+                                <CircularProgress size={34} thickness={4} color="primary" />
+                            </Box>
+                        )}
                         <Box
                             component="iframe"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3384.6023027198144!2d35.90720517611209!3d31.97168422470498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151ca194cbdaecaf%3A0xd96ed3b9c3083bff!2zR29vZCBGb29kIE1vb2QgQ28uINi02LHZg9ipINmF2LLYp9isINin2YTYutiw2KfYoSDYp9mE2KzZitiv!5e0!3m2!1sen!2sjo!4v1766145454698!5m2!1sen!2sjo"
@@ -113,8 +133,11 @@ export const LocationMap = () => {
                             minHeight={{ md: 400 }}
                             width={"100%"}
                             loading="lazy"
+                            title={t("contactPage.location.companyName")}
                             referrerPolicy="no-referrer-when-downgrade"
                             sx={{ border: 0, display: "block" }}
+                            onLoad={() => setIsMapLoading(false)}
+                            onError={() => setIsMapLoading(false)}
                             allowFullScreen
                         />
                     </Paper>

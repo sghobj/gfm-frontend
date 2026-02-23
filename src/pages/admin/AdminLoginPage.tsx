@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAdminAuth } from "../../auth/AdminAuthProvider";
+import { useAdminAuth } from "../../auth/AdminAuthContext";
 
 type LocationState = {
     from?: string;
@@ -35,8 +35,10 @@ export function AdminLoginPage() {
         try {
             await login({ identifier, password });
             navigate(redirectTarget, { replace: true });
-        } catch (err: any) {
-            setError(err?.message ?? t("adminLogin.errors.unableToSignIn"));
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message : t("adminLogin.errors.unableToSignIn");
+            setError(message);
         } finally {
             setBusy(false);
         }

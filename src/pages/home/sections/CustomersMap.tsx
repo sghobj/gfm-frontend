@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import type { GetHomeDataQuery } from "../../../gql/graphql";
 import { countryToContinent, getFlagUrl, normalizeCountryName } from "../../../utils/countries.ts";
 import { hasNonEmptyText } from "../../../utils/localizedContent";
+import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type MapData = NonNullable<GetHomeDataQuery["homepage"]>["map"];
 
@@ -140,14 +141,6 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
     const subtitle = data?.subtitle ?? "";
     const title = data?.title ?? "";
     const description = data?.description ?? "";
-    const hasMapContent =
-        hasNonEmptyText(subtitle) &&
-        hasNonEmptyText(title) &&
-        hasNonEmptyText(description) &&
-        Array.isArray(activeCountries) &&
-        activeCountries.length > 0;
-
-    if (!hasMapContent) return null;
 
     const getFlagEmoji = (countryName: string) => getFlagUrl(countryName);
 
@@ -192,6 +185,14 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
         });
         return map;
     }, [activeCountries]);
+    const hasMapContent =
+        hasNonEmptyText(subtitle) &&
+        hasNonEmptyText(title) &&
+        hasNonEmptyText(description) &&
+        Array.isArray(activeCountries) &&
+        activeCountries.length > 0;
+
+    if (!hasMapContent) return null;
 
     // Make inactive land visible vs background
     const inactiveFill = "#DADDE3";
@@ -207,35 +208,32 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
                 }}
             />
 
-            <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    maxWidth: "1440px",
+                    px: { xs: 2, sm: 4, md: 6 },
+                    position: "relative",
+                    zIndex: 1,
+                }}
+            >
                 <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={{ xs: 4, lg: 10 }}>
                     {/* Left column */}
                     <Stack
                         spacing={2.5}
                         sx={{ flex: 1, minWidth: { md: 420 }, justifyContent: "center" }}
                     >
-                        <Typography
-                            variant="overline"
-                            sx={{
-                                letterSpacing: 3,
-                                fontWeight: 800,
-                                color: theme.palette.primary.main,
-                            }}
-                        >
+                        <Typography variant="overline" sx={HOME_SECTION_TYPOGRAPHY.overline}>
                             {subtitle}
                         </Typography>
 
-                        <Typography
-                            variant="h3"
-                            sx={{ fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5 }}
-                        >
+                        <Typography variant="h2" sx={HOME_SECTION_TYPOGRAPHY.heading}>
                             {title}
                         </Typography>
 
                         <Typography
                             variant="body1"
-                            color="text.secondary"
-                            sx={{ maxWidth: 520, fontSize: "1.05rem" }}
+                            sx={{ ...HOME_SECTION_TYPOGRAPHY.subtitle, maxWidth: 520 }}
                         >
                             {description}
                         </Typography>

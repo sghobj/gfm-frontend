@@ -15,12 +15,13 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Scheme } from "../../../components/scheme/Scheme";
-import { SectionSubtitle } from "../../../components/typography/SectionTypography";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia";
 import type { CertificatesQuery } from "../../../gql/graphql";
+import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type CertificateType = NonNullable<CertificatesQuery["certificates"]>[number];
 
@@ -35,7 +36,14 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
 
     const handleClose = () => setSelectedCert(null);
 
-    const sortedCertificates = [...certificates];
+    const sortedCertificates = certificates.filter((cert): cert is NonNullable<CertificateType> =>
+        Boolean(cert),
+    );
+    if (sortedCertificates.length === 0) {
+        return null;
+    }
+    const MAX_HOME_CERTIFICATES = 6;
+    const displayedCertificates = sortedCertificates.slice(0, MAX_HOME_CERTIFICATES);
 
     return (
         <Scheme id={1}>
@@ -70,104 +78,129 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                             <Stack spacing={3}>
                                 <Typography
                                     variant="overline"
-                                    color="primary"
-                                    fontWeight={800}
-                                    sx={{ letterSpacing: 3 }}
+                                    sx={HOME_SECTION_TYPOGRAPHY.overline}
                                 >
                                     {t("home.certifications.overline")}
                                 </Typography>
 
-                                <Typography
-                                    variant="h2"
-                                    sx={{
-                                        fontWeight: 900,
-                                        lineHeight: 1.05,
-                                        letterSpacing: -0.5,
-                                    }}
-                                >
+                                <Typography variant="h2" sx={HOME_SECTION_TYPOGRAPHY.heading}>
                                     {t("home.certifications.title")}
                                 </Typography>
 
-                                <SectionSubtitle
-                                    sx={{
-                                        fontWeight: 400,
-                                        fontSize: "1.1rem",
-                                        lineHeight: 1.6,
-                                        color: "text.secondary",
-                                    }}
-                                >
+                                <Typography variant="body1" sx={HOME_SECTION_TYPOGRAPHY.subtitle}>
                                     {t("home.certifications.subtitle")}
-                                </SectionSubtitle>
+                                </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, lg: 7 }}>
                             <Box
                                 sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "flex-start",
-                                    gap: 6,
+                                    width: "100%",
+                                    p: { xs: 0, md: 0.5 },
                                 }}
                             >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexWrap: "wrap",
-                                        gap: { xs: 3, md: 4 },
-                                        justifyContent: "flex-start",
-                                        alignItems: "center",
-                                        width: "100%",
-                                    }}
-                                >
-                                    {sortedCertificates.map((cert, idx) => (
-                                        <Tooltip
-                                            key={cert?.documentId ?? idx}
-                                            title={cert?.name}
-                                            arrow
+                                <Stack spacing={{ xs: 2, md: 2.5 }}>
+                                    <Stack
+                                        direction={{ xs: "column", sm: "row" }}
+                                        useFlexGap
+                                        gap={{ xs: 2.5, md: 3 }}
+                                        sx={{
+                                            alignItems: { xs: "flex-start", sm: "center" },
+                                            justifyContent: "end",
+                                        }}
+                                    >
+                                        <Button
+                                            variant="text"
+                                            endIcon={<ArrowOutwardRoundedIcon />}
+                                            onClick={() => navigate("/certificates")}
+                                            sx={{
+                                                px: 0,
+                                                minWidth: 0,
+                                                fontWeight: 700,
+                                                fontSize: "0.78rem",
+                                                fontFamily: '"Inter",sans-serif',
+                                                textTransform: "uppercase",
+                                                color: "primary.main",
+                                                letterSpacing: "0.18em",
+                                                alignSelf: { xs: "flex-start", sm: "flex-end" },
+                                                "&:hover": {
+                                                    bgcolor: "transparent",
+                                                    textDecoration: "underline",
+                                                },
+                                            }}
                                         >
-                                            <Box
-                                                onClick={() => setSelectedCert(cert)}
-                                                sx={{
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    minWidth: { xs: 100, md: 130 },
-                                                    transition: "all 0.3s ease",
-                                                    cursor: "pointer",
-                                                    "&:hover": {
-                                                        transform: "translateY(-4px)",
-                                                        "& img": {
-                                                            opacity: 1,
-                                                            filter: "grayscale(0%) drop-shadow(0 10px 15px rgba(0,0,0,0.05))",
-                                                        },
-                                                    },
-                                                }}
-                                            >
-                                                <Box
-                                                    component="img"
-                                                    src={resolveStrapiMediaUrl(cert?.logo?.url)}
-                                                    alt={
-                                                        cert?.name ??
-                                                        t("home.certifications.logoAlt")
-                                                    }
-                                                    loading="lazy"
-                                                    sx={{
-                                                        // maxHeight: { xs: 70, md: 90 },
-                                                        width: "100%",
-                                                        maxWidth: 160,
-                                                        objectFit: "contain",
-                                                        opacity: 0.6,
-                                                        // filter: "grayscale(100%)",
-                                                        transition: "all 0.4s ease",
-                                                        borderRadius: 2,
-                                                    }}
-                                                />
-                                            </Box>
-                                        </Tooltip>
-                                    ))}
-                                </Box>
+                                            {t("home.certifications.moreDetails")}
+                                        </Button>
+                                    </Stack>
+
+                                    <Box
+                                        sx={{
+                                            display: "grid",
+                                            gridTemplateColumns: {
+                                                xs: "repeat(2, minmax(0, 1fr))",
+                                                sm: "repeat(3, minmax(0, 1fr))",
+                                            },
+                                            gap: { xs: 2, md: 2.5 },
+                                            pt: { xs: 0.75, md: 1.25 },
+                                        }}
+                                    >
+                                        {displayedCertificates.map((cert, idx) => {
+                                            return (
+                                                <Tooltip
+                                                    key={cert.documentId ?? idx}
+                                                    title={cert.name}
+                                                    arrow
+                                                >
+                                                    <Box
+                                                        onClick={() => setSelectedCert(cert)}
+                                                        sx={{
+                                                            display: "flex",
+                                                            flexDirection: "column",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            p: { xs: 1.75, md: 2 },
+                                                            minHeight: { xs: 138, md: 168 },
+                                                            borderRadius: 2.5,
+                                                            cursor: "pointer",
+                                                            transition: "all 0.3s ease",
+                                                            "&:hover": {
+                                                                transform: "translateY(-4px)",
+                                                                bgcolor: "rgba(255,255,255,0.7)",
+                                                                "& img": {
+                                                                    opacity: 1,
+                                                                    transform: "scale(1.05)",
+                                                                    filter: "grayscale(0%)",
+                                                                },
+                                                            },
+                                                        }}
+                                                    >
+                                                        <Box
+                                                            component="img"
+                                                            src={resolveStrapiMediaUrl(
+                                                                cert.logo?.url,
+                                                            )}
+                                                            alt={
+                                                                cert.name ??
+                                                                t("home.certifications.logoAlt")
+                                                            }
+                                                            loading="lazy"
+                                                            sx={{
+                                                                width: "100%",
+                                                                maxWidth: 210,
+                                                                height: { xs: 74, md: 90 },
+                                                                objectFit: "contain",
+                                                                filter: "grayscale(18%)",
+                                                                opacity: 0.9,
+                                                                transition: "all 0.3s ease",
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                </Tooltip>
+                                            );
+                                        })}
+                                    </Box>
+                                </Stack>
                             </Box>
                         </Grid>
                     </Grid>
@@ -269,7 +302,12 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                             handleClose();
                             navigate("/certificates");
                         }}
-                        sx={{ borderRadius: 2, fontWeight: 700 }}
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            fontFamily: (theme) => theme.typography.h2.fontFamily,
+                            textTransform: "none",
+                        }}
                     >
                         {t("home.certifications.moreDetails")}
                     </Button>

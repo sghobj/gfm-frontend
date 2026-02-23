@@ -9,6 +9,7 @@ import type { GetHomeDataQuery } from "../../../gql/graphql";
 import "swiper/swiper-bundle.css";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
 import { hasNonEmptyText } from "../../../utils/localizedContent";
+import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type HeroData = NonNullable<GetHomeDataQuery["homepage"]>["hero"];
 
@@ -130,7 +131,15 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                     },
                                 }}
                             >
-                                <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2 }}>
+                                <Container
+                                    maxWidth="xl"
+                                    sx={{
+                                        maxWidth: "1440px",
+                                        px: { xs: 2, sm: 4, md: 6 },
+                                        position: "relative",
+                                        zIndex: 2,
+                                    }}
+                                >
                                     <Stack
                                         spacing={3}
                                         sx={{
@@ -142,6 +151,7 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                             <Typography
                                                 variant="overline"
                                                 sx={{
+                                                    ...HOME_SECTION_TYPOGRAPHY.overline,
                                                     color: "primary.light",
                                                     display: "block",
                                                     mb: 1,
@@ -153,6 +163,7 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                             <Typography
                                                 variant="h1"
                                                 sx={{
+                                                    ...HOME_SECTION_TYPOGRAPHY.heading,
                                                     fontSize: {
                                                         xs: "2.5rem",
                                                         sm: "3.5rem",
@@ -168,10 +179,11 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                             <Typography
                                                 variant="body1"
                                                 sx={{
+                                                    ...HOME_SECTION_TYPOGRAPHY.subtitle,
                                                     maxWidth: 600,
                                                     mb: 4,
-                                                    opacity: 0.95,
-                                                    fontSize: { xs: "1rem", md: "1.25rem" },
+                                                    color: "rgba(255, 255, 255, 0.95)",
+                                                    fontSize: { xs: "1rem", md: "1.2rem" },
                                                     textShadow: "0 2px 6px rgba(0,0,0,0.3)",
                                                 }}
                                             >

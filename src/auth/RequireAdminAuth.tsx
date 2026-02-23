@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAdminAuth } from "./AdminAuthProvider";
+import { useAdminAuth } from "./AdminAuthContext";
 
 export function RequireAdminAuth() {
     const location = useLocation();

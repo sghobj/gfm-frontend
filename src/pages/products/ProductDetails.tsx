@@ -94,7 +94,15 @@ export const ProductDetails = () => {
               : t("productDetails.notFoundSubtitle");
 
         return (
-            <Container maxWidth="xl" sx={{ py: 10, textAlign: "center" }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    maxWidth: "1440px",
+                    px: { xs: 2, sm: 4, md: 6 },
+                    py: 10,
+                    textAlign: "center",
+                }}
+            >
                 <Typography variant="h5" color="error" fontWeight={900}>
                     {title}
                 </Typography>

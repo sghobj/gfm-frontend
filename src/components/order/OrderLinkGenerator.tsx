@@ -155,8 +155,10 @@ export function OrderLinkGenerator() {
                 token,
             )}`;
             setResultLink(link);
-        } catch (err: any) {
-            setError(err?.message ?? t("adminOrderLinks.errors.createFailed"));
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message : t("adminOrderLinks.errors.createFailed");
+            setError(message);
         } finally {
             setBusy(false);
         }

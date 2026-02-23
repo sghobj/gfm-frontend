@@ -45,7 +45,6 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
                                 sx={{
                                     display: "block",
                                     py: { xs: 1.6, sm: 2 },
-                                    px: { xs: 0.5, sm: 1 },
                                     borderRadius: 3,
                                     transition: "transform 180ms ease, background-color 180ms ease",
                                     "&:hover": {
@@ -76,7 +75,6 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
                                         mt: 0.2,
                                         opacity: 0.6,
                                         borderColor: "divider",
-                                        mx: { xs: 0.5, sm: 1 },
                                     }}
                                 />
                             ) : null}

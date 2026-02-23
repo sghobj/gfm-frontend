@@ -132,7 +132,14 @@ export function CertificatesPage() {
             </Scheme>
 
             {/* Content */}
-            <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 }, maxWidth: "1440px" }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    maxWidth: "1440px",
+                    px: { xs: 2, sm: 4, md: 6 },
+                    py: { xs: 8, md: 12 },
+                }}
+            >
                 {loading ? (
                     <LoadingState message={t("certificates.loading")} />
                 ) : error ? (

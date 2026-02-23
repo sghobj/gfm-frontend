@@ -1,7 +1,7 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAdminAuth } from "../../auth/AdminAuthProvider";
+import { useAdminAuth } from "../../auth/AdminAuthContext";
 import { OrderLinkGenerator } from "../../components/order/OrderLinkGenerator";
 
 export function AdminOrderLinksPage() {
