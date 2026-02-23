@@ -740,6 +740,7 @@ export type CreateOrderInvitationInput = {
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   grade?: InputMaybe<Scalars['String']['input']>;
   offeringDocumentId: Scalars['ID']['input'];
+  orderType?: InputMaybe<OrderType>;
   packaging?: InputMaybe<Scalars['String']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['String']['input']>;
@@ -1020,6 +1021,14 @@ export type Enum_Dategrade_Gradename =
 export type Enum_Offering_Availability =
   | 'no'
   | 'yes';
+
+export type Enum_Orderinvitation_Ordertype =
+  | 'ORDER'
+  | 'SAMPLE';
+
+export type Enum_Order_Ordertype =
+  | 'ORDER'
+  | 'SAMPLE';
 
 export type Enum_Order_Status =
   | 'cancelled'
@@ -1900,6 +1909,7 @@ export type Order = {
   numberOfPackages?: Maybe<Scalars['Int']['output']>;
   offering?: Maybe<Offering>;
   orderNumber?: Maybe<Scalars['String']['output']>;
+  orderType?: Maybe<Enum_Order_Ordertype>;
   packOption?: Maybe<PackOption>;
   packaging?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -1907,7 +1917,6 @@ export type Order = {
   size?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Enum_Order_Status>;
   totalPrice?: Maybe<Scalars['Float']['output']>;
-  totalShipmentSize?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -1933,6 +1942,7 @@ export type OrderFiltersInput = {
   offering?: InputMaybe<OfferingFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<OrderFiltersInput>>>;
   orderNumber?: InputMaybe<StringFilterInput>;
+  orderType?: InputMaybe<StringFilterInput>;
   packOption?: InputMaybe<PackOptionFiltersInput>;
   packaging?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
@@ -1940,7 +1950,6 @@ export type OrderFiltersInput = {
   size?: InputMaybe<StringFilterInput>;
   status?: InputMaybe<StringFilterInput>;
   totalPrice?: InputMaybe<FloatFilterInput>;
-  totalShipmentSize?: InputMaybe<FloatFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
 };
 
@@ -1961,6 +1970,7 @@ export type OrderInvitation = {
   isUsed?: Maybe<Scalars['Boolean']['output']>;
   offering?: Maybe<Offering>;
   order?: Maybe<Order>;
+  orderType?: Maybe<Enum_Orderinvitation_Ordertype>;
   packaging?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   quantity?: Maybe<Scalars['Int']['output']>;
@@ -1990,6 +2000,7 @@ export type OrderInvitationFiltersInput = {
   offering?: InputMaybe<OfferingFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<OrderInvitationFiltersInput>>>;
   order?: InputMaybe<OrderFiltersInput>;
+  orderType?: InputMaybe<StringFilterInput>;
   packaging?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   quantity?: InputMaybe<IntFilterInput>;
@@ -2008,6 +2019,7 @@ export type OrderInvitationInput = {
   isUsed?: InputMaybe<Scalars['Boolean']['input']>;
   offering?: InputMaybe<Scalars['ID']['input']>;
   order?: InputMaybe<Scalars['ID']['input']>;
+  orderType?: InputMaybe<Enum_Orderinvitation_Ordertype>;
   packaging?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
@@ -2028,12 +2040,17 @@ export type OrderSubmissionInput = {
   grade?: InputMaybe<Scalars['String']['input']>;
   invitationToken: Scalars['String']['input'];
   message?: InputMaybe<Scalars['String']['input']>;
+  numberOfPackages?: InputMaybe<Scalars['Int']['input']>;
   offering?: InputMaybe<Scalars['ID']['input']>;
   packOption?: InputMaybe<Scalars['ID']['input']>;
   packaging?: InputMaybe<Scalars['String']['input']>;
   quantity: Scalars['Int']['input'];
   size?: InputMaybe<Scalars['String']['input']>;
 };
+
+export type OrderType =
+  | 'ORDER'
+  | 'SAMPLE';
 
 export type PackOption = {
   __typename?: 'PackOption';
