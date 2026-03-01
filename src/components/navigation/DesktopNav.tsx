@@ -95,7 +95,7 @@ export function DesktopNav() {
                                         color: "var(--app-text)",
                                     }}
                                 >
-                                    <Logo width={50} />
+                                    <Logo width={200} />
                                 </Box>
 
                                 {/* CENTER: desktop links */}

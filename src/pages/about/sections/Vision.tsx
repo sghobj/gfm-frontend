@@ -1,5 +1,5 @@
 import { Box, Typography, Stack, Divider } from "@mui/material";
-import type { AboutQuery } from "../../../gql/graphql.ts";
+import type { AboutQuery } from "../../../graphql/gql/graphql.ts";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import {
     SectionSubtitle,

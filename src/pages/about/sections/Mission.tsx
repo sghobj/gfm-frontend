@@ -2,7 +2,7 @@ import { Box, Stack } from "@mui/material";
 import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import { SectionLayout } from "../../../components/layout/SectionLayout.tsx";
-import type { AboutQuery } from "../../../gql/graphql.ts";
+import type { AboutQuery } from "../../../graphql/gql/graphql.ts";
 import { SectionTitle } from "../../../components/typography/SectionTypography.tsx";
 import { BlocksTypography } from "../../../components/typography/BlocksTypography.tsx";
 

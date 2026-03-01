@@ -1,35 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Box, Button, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material";
-import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { GetAllOfferingsDocument } from "../../gql/graphql";
+import {
+    GenerateOrderInvitationDocument,
+    GetAllOfferingsDocument,
+    type GenerateOrderInvitationMutation,
+    type GenerateOrderInvitationMutationVariables,
+} from "../../graphql/gql/graphql";
 import { useTranslation } from "react-i18next";
 import { toStrapiLocale } from "../../apollo/apolloClient";
 import { isContentForLocale } from "../../utils/localizedContent";
 
 const FRONTEND_URL = import.meta.env.VITE_APP_URL ?? window.location.origin;
-
-const CREATE_ORDER_INVITATION = gql`
-    mutation GenerateOrderInvitation($input: CreateOrderInvitationInput!) {
-        generateOrderInvitation(input: $input) {
-            documentId
-            token
-            expiresAt
-            customerEmail
-            customerName
-            customerCompany
-            offering {
-                documentId
-                product {
-                    name
-                }
-                brand {
-                    name
-                }
-            }
-        }
-    }
-`;
 
 type OfferingOption = {
     documentId: string;
@@ -43,25 +25,6 @@ type OfferingOption = {
         locale?: string | null;
         name?: string | null;
     } | null;
-};
-
-type CreateInvitationResult = {
-    generateOrderInvitation?: {
-        documentId: string;
-        token: string;
-        expiresAt?: string | null;
-    } | null;
-};
-
-type CreateInvitationVars = {
-    input: {
-        offeringDocumentId: string;
-        customerEmail: string;
-        customerName?: string;
-        customerCompany?: string;
-        expiresAt?: string | null;
-        quantity?: number;
-    };
 };
 
 const DEFAULT_EXPIRY_DAYS = 7;
@@ -92,9 +55,10 @@ export function OrderLinkGenerator() {
     const { data, loading } = useQuery(GetAllOfferingsDocument, {
         variables: { locale },
     });
-    const [createInvitation] = useMutation<CreateInvitationResult, CreateInvitationVars>(
-        CREATE_ORDER_INVITATION,
-    );
+    const [createInvitation] = useMutation<
+        GenerateOrderInvitationMutation,
+        GenerateOrderInvitationMutationVariables
+    >(GenerateOrderInvitationDocument);
 
     const offerings = useMemo<OfferingOption[]>(() => {
         const raw = (data?.offerings ?? []) as Array<OfferingOption | null | undefined>;
@@ -155,8 +119,10 @@ export function OrderLinkGenerator() {
                 token,
             )}`;
             setResultLink(link);
-        } catch (err: any) {
-            setError(err?.message ?? t("adminOrderLinks.errors.createFailed"));
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message : t("adminOrderLinks.errors.createFailed");
+            setError(message);
         } finally {
             setBusy(false);
         }

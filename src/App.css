@@ -10,27 +10,13 @@ html {
     scroll-margin-top: 100px;
 }
 
-.section .scheme {
-    padding: 4rem;
-}
-
 .about img {
     display: block;
     margin: auto;
-}
-
-.footer {
-    padding: 4rem;
 }
 
 .contact .text-area {
     margin: auto;
     align-items: center;
     align-content: center;
-}
-
-@media (max-width: 500px) {
-    .section .scheme {
-        padding: 2rem;
-    }
 }

@@ -1,0 +1,18 @@
+query Footer($locale: I18NLocaleCode) {
+  footer(locale: $locale) {
+    locale
+    brandName
+    brandDescription
+    quickLinks {
+      label
+      href
+    }
+    address
+    email
+    legalLinks {
+      label
+      href
+    }
+    copyrightText
+  }
+}

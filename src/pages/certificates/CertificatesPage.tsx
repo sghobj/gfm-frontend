@@ -24,7 +24,7 @@ import { useQuery } from "@apollo/client/react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { useTranslation } from "react-i18next";
 
-import { CertificatesDocument, type CertificatesQuery } from "../../gql/graphql.ts";
+import { CertificatesDocument, type CertificatesQuery } from "../../graphql/gql/graphql.ts";
 import { resolveStrapiMediaUrl, toSearchableText } from "../../utils/strapiMedia";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
@@ -132,7 +132,14 @@ export function CertificatesPage() {
             </Scheme>
 
             {/* Content */}
-            <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 }, maxWidth: "1440px" }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    maxWidth: "1440px",
+                    px: { xs: 2, sm: 4, md: 6 },
+                    py: { xs: 8, md: 12 },
+                }}
+            >
                 {loading ? (
                     <LoadingState message={t("certificates.loading")} />
                 ) : error ? (

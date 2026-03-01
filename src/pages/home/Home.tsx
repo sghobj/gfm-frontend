@@ -4,10 +4,11 @@ import { QualityMarketing } from "./sections/QualityMarketing";
 import { CustomersMap } from "./sections/CustomersMap";
 import { Brands } from "./sections/Brands";
 import { Certifications } from "./sections/Certifications";
+import { B2BSubscribe } from "./sections/B2BSubscribe";
 import { useQuery } from "@apollo/client/react";
 import { useTranslation } from "react-i18next";
 import { toStrapiLocale } from "../../apollo/apolloClient";
-import { GetHomeDataDocument, CertificatesDocument } from "../../gql/graphql";
+import { GetHomeDataDocument, CertificatesDocument } from "../../graphql/gql/graphql";
 import { LoadingState } from "../../components/state/LoadingState";
 import {
     hasAnyLocalizedContent,
@@ -102,6 +103,8 @@ export const Home = () => {
                 {hasCertificatesSection && <Certifications certificates={certificates} />}
 
                 {hasMapSection && <CustomersMap data={mapSection} />}
+
+                <B2BSubscribe />
             </Box>
         </Box>
     );

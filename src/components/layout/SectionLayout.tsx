@@ -29,7 +29,7 @@ export const SectionLayout: React.FC<SectionLayoutProps> = ({
     schemeId,
     leftSx,
     reverse,
-    spacing = { xs: 4, md: 10 },
+    spacing = { xs: 4, md: 8 },
     alignItems = "center",
 }) => {
     return (

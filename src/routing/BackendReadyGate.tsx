@@ -1,18 +1,8 @@
-import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-const BACKEND_READY_QUERY = gql`
-    query BackendReady {
-        __typename
-    }
-`;
-
-type BackendReadyData = {
-    __typename?: string;
-};
+import { BackendReadyDocument, type BackendReadyQuery } from "../graphql/gql/graphql";
 
 type BackendReadyGateProps = {
     loadingMessage?: string;
@@ -23,7 +13,7 @@ export function BackendReadyGate({
 }: BackendReadyGateProps) {
     const [isBackendReady, setIsBackendReady] = useState(false);
 
-    const { data } = useQuery<BackendReadyData>(BACKEND_READY_QUERY, {
+    const { data } = useQuery<BackendReadyQuery>(BackendReadyDocument, {
         fetchPolicy: "no-cache",
         nextFetchPolicy: "no-cache",
         pollInterval: isBackendReady ? 0 : 3000,

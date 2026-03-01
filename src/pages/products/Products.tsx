@@ -27,7 +27,7 @@ import { useQuery } from "@apollo/client/react";
 
 import { BlocksTypography } from "../../components/typography/BlocksTypography.tsx";
 import { ProductInquiryModal } from "../../components/order/ProductInquiryModal.tsx";
-import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../gql/graphql.ts";
+import { GetAllOfferingsDocument, type GetAllOfferingsQuery } from "../../graphql/gql/graphql.ts";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { Scheme } from "../../components/scheme/Scheme.tsx";
 import { SectionSubtitle, SectionTitle } from "../../components/typography/SectionTypography.tsx";
@@ -74,20 +74,6 @@ export function Products() {
         variables: { locale },
     });
 
-    const hasAnyAvailableOfferings = useMemo(() => {
-        if (!data?.offerings) return false;
-        return data.offerings.some(
-            (o) =>
-                !!o &&
-                !!o.brand &&
-                !!o.product &&
-                isContentForLocale(o.locale, activeLocale) &&
-                isContentForLocale(o.brand.locale, activeLocale) &&
-                isContentForLocale(o.product.locale, activeLocale) &&
-                String(o.availability ?? "").toLowerCase() !== "no",
-        );
-    }, [data?.offerings, activeLocale]);
-
     const offerings: GQLOffering[] = useMemo(() => {
         if (!data?.offerings) return [];
         return data.offerings.filter(
@@ -101,6 +87,7 @@ export function Products() {
                 String(o.availability ?? "").toLowerCase() !== "no",
         );
     }, [data, activeLocale]);
+    const hasAnyAvailableOfferings = offerings.length > 0;
 
     // Filters
     const [search, setSearch] = useState("");
@@ -235,7 +222,14 @@ export function Products() {
             </Scheme>
 
             {/* Content */}
-            <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 } }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    maxWidth: "1440px",
+                    px: { xs: 2, sm: 4, md: 6 },
+                    py: { xs: 8, md: 12 },
+                }}
+            >
                 {loading ? (
                     <LoadingState message={t("products.loading")} />
                 ) : error ? (

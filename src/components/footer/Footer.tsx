@@ -1,4 +1,14 @@
-import { Box, Grid, Stack, Typography, Link as MuiLink, Divider, IconButton } from "@mui/material";
+import {
+    Box,
+    Button,
+    Container,
+    Grid,
+    Stack,
+    Typography,
+    Link as MuiLink,
+    Divider,
+    IconButton,
+} from "@mui/material";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
@@ -8,7 +18,7 @@ import { useQuery } from "@apollo/client/react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Scheme } from "../scheme/Scheme";
-import { FooterDocument } from "../../gql/graphql";
+import { FooterDocument } from "../../graphql/gql/graphql";
 import { toStrapiLocale } from "../../apollo/apolloClient";
 import {
     hasAnyLocalizedContent,
@@ -29,7 +39,6 @@ type FooterFallbackContent = {
     quickLinks: FooterLink[];
     legalLinks: FooterLink[];
     copyrightText: string;
-    unavailableNote: string;
 };
 
 const buildFallbackFooter = (
@@ -56,7 +65,6 @@ const buildFallbackFooter = (
             year,
             brandName,
         }),
-        unavailableNote: translate("footer.fallback.unavailableNote"),
     };
 };
 
@@ -135,160 +143,209 @@ export function Footer() {
 
     return (
         <Scheme id={2}>
-            <Box
-                className={"footer"}
-                component="footer"
-                sx={{ borderTop: "1px solid", borderColor: "divider" }}
-            >
-                <Grid container spacing={4}>
-                    {showEffectiveBrandSection && (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Stack spacing={1.2}>
-                                <Typography
-                                    sx={{ fontWeight: 800, letterSpacing: "0.02em" }}
-                                    variant="h6"
-                                >
-                                    {effectiveBrandName}
-                                </Typography>
-
-                                <Typography sx={{ opacity: 0.85, lineHeight: 1.75, maxWidth: 420 }}>
-                                    {effectiveBrandDescription}
-                                </Typography>
-
-                                <Stack direction="row" useFlexGap gap={1}>
-                                    <IconButton
-                                        aria-label="LinkedIn"
-                                        size="small"
-                                        component="a"
-                                        href="https://www.linkedin.com/"
-                                        target="_blank"
-                                        rel="noreferrer"
+            <Box component="footer" sx={{ borderTop: "1px solid", borderColor: "divider" }}>
+                <Container
+                    maxWidth="xl"
+                    sx={{
+                        maxWidth: "1440px",
+                        px: { xs: 2, sm: 4, md: 6 },
+                        py: { xs: 6, md: 8 },
+                    }}
+                >
+                    <Grid container spacing={4}>
+                        {showEffectiveBrandSection && (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <Stack spacing={1.2}>
+                                    <Typography
+                                        sx={{ fontWeight: 800, letterSpacing: "0.02em" }}
+                                        variant="h6"
                                     >
-                                        <LinkedInIcon fontSize="small" />
-                                    </IconButton>
+                                        {effectiveBrandName}
+                                    </Typography>
 
-                                    <IconButton
-                                        aria-label="Instagram"
-                                        size="small"
-                                        component="a"
-                                        href="https://www.instagram.com/"
-                                        target="_blank"
-                                        rel="noreferrer"
+                                    <Typography
+                                        sx={{ opacity: 0.85, lineHeight: 1.75, maxWidth: 420 }}
                                     >
-                                        <InstagramIcon fontSize="small" />
-                                    </IconButton>
+                                        {effectiveBrandDescription}
+                                    </Typography>
 
-                                    <IconButton
-                                        aria-label="X"
-                                        size="small"
-                                        component="a"
-                                        href="https://x.com/"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <XIcon fontSize="small" />
-                                    </IconButton>
+                                    <Stack direction="row" useFlexGap gap={1}>
+                                        <IconButton
+                                            aria-label="LinkedIn"
+                                            size="small"
+                                            component="a"
+                                            href="https://www.linkedin.com/"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <LinkedInIcon fontSize="small" />
+                                        </IconButton>
+
+                                        <IconButton
+                                            aria-label="Instagram"
+                                            size="small"
+                                            component="a"
+                                            href="https://www.instagram.com/"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <InstagramIcon fontSize="small" />
+                                        </IconButton>
+
+                                        <IconButton
+                                            aria-label="X"
+                                            size="small"
+                                            component="a"
+                                            href="https://x.com/"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <XIcon fontSize="small" />
+                                        </IconButton>
+                                    </Stack>
                                 </Stack>
-                            </Stack>
-                        </Grid>
-                    )}
+                            </Grid>
+                        )}
 
-                    {showEffectiveQuickLinksSection && (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Typography sx={{ fontWeight: 700, mb: 1.2 }}>
-                                {t("footer.quickLinksTitle")}
-                            </Typography>
-                            <Stack spacing={0.8}>
-                                {effectiveQuickLinks.map((link) => (
-                                    <MuiLink
-                                        key={`${link.label}-${link.href}`}
-                                        href={link.href}
-                                        underline="hover"
-                                        sx={{
-                                            color: "text.primary",
-                                            opacity: 0.85,
-                                            width: "fit-content",
-                                        }}
-                                    >
-                                        {link.label}
-                                    </MuiLink>
-                                ))}
-                            </Stack>
-                        </Grid>
-                    )}
-
-                    {showEffectiveContactSection && (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Typography sx={{ fontWeight: 700, mb: 1.2 }}>
-                                {t("footer.contactTitle")}
-                            </Typography>
-
-                            <Stack spacing={1.2}>
-                                {hasNonEmptyText(effectiveAddress) && (
-                                    <Stack
-                                        direction="row"
-                                        useFlexGap
-                                        gap={1}
-                                        alignItems="flex-start"
-                                    >
-                                        <LocationOnOutlinedIcon
-                                            fontSize="small"
-                                            sx={{ mt: "2px", opacity: 0.8 }}
-                                        />
-                                        <Typography
+                        {showEffectiveQuickLinksSection && (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <Typography sx={{ fontWeight: 700, mb: 1.2 }}>
+                                    {t("footer.quickLinksTitle")}
+                                </Typography>
+                                <Stack spacing={0.8}>
+                                    {effectiveQuickLinks.map((link) => (
+                                        <MuiLink
+                                            key={`${link.label}-${link.href}`}
+                                            href={link.href}
+                                            underline="hover"
                                             sx={{
+                                                color: "text.primary",
                                                 opacity: 0.85,
-                                                lineHeight: 1.6,
-                                                whiteSpace: "pre-line",
+                                                width: "fit-content",
                                             }}
                                         >
-                                            {effectiveAddress}
-                                        </Typography>
-                                    </Stack>
-                                )}
-
-                                {hasNonEmptyText(effectiveEmail) && (
-                                    <Stack direction="row" useFlexGap gap={1} alignItems="center">
-                                        <EmailOutlinedIcon fontSize="small" sx={{ opacity: 0.8 }} />
-                                        <MuiLink
-                                            href={`mailto:${effectiveEmail}`}
-                                            underline="hover"
-                                            sx={{ color: "text.primary", opacity: 0.85 }}
-                                        >
-                                            {effectiveEmail}
+                                            {link.label}
                                         </MuiLink>
-                                    </Stack>
-                                )}
-                            </Stack>
-                        </Grid>
-                    )}
-                </Grid>
+                                    ))}
+                                </Stack>
+                            </Grid>
+                        )}
 
-                {shouldUseFallback && hasNonEmptyText(fallbackFooter.unavailableNote) && (
-                    <Typography sx={{ mt: 2.5, opacity: 0.65, fontSize: "0.85rem" }}>
-                        {fallbackFooter.unavailableNote}
-                    </Typography>
-                )}
+                        {showEffectiveContactSection && (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <Typography sx={{ fontWeight: 700, mb: 1.2 }}>
+                                    {t("footer.contactTitle")}
+                                </Typography>
 
-                {showEffectiveBottomSection && (
-                    <>
-                        <Divider sx={{ my: 3 }} />
+                                <Stack spacing={1.2}>
+                                    {hasNonEmptyText(effectiveAddress) && (
+                                        <Stack
+                                            direction="row"
+                                            useFlexGap
+                                            gap={1}
+                                            alignItems="flex-start"
+                                        >
+                                            <LocationOnOutlinedIcon
+                                                fontSize="small"
+                                                sx={{ mt: "2px", opacity: 0.8 }}
+                                            />
+                                            <Typography
+                                                sx={{
+                                                    opacity: 0.85,
+                                                    lineHeight: 1.6,
+                                                    whiteSpace: "pre-line",
+                                                }}
+                                            >
+                                                {effectiveAddress}
+                                            </Typography>
+                                        </Stack>
+                                    )}
 
+                                    {hasNonEmptyText(effectiveEmail) && (
+                                        <Stack
+                                            direction="row"
+                                            useFlexGap
+                                            gap={1}
+                                            alignItems="center"
+                                        >
+                                            <EmailOutlinedIcon
+                                                fontSize="small"
+                                                sx={{ opacity: 0.8 }}
+                                            />
+                                            <MuiLink
+                                                href={`mailto:${effectiveEmail}`}
+                                                underline="hover"
+                                                sx={{ color: "text.primary", opacity: 0.85 }}
+                                            >
+                                                {effectiveEmail}
+                                            </MuiLink>
+                                        </Stack>
+                                    )}
+                                </Stack>
+                            </Grid>
+                        )}
+                    </Grid>
+
+                    <Box
+                        sx={{
+                            mt: { xs: 4, md: 5 },
+                            pt: { xs: 3, md: 4 },
+                            borderTop: "1px solid",
+                            borderColor: "divider",
+                        }}
+                    >
                         <Stack
-                            direction={{ xs: "column", sm: "row" }}
+                            direction={{ xs: "column", md: "row" }}
                             useFlexGap
-                            gap={1}
+                            gap={{ xs: 1.5, md: 2.5 }}
+                            alignItems={{ xs: "flex-start", md: "center" }}
                             justifyContent="space-between"
-                            alignItems={{ xs: "flex-start", sm: "center" }}
                         >
-                            <Typography sx={{ opacity: 0.75 }}>
-                                {hasNonEmptyText(effectiveCopyrightText)
-                                    ? effectiveCopyrightText
-                                    : `© ${year} ${effectiveBrandName}`}
-                            </Typography>
+                            <Box>
+                                <Typography sx={{ fontWeight: 700 }}>
+                                    {t("subscription.footerCtaTitle")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ opacity: 0.78 }}>
+                                    {t("subscription.footerCtaDescription")}
+                                </Typography>
+                            </Box>
+                            <Button
+                                variant="outlined"
+                                href="/#b2b-subscribe"
+                                sx={{
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    textTransform: "none",
+                                    px: 2.5,
+                                    py: 1,
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {t("subscription.footerCtaButton")}
+                            </Button>
                         </Stack>
-                    </>
-                )}
+                    </Box>
+
+                    {showEffectiveBottomSection && (
+                        <>
+                            <Divider sx={{ my: 3 }} />
+
+                            <Stack
+                                direction={{ xs: "column", sm: "row" }}
+                                useFlexGap
+                                gap={1}
+                                justifyContent="space-between"
+                                alignItems={{ xs: "flex-start", sm: "center" }}
+                            >
+                                <Typography sx={{ opacity: 0.75 }}>
+                                    {hasNonEmptyText(effectiveCopyrightText)
+                                        ? effectiveCopyrightText
+                                        : `© ${year} ${effectiveBrandName}`}
+                                </Typography>
+                            </Stack>
+                        </>
+                    )}
+                </Container>
             </Box>
         </Scheme>
     );

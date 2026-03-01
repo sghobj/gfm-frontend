@@ -1,0 +1,39 @@
+query SubscriptionProducts($locale: I18NLocaleCode) {
+    products(locale: $locale, pagination: { limit: 100 }, sort: ["name:asc"]) {
+        documentId
+        name
+    }
+}
+
+mutation UpsertCustomerSubscription($input: UpsertCustomerSubscriptionInput!) {
+    upsertCustomerSubscription(input: $input) {
+        ok
+        customerDocumentId
+        message
+        brevoAttempted
+        brevoSynced
+        brevoMessage
+        brevoListIds
+    }
+}
+
+query FindCustomerByEmail($email: String!) {
+    customers(filters: { email: { eqi: $email } }, pagination: { limit: 1 }) {
+        documentId
+        email
+        company
+        isSubscriber
+    }
+}
+
+mutation CreateSubscriberCustomer($data: CustomerInput!) {
+    createCustomer(data: $data) {
+        documentId
+    }
+}
+
+mutation UpdateSubscriberCustomer($documentId: ID!, $data: CustomerInput!) {
+    updateCustomer(documentId: $documentId, data: $data) {
+        documentId
+    }
+}

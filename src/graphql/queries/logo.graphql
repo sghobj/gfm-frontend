@@ -1,0 +1,9 @@
+query GoodFoodMoodLogo {
+    goodFoodMoodLogo {
+        logo {
+            caption
+            url
+            alternativeText
+        }
+    }
+}

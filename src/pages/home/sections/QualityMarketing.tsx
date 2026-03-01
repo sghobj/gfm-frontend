@@ -1,8 +1,9 @@
 import { Box, Typography, Container, Grid, Stack, Card, CardContent } from "@mui/material";
 import { Scheme } from "../../../components/scheme/Scheme";
-import type { GetHomeDataQuery } from "../../../gql/graphql";
+import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 import { hasAnyLocalizedContent, hasNonEmptyText } from "../../../utils/localizedContent";
+import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 
 type QualityMarketingData = NonNullable<GetHomeDataQuery["homepage"]>["qualityMarketing"];
 
@@ -48,29 +49,22 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
                             <Stack spacing={3}>
                                 <Typography
                                     variant="overline"
-                                    color="primary"
-                                    fontWeight={800}
-                                    sx={{ letterSpacing: 3 }}
+                                    sx={HOME_SECTION_TYPOGRAPHY.overline}
                                 >
                                     {general.subtitle}
                                 </Typography>
-                                <Typography variant="h2" fontWeight={900} sx={{ lineHeight: 1.1 }}>
-                                    {general.title
-                                        ? general.title.split(",").map((part, i) => (
-                                              <span key={i}>
-                                                  {part}
-                                                  {general.title && general.title.includes(",") && (
-                                                      <br />
-                                                  )}
-                                              </span>
-                                          ))
-                                        : general.title}
+                                <Typography variant="h2" sx={HOME_SECTION_TYPOGRAPHY.heading}>
+                                    {general.title?.split(",").map((part, index, parts) => (
+                                        <span key={index}>
+                                            {part.trim()}
+                                            {index < parts.length - 1 && <br />}
+                                        </span>
+                                    ))}
                                 </Typography>
                                 <Typography
-                                    variant="h6"
+                                    variant="body1"
                                     component="div"
-                                    color="text.secondary"
-                                    sx={{ fontWeight: 400 }}
+                                    sx={HOME_SECTION_TYPOGRAPHY.subtitle}
                                 >
                                     <BlocksRenderer content={general.text} />
                                 </Typography>
@@ -100,15 +94,14 @@ export const QualityMarketing = ({ data }: QualityMarketingProps) => {
                                                 <CardContent sx={{ p: 4 }}>
                                                     <Typography
                                                         variant="h5"
-                                                        fontWeight={800}
                                                         gutterBottom
+                                                        sx={HOME_SECTION_TYPOGRAPHY.cardTitle}
                                                     >
                                                         {point?.title}
                                                     </Typography>
                                                     <Typography
                                                         variant="body1"
-                                                        color="text.secondary"
-                                                        lineHeight={1.6}
+                                                        sx={HOME_SECTION_TYPOGRAPHY.cardBody}
                                                     >
                                                         {point?.subtitle}
                                                     </Typography>
