@@ -119,4 +119,3 @@ export const Home = () => {
         </Box>
     );
 };
-

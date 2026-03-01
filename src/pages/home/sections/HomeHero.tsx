@@ -735,4 +735,3 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
         </Box>
     );
 };
-

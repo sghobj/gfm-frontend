@@ -308,4 +308,3 @@ export function Footer() {
         </Scheme>
     );
 }
-
