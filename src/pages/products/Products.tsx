@@ -1579,4 +1579,3 @@ export function Products() {
         </Box>
     );
 }
-

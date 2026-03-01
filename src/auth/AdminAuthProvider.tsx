@@ -95,4 +95,3 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
     return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 }
-

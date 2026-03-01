@@ -96,14 +96,12 @@ const upsertViaLegacyCustomerModel = async (
 ) => {
     const data = buildLegacyCustomerData(input);
 
-    const lookup = await client.query<FindCustomerByEmailQuery, FindCustomerByEmailQueryVariables>(
-        {
-            query: FindCustomerByEmailDocument,
-            variables: { email: input.email },
-            fetchPolicy: "network-only",
-            context: { skipAuth: true },
-        },
-    );
+    const lookup = await client.query<FindCustomerByEmailQuery, FindCustomerByEmailQueryVariables>({
+        query: FindCustomerByEmailDocument,
+        variables: { email: input.email },
+        fetchPolicy: "network-only",
+        context: { skipAuth: true },
+    });
 
     const customers = (lookup.data?.customers ?? []) as Array<CustomerLookupRecord | null>;
     const existingCustomer = customers.find((record): record is CustomerLookupRecord =>
@@ -111,27 +109,29 @@ const upsertViaLegacyCustomerModel = async (
     );
 
     if (existingCustomer?.documentId) {
-        await client.mutate<UpdateSubscriberCustomerMutation, UpdateSubscriberCustomerMutationVariables>(
-            {
-                mutation: UpdateSubscriberCustomerDocument,
-                variables: {
-                    documentId: existingCustomer.documentId,
-                    data,
-                },
-                context: { skipAuth: true },
+        await client.mutate<
+            UpdateSubscriberCustomerMutation,
+            UpdateSubscriberCustomerMutationVariables
+        >({
+            mutation: UpdateSubscriberCustomerDocument,
+            variables: {
+                documentId: existingCustomer.documentId,
+                data,
             },
-        );
+            context: { skipAuth: true },
+        });
         return;
     }
 
     try {
-        await client.mutate<CreateSubscriberCustomerMutation, CreateSubscriberCustomerMutationVariables>(
-            {
-                mutation: CreateSubscriberCustomerDocument,
-                variables: { data },
-                context: { skipAuth: true },
-            },
-        );
+        await client.mutate<
+            CreateSubscriberCustomerMutation,
+            CreateSubscriberCustomerMutationVariables
+        >({
+            mutation: CreateSubscriberCustomerDocument,
+            variables: { data },
+            context: { skipAuth: true },
+        });
     } catch (error) {
         const firstErrorMessage = toErrorMessage(error);
         if (!looksLikeDuplicateError(firstErrorMessage)) {
@@ -158,16 +158,17 @@ const upsertViaLegacyCustomerModel = async (
             throw error;
         }
 
-        await client.mutate<UpdateSubscriberCustomerMutation, UpdateSubscriberCustomerMutationVariables>(
-            {
-                mutation: UpdateSubscriberCustomerDocument,
-                variables: {
-                    documentId: retryCustomer.documentId,
-                    data,
-                },
-                context: { skipAuth: true },
+        await client.mutate<
+            UpdateSubscriberCustomerMutation,
+            UpdateSubscriberCustomerMutationVariables
+        >({
+            mutation: UpdateSubscriberCustomerDocument,
+            variables: {
+                documentId: retryCustomer.documentId,
+                data,
             },
-        );
+            context: { skipAuth: true },
+        });
     }
 };
 
@@ -195,13 +196,14 @@ const upsertViaCustomMutation = async (
         },
     };
 
-    await client.mutate<UpsertCustomerSubscriptionMutation, UpsertCustomerSubscriptionMutationVariables>(
-        {
-            mutation: UpsertCustomerSubscriptionDocument,
-            variables,
-            context: { skipAuth: true },
-        },
-    );
+    await client.mutate<
+        UpsertCustomerSubscriptionMutation,
+        UpsertCustomerSubscriptionMutationVariables
+    >({
+        mutation: UpsertCustomerSubscriptionDocument,
+        variables,
+        context: { skipAuth: true },
+    });
 };
 
 export const upsertSubscriberCustomer = async (
@@ -270,4 +272,3 @@ export const upsertSubscriberCustomer = async (
         subscribeGlobal,
     });
 };
-
