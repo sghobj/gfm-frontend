@@ -391,4 +391,3 @@ export const CustomersMap = ({ data }: CustomersMapProps) => {
         </Box>
     );
 };
-

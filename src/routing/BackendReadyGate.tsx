@@ -49,4 +49,3 @@ export function BackendReadyGate({
 
     return <Outlet />;
 }
-
