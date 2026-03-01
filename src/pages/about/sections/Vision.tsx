@@ -96,4 +96,3 @@ export function Line({ label, value }: LineProps) {
         </Box>
     );
 }
-

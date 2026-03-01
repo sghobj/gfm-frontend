@@ -14,6 +14,7 @@ import {
     IconButton,
     FormControlLabel,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
@@ -588,15 +589,21 @@ ${data.message}`;
 
                         <Button
                             fullWidth
-                            variant="contained"
-                            color="success"
+                            variant="outlined"
                             startIcon={<WhatsAppIcon />}
                             onClick={handleSubmit(onSubmitWhatsApp)}
                             sx={{
                                 fontWeight: 900,
                                 py: 1.5,
-                                bgcolor: "#25D366",
-                                "&:hover": { bgcolor: "#128C7E" },
+                                borderWidth: 2,
+                                color: "primary.main",
+                                borderColor: "primary.main",
+                                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
+                                "&:hover": {
+                                    borderWidth: 2,
+                                    borderColor: "primary.main",
+                                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.14),
+                                },
                             }}
                         >
                             {t("inquiryModal.actions.whatsapp")}
@@ -607,4 +614,3 @@ ${data.message}`;
         </Dialog>
     );
 };
-

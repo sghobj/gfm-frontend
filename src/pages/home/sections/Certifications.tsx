@@ -316,4 +316,3 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
         </Scheme>
     );
 };
-

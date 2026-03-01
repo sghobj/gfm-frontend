@@ -85,4 +85,3 @@ export const CsrSection = ({ data }: CSRSectionProps) => {
         />
     );
 };
-

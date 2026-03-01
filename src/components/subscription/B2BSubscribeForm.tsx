@@ -394,8 +394,7 @@ export const B2BSubscribeForm = ({
                     name="consent"
                     control={control}
                     rules={{
-                        validate: (value) =>
-                            value || t("subscription.validation.consentRequired"),
+                        validate: (value) => value || t("subscription.validation.consentRequired"),
                     }}
                     render={({ field, fieldState }) => (
                         <FormControl error={Boolean(fieldState.error)} component="fieldset">
@@ -460,4 +459,3 @@ export const B2BSubscribeForm = ({
         </Box>
     );
 };
-
