@@ -25,6 +25,8 @@ import {
     hasNonEmptyText,
     isContentForLocale,
 } from "../../utils/localizedContent";
+import { useContactLinks } from "../../providers/ContactLinksProvider";
+import { buildSafeMailtoHref, normalizeEmailRecipient } from "../../utils/contactLinks";
 
 type FooterLink = {
     label: string;
@@ -70,6 +72,7 @@ const buildFallbackFooter = (
 
 export function Footer() {
     const { t, i18n } = useTranslation("common");
+    const { infoEmail } = useContactLinks();
     const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
     const activeLocale = locale as "en" | "ar";
     const { data, loading } = useQuery(FooterDocument, {
@@ -100,7 +103,7 @@ export function Footer() {
     const brandName = footer?.brandName ?? "";
     const brandDescription = footer?.brandDescription ?? "";
     const address = footer?.address ?? "";
-    const email = footer?.email ?? "";
+    const email = normalizeEmailRecipient(footer?.email) ?? infoEmail ?? "";
     const copyrightText = footer?.copyrightText ?? "";
 
     const showBrandSection = hasAnyLocalizedContent(brandName, brandDescription);
@@ -119,6 +122,7 @@ export function Footer() {
         : brandDescription;
     const effectiveAddress = shouldUseFallback ? fallbackFooter.address : address;
     const effectiveEmail = shouldUseFallback ? fallbackFooter.email : email;
+    const effectiveMailtoHref = buildSafeMailtoHref(effectiveEmail);
     const effectiveQuickLinks = shouldUseFallback ? fallbackFooter.quickLinks : quickLinks;
     const effectiveLegalLinks = shouldUseFallback ? fallbackFooter.legalLinks : legalLinks;
     const effectiveCopyrightText = shouldUseFallback ? fallbackFooter.copyrightText : copyrightText;
@@ -261,7 +265,7 @@ export function Footer() {
                                         </Stack>
                                     )}
 
-                                    {hasNonEmptyText(effectiveEmail) && (
+                                    {hasNonEmptyText(effectiveEmail) && hasNonEmptyText(effectiveMailtoHref) && (
                                         <Stack
                                             direction="row"
                                             useFlexGap
@@ -273,7 +277,7 @@ export function Footer() {
                                                 sx={{ opacity: 0.8 }}
                                             />
                                             <MuiLink
-                                                href={`mailto:${effectiveEmail}`}
+                                                href={effectiveMailtoHref}
                                                 underline="hover"
                                                 sx={{ color: "text.primary", opacity: 0.85 }}
                                             >

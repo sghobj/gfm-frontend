@@ -1,0 +1,7 @@
+query ContactLinks {
+    contactUs {
+        sales_email
+        info_email
+        whatsapp_link
+    }
+}

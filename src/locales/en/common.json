@@ -343,15 +343,15 @@
         }
     },
     "subscription": {
-        "badge": "B2B SUBSCRIPTIONS",
+        "badge": "NEWSLETTER SUBSCRIPTIONS",
         "title": "Get Offers and Availability Updates",
         "subtitle": "Subscribe with your work email to receive promotional offers and updates on product availability.",
         "footerTitle": "Stay Updated",
-        "footerSubtitle": "B2B offers and stock updates for your company inbox.",
-        "footerCtaTitle": "B2B offers and stock alerts",
+        "footerSubtitle": "Offers and availability updates for your company inbox.",
+        "footerCtaTitle": "Offers and availability alerts",
         "footerCtaDescription": "Get updates in your company inbox.",
         "footerCtaButton": "Subscribe",
-        "heroCtaButton": "Get B2B Updates",
+        "heroCtaButton": "Get Product Updates",
         "fields": {
             "workEmail": "Work email",
             "workEmailPlaceholder": "name@company.com",

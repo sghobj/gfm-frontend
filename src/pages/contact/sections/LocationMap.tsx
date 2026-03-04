@@ -6,6 +6,7 @@ import {
     CircularProgress,
     Divider,
     Grid,
+    Link as MuiLink,
     Paper,
     Stack,
     Typography,
@@ -13,11 +14,36 @@ import {
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Logo } from "../../../components/logo/Logo";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useContactLinks } from "../../../providers/ContactLinksProvider";
+import { buildSafeMailtoHref } from "../../../utils/contactLinks";
 
-const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => {
+function buildPhoneHref(rawPhone: string): string | null {
+    const trimmed = rawPhone.trim();
+    if (!trimmed) return null;
+
+    const digits = trimmed.replace(/\D+/g, "");
+    if (!digits) return null;
+
+    return `tel:${trimmed.startsWith("+") ? `+${digits}` : digits}`;
+}
+
+const InfoRow = ({
+    icon,
+    label,
+    value,
+    infoLink,
+}: {
+    icon: ReactNode;
+    label: string;
+    value: string;
+    infoLink?: string | null;
+}) => {
+    const shouldOpenInNewTab = Boolean(infoLink && /^https?:\/\//i.test(infoLink));
+
     return (
         <Stack direction="row" useFlexGap gap={1.5} alignItems="flex-start">
             <Box
@@ -36,9 +62,22 @@ const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value
                 <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1.1 }}>
                     {label}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.4 }}>
-                    {value}
-                </Typography>
+                {infoLink ? (
+                    <MuiLink
+                        href={infoLink}
+                        underline="hover"
+                        color="inherit"
+                        target={shouldOpenInNewTab ? "_blank" : undefined}
+                        rel={shouldOpenInNewTab ? "noopener noreferrer" : undefined}
+                        sx={{ mt: 0.4, display: "inline-block", color: "text.secondary" }}
+                    >
+                        {value}
+                    </MuiLink>
+                ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.4 }}>
+                        {value}
+                    </Typography>
+                )}
             </Box>
         </Stack>
     );
@@ -47,6 +86,11 @@ const InfoRow = ({ icon, label, value }: { icon: ReactNode; label: string; value
 export const LocationMap = () => {
     const { t } = useTranslation("common");
     const [isMapLoading, setIsMapLoading] = useState(true);
+    const { infoEmail, whatsappNumber, whatsappLink } = useContactLinks();
+
+    const phoneValue = "+962 (6) 465-0000";
+    const emailValue = infoEmail ?? "hello@organicjordanian.com";
+    const whatsappValue = whatsappNumber ? `+${whatsappNumber}` : "+962 77 000000";
 
     return (
         <Box component="section">
@@ -81,12 +125,20 @@ export const LocationMap = () => {
                                 <InfoRow
                                     icon={<EmailIcon fontSize="small" />}
                                     label={t("contactPage.location.emailLabel")}
-                                    value="hello@organicjordanian.com"
+                                    value={emailValue}
+                                    infoLink={buildSafeMailtoHref(emailValue)}
                                 />
                                 <InfoRow
                                     icon={<PhoneIcon fontSize="small" />}
                                     label={t("contactPage.location.phoneLabel")}
-                                    value="+962 (6) 465-0000"
+                                    value={phoneValue}
+                                    infoLink={buildPhoneHref(phoneValue)}
+                                />
+                                <InfoRow
+                                    icon={<WhatsAppIcon fontSize={"small"} />}
+                                    label={t("inquiryModal.actions.whatsapp")}
+                                    value={whatsappValue}
+                                    infoLink={whatsappLink}
                                 />
                                 <InfoRow
                                     icon={<LocationOnIcon fontSize="small" />}
