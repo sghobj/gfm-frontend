@@ -218,27 +218,26 @@ export function Footer() {
                                         </Stack>
                                     )}
 
-                                    {hasNonEmptyText(effectiveEmail) &&
-                                        hasNonEmptyText(effectiveMailtoHref) && (
-                                            <Stack
-                                                direction="row"
-                                                useFlexGap
-                                                gap={1}
-                                                alignItems="center"
+                                    {hasNonEmptyText(effectiveEmail) && hasNonEmptyText(effectiveMailtoHref) && (
+                                        <Stack
+                                            direction="row"
+                                            useFlexGap
+                                            gap={1}
+                                            alignItems="center"
+                                        >
+                                            <EmailOutlinedIcon
+                                                fontSize="small"
+                                                sx={{ opacity: 0.8 }}
+                                            />
+                                            <MuiLink
+                                                href={effectiveMailtoHref}
+                                                underline="hover"
+                                                sx={{ color: "text.primary", opacity: 0.85 }}
                                             >
-                                                <EmailOutlinedIcon
-                                                    fontSize="small"
-                                                    sx={{ opacity: 0.8 }}
-                                                />
-                                                <MuiLink
-                                                    href={effectiveMailtoHref}
-                                                    underline="hover"
-                                                    sx={{ color: "text.primary", opacity: 0.85 }}
-                                                >
-                                                    {effectiveEmail}
-                                                </MuiLink>
-                                            </Stack>
-                                        )}
+                                                {effectiveEmail}
+                                            </MuiLink>
+                                        </Stack>
+                                    )}
                                 </Stack>
                             </Grid>
                         )}
