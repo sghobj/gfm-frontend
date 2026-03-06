@@ -10,7 +10,7 @@ export const B2BSubscribe = () => {
     return (
         <Scheme id={3}>
             <Box
-                id="b2b-subscribe"
+                id="subscribe"
                 sx={{
                     py: { xs: 8, md: 10 },
                     display: "flex",

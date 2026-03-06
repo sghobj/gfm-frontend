@@ -5,6 +5,12 @@ import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
+import AirRoundedIcon from "@mui/icons-material/AirRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
+import ThermostatRoundedIcon from "@mui/icons-material/ThermostatRounded";
+import WbSunnyRoundedIcon from "@mui/icons-material/WbSunnyRounded";
 import { useTranslation } from "react-i18next";
 import type { GetHomeDataQuery } from "../../../graphql/gql/graphql";
 
@@ -362,6 +368,11 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                 : weather.isLoading
                                   ? "Updating weather..."
                                   : "\u00a0";
+                            const weatherBadgeLabel = weather.error
+                                ? "Offline"
+                                : weather.isLoading
+                                  ? "Updating"
+                                  : "Live";
 
                             return (
                                 <SwiperSlide key={slide.id}>
@@ -430,81 +441,296 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                 <Grid size={{ xs: 12, md: 4 }}>
                                                     <Box
                                                         sx={{
-                                                            borderRadius: 3,
-                                                            p: { xs: 2.5, md: 3.5 },
-                                                            bgcolor: "rgba(255,255,255,0.92)",
-                                                            border: "1px solid rgba(23,59,33,0.15)",
+                                                            position: "relative",
+                                                            overflow: "hidden",
+                                                            borderRadius: { xs: 3, md: 4 },
+                                                            p: { xs: 2.5, md: 3.25 },
+                                                            border: "1px solid rgba(255,255,255,0.22)",
+                                                            background:
+                                                                "linear-gradient(155deg, #1b4b35 0%, #113726 58%, #0a291c 100%)",
                                                             boxShadow:
-                                                                "0 12px 32px rgba(20,39,24,0.12)",
-                                                            color: "#173b21",
+                                                                "0 24px 50px rgba(7,26,18,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+                                                            color: "#ffffff",
+                                                            "&::before": {
+                                                                content: '""',
+                                                                position: "absolute",
+                                                                top: -90,
+                                                                right: -50,
+                                                                width: 210,
+                                                                height: 210,
+                                                                borderRadius: "50%",
+                                                                background:
+                                                                    "radial-gradient(circle at center, rgba(255,255,255,0.26), rgba(255,255,255,0) 68%)",
+                                                            },
+                                                            "&::after": {
+                                                                content: '""',
+                                                                position: "absolute",
+                                                                bottom: -84,
+                                                                left: -52,
+                                                                width: 190,
+                                                                height: 190,
+                                                                borderRadius: "50%",
+                                                                background:
+                                                                    "radial-gradient(circle at center, rgba(92, 190, 142, 0.34), rgba(92, 190, 142, 0) 70%)",
+                                                            },
                                                         }}
                                                     >
-                                                        <Typography
-                                                            variant="overline"
+                                                        <Stack
+                                                            direction="row"
+                                                            alignItems="flex-start"
+                                                            justifyContent="space-between"
+                                                            spacing={1}
                                                             sx={{
-                                                                ...HOME_SECTION_TYPOGRAPHY.overline,
-                                                                color: "rgba(23,59,33,0.74)",
-                                                                display: "block",
-                                                                mb: 1,
+                                                                position: "relative",
+                                                                zIndex: 1,
+                                                                mb: 2.4,
                                                             }}
                                                         >
-                                                            {slide.weatherCity}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="h2"
-                                                            sx={{
-                                                                fontWeight: 800,
-                                                                lineHeight: 1,
-                                                                mb: 0.75,
-                                                            }}
-                                                        >
-                                                            {timeLabel}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                color: "rgba(23,59,33,0.72)",
-                                                                mb: 3,
-                                                            }}
-                                                        >
-                                                            {dateLabel}
-                                                        </Typography>
+                                                            <Box>
+                                                                <Stack
+                                                                    direction="row"
+                                                                    spacing={0.8}
+                                                                    alignItems="center"
+                                                                    sx={{ mb: 0.8 }}
+                                                                >
+                                                                    <LocationOnRoundedIcon
+                                                                        sx={{
+                                                                            fontSize: 18,
+                                                                            color: "rgba(255,255,255,0.86)",
+                                                                        }}
+                                                                    />
+                                                                    <Typography
+                                                                        variant="overline"
+                                                                        sx={{
+                                                                            ...HOME_SECTION_TYPOGRAPHY.overline,
+                                                                            color: "rgba(255,255,255,0.86)",
+                                                                        }}
+                                                                    >
+                                                                        {slide.weatherCity}
+                                                                    </Typography>
+                                                                </Stack>
+                                                                <Stack
+                                                                    direction="row"
+                                                                    spacing={0.8}
+                                                                    alignItems="center"
+                                                                    sx={{ mb: 0.45 }}
+                                                                >
+                                                                    <AccessTimeRoundedIcon
+                                                                        sx={{
+                                                                            fontSize: 22,
+                                                                            color: "rgba(255,255,255,0.9)",
+                                                                        }}
+                                                                    />
+                                                                    <Typography
+                                                                        variant="h2"
+                                                                        sx={{
+                                                                            fontWeight: 800,
+                                                                            lineHeight: 1,
+                                                                            letterSpacing: 0.5,
+                                                                        }}
+                                                                    >
+                                                                        {timeLabel}
+                                                                    </Typography>
+                                                                </Stack>
+                                                                <Stack
+                                                                    direction="row"
+                                                                    spacing={0.75}
+                                                                    alignItems="center"
+                                                                >
+                                                                    <CalendarMonthRoundedIcon
+                                                                        sx={{
+                                                                            fontSize: 17,
+                                                                            color: "rgba(255,255,255,0.78)",
+                                                                        }}
+                                                                    />
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        sx={{ color: "rgba(255,255,255,0.78)" }}
+                                                                    >
+                                                                        {dateLabel}
+                                                                    </Typography>
+                                                                </Stack>
+                                                            </Box>
+                                                            <Box
+                                                                sx={{
+                                                                    px: 1.3,
+                                                                    py: 0.6,
+                                                                    borderRadius: 999,
+                                                                    border:
+                                                                        "1px solid rgba(255,255,255,0.3)",
+                                                                    bgcolor: weather.error
+                                                                        ? "rgba(176, 57, 57, 0.35)"
+                                                                        : weather.isLoading
+                                                                          ? "rgba(240, 180, 57, 0.3)"
+                                                                          : "rgba(85, 203, 149, 0.3)",
+                                                                }}
+                                                            >
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        fontWeight: 700,
+                                                                        color: "#fff",
+                                                                        letterSpacing: 0.35,
+                                                                    }}
+                                                                >
+                                                                    {weatherBadgeLabel}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Stack>
 
-                                                        <Stack spacing={1.25}>
-                                                            <Typography
-                                                                variant="h3"
-                                                                sx={{ fontWeight: 800 }}
-                                                            >
-                                                                {weather.temperatureC == null
-                                                                    ? "--"
-                                                                    : `${Math.round(weather.temperatureC)}°C`}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="body1"
-                                                                sx={{
-                                                                    color: "rgba(23,59,33,0.88)",
-                                                                }}
-                                                            >
-                                                                {weatherConditionLabel}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="body2"
-                                                                sx={{
-                                                                    color: "rgba(23,59,33,0.72)",
-                                                                }}
-                                                            >
-                                                                Wind:{" "}
-                                                                {weather.windSpeedKmh == null
-                                                                    ? "--"
-                                                                    : `${Math.round(weather.windSpeedKmh)} km/h`}
-                                                            </Typography>
+                                                        <Stack
+                                                            spacing={1.2}
+                                                            sx={{ position: "relative", zIndex: 1 }}
+                                                        >
+                                                            <Grid container spacing={1.1}>
+                                                                <Grid size={{ xs: 6 }}>
+                                                                    <Box
+                                                                        sx={{
+                                                                            p: 1.4,
+                                                                            borderRadius: 2.25,
+                                                                            bgcolor:
+                                                                                "rgba(255,255,255,0.1)",
+                                                                            backdropFilter:
+                                                                                "blur(4px)",
+                                                                            border:
+                                                                                "1px solid rgba(255,255,255,0.16)",
+                                                                        }}
+                                                                    >
+                                                                        <Stack
+                                                                            direction="row"
+                                                                            spacing={0.8}
+                                                                            alignItems="center"
+                                                                            sx={{ mb: 0.5 }}
+                                                                        >
+                                                                            <ThermostatRoundedIcon
+                                                                                sx={{
+                                                                                    fontSize: 20,
+                                                                                    color: "rgba(255,255,255,0.86)",
+                                                                                }}
+                                                                            />
+                                                                            <Typography
+                                                                                variant="caption"
+                                                                                sx={{
+                                                                                    color: "rgba(255,255,255,0.8)",
+                                                                                }}
+                                                                            >
+                                                                                Temperature
+                                                                            </Typography>
+                                                                        </Stack>
+                                                                        <Typography
+                                                                            variant="h4"
+                                                                            sx={{
+                                                                                fontWeight: 800,
+                                                                                lineHeight: 1.1,
+                                                                            }}
+                                                                        >
+                                                                            {weather.temperatureC == null
+                                                                                ? "--"
+                                                                                : `${Math.round(weather.temperatureC)}°C`}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Grid>
+                                                                <Grid size={{ xs: 6 }}>
+                                                                    <Box
+                                                                        sx={{
+                                                                            p: 1.4,
+                                                                            borderRadius: 2.25,
+                                                                            bgcolor:
+                                                                                "rgba(255,255,255,0.1)",
+                                                                            backdropFilter:
+                                                                                "blur(4px)",
+                                                                            border:
+                                                                                "1px solid rgba(255,255,255,0.16)",
+                                                                        }}
+                                                                    >
+                                                                        <Stack
+                                                                            direction="row"
+                                                                            spacing={0.8}
+                                                                            alignItems="center"
+                                                                            sx={{ mb: 0.5 }}
+                                                                        >
+                                                                            <WbSunnyRoundedIcon
+                                                                                sx={{
+                                                                                    fontSize: 18,
+                                                                                    color: "rgba(255,255,255,0.86)",
+                                                                                }}
+                                                                            />
+                                                                            <Typography
+                                                                                variant="caption"
+                                                                                sx={{
+                                                                                    color: "rgba(255,255,255,0.8)",
+                                                                                }}
+                                                                            >
+                                                                                Conditions
+                                                                            </Typography>
+                                                                        </Stack>
+                                                                        <Typography
+                                                                            variant="body2"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                color: "#fff",
+                                                                                minHeight: 24,
+                                                                                display: "flex",
+                                                                                alignItems: "center",
+                                                                            }}
+                                                                        >
+                                                                            {weatherConditionLabel}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Grid>
+                                                                <Grid size={{ xs: 12 }}>
+                                                                    <Box
+                                                                        sx={{
+                                                                            p: 1.35,
+                                                                            borderRadius: 2.25,
+                                                                            bgcolor:
+                                                                                "rgba(255,255,255,0.1)",
+                                                                            backdropFilter:
+                                                                                "blur(4px)",
+                                                                            border:
+                                                                                "1px solid rgba(255,255,255,0.16)",
+                                                                        }}
+                                                                    >
+                                                                        <Stack
+                                                                            direction="row"
+                                                                            spacing={0.8}
+                                                                            alignItems="center"
+                                                                        >
+                                                                            <AirRoundedIcon
+                                                                                sx={{
+                                                                                    fontSize: 18,
+                                                                                    color: "rgba(255,255,255,0.86)",
+                                                                                }}
+                                                                            />
+                                                                            <Typography
+                                                                                variant="caption"
+                                                                                sx={{
+                                                                                    color: "rgba(255,255,255,0.8)",
+                                                                                }}
+                                                                            >
+                                                                                Wind
+                                                                            </Typography>
+                                                                            <Typography
+                                                                                variant="body2"
+                                                                                sx={{
+                                                                                    ml: "auto",
+                                                                                    fontWeight: 700,
+                                                                                    color: "#fff",
+                                                                                }}
+                                                                            >
+                                                                                {weather.windSpeedKmh == null
+                                                                                    ? "--"
+                                                                                    : `${Math.round(weather.windSpeedKmh)} km/h`}
+                                                                            </Typography>
+                                                                        </Stack>
+                                                                    </Box>
+                                                                </Grid>
+                                                            </Grid>
                                                             <Typography
                                                                 variant="caption"
                                                                 sx={{
                                                                     minHeight: "1.4em",
-                                                                    color: weather.error
-                                                                        ? "rgba(23,59,33,0.72)"
-                                                                        : "rgba(23,59,33,0.62)",
+                                                                    color: "rgba(255,255,255,0.74)",
                                                                 }}
                                                             >
                                                                 {weatherStatusMessage}
@@ -521,16 +747,21 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                                         )
                                                                     }
                                                                     sx={{
-                                                                        mt: 1,
+                                                                        mt: 0.3,
                                                                         alignSelf: "flex-start",
-                                                                        px: 5,
-                                                                        py: 2,
-                                                                        borderRadius: 2,
+                                                                        px: 3.8,
+                                                                        py: 1.35,
+                                                                        borderRadius: 99,
                                                                         fontWeight: 800,
-                                                                        fontSize: "1.1rem",
+                                                                        fontSize: "1rem",
                                                                         textTransform: "none",
+                                                                        bgcolor: "#fff",
+                                                                        color: "#13432e",
                                                                         boxShadow:
-                                                                            "0 8px 24px rgba(0,0,0,0.2)",
+                                                                            "0 10px 24px rgba(0,0,0,0.22)",
+                                                                        "&:hover": {
+                                                                            bgcolor: "#f1fff7",
+                                                                        },
                                                                     }}
                                                                 >
                                                                     {t(

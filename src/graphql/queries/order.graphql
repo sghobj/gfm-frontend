@@ -3,6 +3,8 @@ mutation SubmitOrder($data: OrderSubmissionInput!) {
         documentId
         orderNumber
         status
+        orderType
+        numberOfPackages
     }
 }
 
@@ -14,6 +16,7 @@ mutation GenerateOrderInvitation($input: CreateOrderInvitationInput!) {
         customerEmail
         customerName
         customerCompany
+        orderType
         offering {
             documentId
             product {
@@ -38,14 +41,18 @@ query GetInvitation($token: String!) {
         size
         packaging
         quantity
+        orderType
         isUsed
         usedAt
         offering {
             documentId
+            variantLabel
             isMedjoolDate
             product {
                 documentId
+                slug
                 name
+                minimumOrder
                 image {
                     url
                 }

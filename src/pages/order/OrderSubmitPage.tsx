@@ -44,6 +44,8 @@ type DateSpec = {
 
 const normalize = (value: string) => value.trim().toLowerCase();
 const SUBMIT_ORDER_TIMEOUT_MS = 20000;
+const JAPANESE_PRODUCTS_SLUG = "japanese-products";
+const DEFAULT_MIN_QUANTITY_KG = 1;
 
 const formatPackOptionLabel = (option: PackOption | null | undefined): string => {
     if (!option) return "";
@@ -79,6 +81,23 @@ export function OrderSubmitPage() {
 
     const invitation = data?.getInvitation ?? null;
     const offering = invitation?.offering ?? null;
+    const minimumOrderKg = useMemo<number | null>(() => {
+        const value = Number(offering?.product?.minimumOrder);
+        if (!Number.isFinite(value) || value <= 0) return null;
+        return value;
+    }, [offering?.product?.minimumOrder]);
+    const enforcedMinQuantityKg = minimumOrderKg;
+    const offeringDisplayName = useMemo(() => {
+        const productName = offering?.product?.name?.trim();
+        const variantLabel = offering?.variantLabel?.trim();
+        const isJapaneseProduct = offering?.product?.slug === JAPANESE_PRODUCTS_SLUG;
+
+        if (isJapaneseProduct && variantLabel) {
+            return variantLabel;
+        }
+
+        return productName || t("orderSubmit.productFallback");
+    }, [offering?.product?.name, offering?.product?.slug, offering?.variantLabel, t]);
 
     const dateSpecs = useMemo<DateSpec[]>(() => {
         const raw = (offering?.dateSpecifications ?? []) as Array<DateSpec | null | undefined>;
@@ -115,12 +134,18 @@ export function OrderSubmitPage() {
         setCustomerName(invitation.customerName ?? "");
         setCustomerEmail(invitation.customerEmail ?? "");
         setCustomerCompany(invitation.customerCompany ?? "");
-        setQuantityKg(invitation.quantity && invitation.quantity > 0 ? invitation.quantity : 1);
+        const invitationQuantity =
+            invitation.quantity && invitation.quantity > 0 ? invitation.quantity : 1;
+        setQuantityKg(
+            enforcedMinQuantityKg != null
+                ? Math.max(invitationQuantity, enforcedMinQuantityKg)
+                : invitationQuantity,
+        );
         setSelectedGrade(invitation.grade ?? "");
         setSelectedSize(invitation.size ?? "");
         setSelectedPackOption("");
         setManualPackaging(invitation.packaging ?? "");
-    }, [invitation]);
+    }, [invitation, enforcedMinQuantityKg]);
 
     const filteredSizeOptions = useMemo<string[]>(() => {
         if (!isDatesFlow || !selectedGrade) return [];
@@ -235,8 +260,22 @@ export function OrderSubmitPage() {
             if (normalize(customerEmail) !== normalize(invitation.customerEmail ?? "")) {
                 throw new Error(t("orderSubmit.errors.customerEmailMustMatch"));
             }
-            if (!Number.isFinite(quantityKg) || quantityKg < 0.1) {
-                throw new Error(t("orderSubmit.errors.quantityMin"));
+            if (!Number.isFinite(quantityKg) || quantityKg < DEFAULT_MIN_QUANTITY_KG) {
+                throw new Error(
+                    t("orderSubmit.errors.quantityMin", {
+                        min: DEFAULT_MIN_QUANTITY_KG,
+                    }),
+                );
+            }
+            if (!Number.isInteger(quantityKg)) {
+                throw new Error(t("orderSubmit.errors.quantityWholeNumber"));
+            }
+            if (enforcedMinQuantityKg != null && quantityKg < enforcedMinQuantityKg) {
+                throw new Error(
+                    t("orderSubmit.errors.quantityMin", {
+                        min: enforcedMinQuantityKg,
+                    }),
+                );
             }
 
             let grade: string | undefined;
@@ -306,11 +345,12 @@ export function OrderSubmitPage() {
                         size,
                         packaging,
                         packOption,
-                        quantity: quantityPackages,
+                        quantity: quantityKg,
                         message: finalMessage,
                         customerName: customerName.trim(),
                         customerEmail: normalize(customerEmail),
                         customerCompany: customerCompany.trim() || undefined,
+                        numberOfPackages: quantityPackages,
                     },
                 },
                 context: {
@@ -378,7 +418,7 @@ export function OrderSubmitPage() {
     }
 
     return (
-        <Container maxWidth="sm" sx={{ py: 6 }}>
+        <Container maxWidth="md" sx={{ py: 6 }}>
             <Paper sx={{ p: 3 }}>
                 <Stack spacing={2.5}>
                     <Box>
@@ -386,7 +426,7 @@ export function OrderSubmitPage() {
                             {t("orderSubmit.title")}
                         </Typography>
                         <Typography color="text.secondary">
-                            {offering.product?.name || t("orderSubmit.productFallback")} -{" "}
+                            {offeringDisplayName} -{" "}
                             {offering.brand?.name || t("orderSubmit.brandFallback")}
                         </Typography>
                     </Box>
@@ -394,7 +434,14 @@ export function OrderSubmitPage() {
                     {submitError && <Alert severity="error">{submitError}</Alert>}
 
                     <Box component="form" onSubmit={handleSubmit}>
-                        <Stack spacing={2}>
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                                gap: 2,
+                                alignItems: "start",
+                            }}
+                        >
                             {isDatesFlow && (
                                 <TextField
                                     select
@@ -438,6 +485,7 @@ export function OrderSubmitPage() {
                                     fullWidth
                                     required
                                     helperText={t("orderSubmit.fields.packagingManualHelp")}
+                                    sx={{ gridColumn: { md: "1 / -1" } }}
                                 />
                             ) : (
                                 <TextField
@@ -451,6 +499,7 @@ export function OrderSubmitPage() {
                                         nonDatePackOptions.length > 0
                                     }
                                     disabled={isDatesFlow ? !selectedGrade : false}
+                                    sx={{ gridColumn: { md: "1 / -1" } }}
                                 >
                                     {(isDatesFlow ? datePackOptions : nonDatePackOptions).map(
                                         (option) => (
@@ -470,7 +519,10 @@ export function OrderSubmitPage() {
                                 type="number"
                                 value={quantityKg}
                                 onChange={(event) => setQuantityKg(Number(event.target.value || 0))}
-                                inputProps={{ min: 0.1, step: 0.1 }}
+                                inputProps={{
+                                    min: enforcedMinQuantityKg ?? DEFAULT_MIN_QUANTITY_KG,
+                                    step: 1,
+                                }}
                                 required
                                 fullWidth
                             />
@@ -519,15 +571,21 @@ export function OrderSubmitPage() {
                                 onChange={(event) => setMessage(event.target.value)}
                                 fullWidth
                                 multiline
-                                rows={3}
+                                rows={2}
+                                sx={{ gridColumn: { md: "1 / -1" } }}
                             />
 
-                            <Button type="submit" variant="contained" disabled={busy}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={busy}
+                                sx={{ gridColumn: { md: "1 / -1" } }}
+                            >
                                 {busy
                                     ? t("orderSubmit.actions.submitting")
                                     : t("orderSubmit.actions.submit")}
                             </Button>
-                        </Stack>
+                        </Box>
                     </Box>
                 </Stack>
             </Paper>

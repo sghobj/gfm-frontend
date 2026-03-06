@@ -7,7 +7,6 @@
         "certificates": "شهاداتنا"
     },
     "actions": {
-        "login": "تسجيل الدخول",
         "logout": "تسجيل الخروج"
     },
     "app": {
@@ -59,7 +58,6 @@
             "pieAriaLabel": "مخطط دائري للتنقل بين أقسام المنتجات",
             "pieCenterTop": "المنتجات",
             "pieCenterBottom": "التنقل",
-            "title": "تنقل سريع بين المنتجات",
             "subtitle": "انقر على أي جزء من المخطط أو اسم المنتج للانتقال مباشرة إلى القسم المطلوب.",
             "floatingTitle": "المنتجات",
             "mobileFabAriaLabel": "فتح التنقل السريع للمنتجات",
@@ -124,7 +122,7 @@
     },
     "adminLogin": {
         "title": "تسجيل دخول الإدارة",
-        "subtitle": "سجّل الدخول لإنشاء روابط طلب B2B محمية.",
+        "subtitle": "سجّل الدخول لإنشاء روابط طلب محمية.",
         "fields": {
             "identifier": "البريد الإلكتروني أو اسم المستخدم",
             "password": "كلمة المرور"
@@ -138,7 +136,7 @@
         }
     },
     "adminOrderLinks": {
-        "pageTitle": "روابط طلبات B2B",
+        "pageTitle": "روابط طلبات",
         "loggedInAs": "تم تسجيل الدخول باسم {{user}}",
         "adminFallback": "مشرف",
         "title": "إنشاء رابط طلب محمي",
@@ -147,7 +145,12 @@
             "customerEmail": "بريد العميل",
             "customerName": "اسم العميل (اختياري)",
             "customerCompany": "شركة العميل (اختياري)",
-            "expiryDate": "تاريخ الانتهاء"
+            "expiryDate": "تاريخ الانتهاء",
+            "orderType": "نوع الطلب"
+        },
+        "options": {
+            "order": "طلب كمية",
+            "sample": "طلب عينة"
         },
         "labels": {
             "unknownProduct": "منتج غير معروف",
@@ -172,7 +175,7 @@
         }
     },
     "orderSubmit": {
-        "title": "طلب B2B آمن",
+        "title": "طلب آمن",
         "productFallback": "منتج",
         "brandFallback": "علامة",
         "validating": "جاري التحقق من الدعوة...",
@@ -207,7 +210,8 @@
             "customerNameRequired": "اسم العميل مطلوب.",
             "customerEmailRequired": "بريد العميل مطلوب.",
             "customerEmailMustMatch": "يجب أن يطابق بريد العميل البريد الموجود في الدعوة.",
-            "quantityMin": "الكمية يجب ألا تقل عن 0.1 كغ.",
+            "quantityMin": "الكمية يجب ألا تقل عن {{min}} كغ.",
+            "quantityWholeNumber": "الكمية بالكيلوغرام يجب أن تكون رقما صحيحا.",
             "gradeRequired": "الدرجة مطلوبة.",
             "sizeRequired": "الحجم مطلوب.",
             "packagingRequired": "خيار التعبئة مطلوب.",
@@ -244,7 +248,8 @@
             "selectionRequired": "الاختيار مطلوب",
             "packagingRequired": "خيار التعبئة مطلوب",
             "quantityRequired": "الكمية بالكيلوغرام مطلوبة",
-            "quantityMin": "الحد الأدنى للكمية 0.1 كغ",
+            "quantityMin": "الحد الأدنى للكمية 1 كغ",
+            "quantityWholeNumber": "الكمية يجب أن تكون رقما صحيحا",
             "nameRequired": "الاسم مطلوب",
             "emailRequired": "البريد الإلكتروني مطلوب",
             "invalidEmail": "البريد الإلكتروني غير صالح"
@@ -268,91 +273,6 @@
             "officeValue": "عمّان، الأردن - قرب منطقة وسط البلد"
         }
     },
-    "contact": {
-        "hero": {
-            "title": "طلبات الجملة والشركات",
-            "subtitle": "أخبرنا قليلًا عن نشاطك التجاري وما تبحث عنه، وسيتواصل فريقنا معك قريبًا."
-        },
-        "form": {
-            "name": "الاسم الكامل",
-            "namePh": "مثال: سارة",
-            "company": "اسم الشركة",
-            "companyPh": "مثال: شركة الأسواق الغذائية",
-            "role": "الوظيفة (اختياري)",
-            "rolePh": "مالك / مشتريات / مدير",
-            "email": "بريد العمل",
-            "emailPh": "name@company.com",
-            "phone": "الهاتف / واتساب",
-            "phonePh": "مثال: +962 7X XXX XXXX",
-            "businessType": "نوع النشاط",
-            "city": "المدينة / المنطقة",
-            "products": "المنتجات المطلوبة",
-            "volume": "حجم الطلب الشهري المتوقع",
-            "message": "الرسالة / التفاصيل",
-            "messagePh": "اكتب ما تحتاجه (المنتجات، الكميات، التوصيل، المدة...)",
-            "branches": "عدد الفروع",
-            "branchesPh": "مثال: 1",
-            "cuisine": "نوع المطبخ (اختياري)",
-            "cuisinePh": "مثال: صحي / لبناني / فطور",
-            "regions": "المناطق المغطاة",
-            "coldStorage": "هل يوجد مستودع / تبريد؟",
-            "coldStorageYes": "نعم",
-            "coldStorageNo": "لا",
-            "catalog": "أرسل لي الكتالوج/قائمة الأسعار",
-            "consent": "أوافق على التواصل معي بخصوص هذا الطلب.",
-            "submit": "إرسال الطلب",
-            "success": "شكرًا! تم استلام طلبك وسنتواصل معك قريبًا.",
-            "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
-        },
-        "options": {
-            "businessTypes": {
-                "retail": "متجر / سوبرماركت",
-                "horeca": "مقهى / مطعم / فندق",
-                "distributor": "موزع / تاجر جملة",
-                "corporate": "شركات / تموين مكاتب",
-                "online": "متجر إلكتروني",
-                "other": "أخرى"
-            },
-            "cities": {
-                "amman": "عمّان",
-                "irbid": "إربد",
-                "zarqa": "الزرقاء",
-                "aqaba": "العقبة",
-                "madaba": "مادبا",
-                "salt": "السلط",
-                "mafraq": "المفرق",
-                "jerash": "جرش",
-                "karak": "الكرك",
-                "tafilah": "الطفيلة",
-                "maan": "معان",
-                "ajloun": "عجلون",
-                "other": "أخرى"
-            },
-            "volumes": {
-                "lt200": "أقل من 200 دينار",
-                "200_500": "200-500 دينار",
-                "500_1000": "500-1000 دينار",
-                "1000plus": "أكثر من 1000 دينار"
-            },
-            "products": {
-                "snacks": "وجبات خفيفة عضوية",
-                "spreads": "سبريد وزبدة مكسرات",
-                "granola": "جرانولا وحبوب",
-                "honey": "عسل",
-                "oils": "زيت زيتون وزيوت",
-                "pickles": "مخللات ومؤن",
-                "spices": "بهارات وأعشاب",
-                "other": "أخرى"
-            },
-            "regions": {
-                "north": "الشمال",
-                "central": "الوسط",
-                "south": "الجنوب",
-                "amman": "عمّان",
-                "nationwide": "جميع المحافظات"
-            }
-        }
-    },
     "subscription": {
         "badge": "اشتراكات النشرة البريدية",
         "title": "احصل على العروض وتحديثات التوفر",
@@ -362,7 +282,6 @@
         "footerCtaTitle": "تنبيهات العروض والتوفر",
         "footerCtaDescription": "استلم التحديثات في بريد شركتك.",
         "footerCtaButton": "اشترك",
-        "heroCtaButton": "احصل على تحديثات المنتجات",
         "fields": {
             "workEmail": "بريد العمل",
             "workEmailPlaceholder": "name@company.com",
@@ -393,22 +312,6 @@
     },
     "footer": {
         "quickLinksTitle": "روابط سريعة",
-        "contactTitle": "التواصل",
-        "fallback": {
-            "brandName": "شركة مزاج الغذاء الجيد",
-            "brandDescription": "شريك تصدير عضوي موثوق من الأردن.",
-            "address": "عمّان، الأردن",
-            "email": "info@example.com",
-            "quickLinks": {
-                "home": "الرئيسية",
-                "products": "المنتجات",
-                "contact": "تواصل معنا"
-            },
-            "legalLinks": {
-                "privacy": "الخصوصية",
-                "terms": "الشروط"
-            },
-            "copyright": "© {{year}} {{brandName}}"
-        }
+        "contactTitle": "التواصل"
     }
 }

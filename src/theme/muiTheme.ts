@@ -146,6 +146,29 @@ export function muiTheme(schemeId: SchemeId, direction: "ltr" | "rtl" = "ltr") {
                     }),
                 },
             },
+            MuiMenu: {
+                styleOverrides: {
+                    paper: ({ theme }) => ({
+                        backgroundColor: theme.palette.common.white,
+                    }),
+                },
+            },
+            MuiMenuItem: {
+                styleOverrides: {
+                    root: ({ theme }) => ({
+                        backgroundColor: theme.palette.common.white,
+                        "&:hover": {
+                            backgroundColor: alpha(theme.palette.common.black, 0.04),
+                        },
+                        "&.Mui-selected": {
+                            backgroundColor: theme.palette.common.white,
+                        },
+                        "&.Mui-selected:hover": {
+                            backgroundColor: alpha(theme.palette.common.black, 0.08),
+                        },
+                    }),
+                },
+            },
         },
     });
 
