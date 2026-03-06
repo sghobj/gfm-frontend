@@ -7,11 +7,7 @@ import {
     Typography,
     Link as MuiLink,
     Divider,
-    IconButton,
 } from "@mui/material";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import XIcon from "@mui/icons-material/X";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import { useQuery } from "@apollo/client/react";
@@ -153,7 +149,8 @@ export function Footer() {
                     sx={{
                         maxWidth: "1440px",
                         px: { xs: 2, sm: 4, md: 6 },
-                        py: { xs: 6, md: 8 },
+                        pt: { xs: 6, md: 8 },
+                        pb: { xs: 2, md: 3 },
                     }}
                 >
                     <Grid container spacing={4}>
@@ -172,41 +169,6 @@ export function Footer() {
                                     >
                                         {effectiveBrandDescription}
                                     </Typography>
-
-                                    <Stack direction="row" useFlexGap gap={1}>
-                                        <IconButton
-                                            aria-label="LinkedIn"
-                                            size="small"
-                                            component="a"
-                                            href="https://www.linkedin.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <LinkedInIcon fontSize="small" />
-                                        </IconButton>
-
-                                        <IconButton
-                                            aria-label="Instagram"
-                                            size="small"
-                                            component="a"
-                                            href="https://www.instagram.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <InstagramIcon fontSize="small" />
-                                        </IconButton>
-
-                                        <IconButton
-                                            aria-label="X"
-                                            size="small"
-                                            component="a"
-                                            href="https://x.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <XIcon fontSize="small" />
-                                        </IconButton>
-                                    </Stack>
                                 </Stack>
                             </Grid>
                         )}

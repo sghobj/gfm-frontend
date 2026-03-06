@@ -13,6 +13,10 @@ type ContactLinksContextValue = {
     infoEmail: string | null;
     whatsappNumber: string | null;
     whatsappLink: string | null;
+    mapsEmbedUrl: string | null;
+    contactHeroTitle: string | null;
+    contactHeroSubtitle: string | null;
+    contactHeroNote: string | null;
     loading: boolean;
 };
 
@@ -21,6 +25,27 @@ const DEFAULT_WHATSAPP_NUMBER = "962779500599";
 const DEFAULT_WHATSAPP_LINK = `https://wa.me/${DEFAULT_WHATSAPP_NUMBER}`;
 
 const ContactLinksContext = createContext<ContactLinksContextValue | undefined>(undefined);
+
+function normalizeNonEmptyText(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : null;
+}
+
+function normalizeHttpUrl(value: string | null | undefined): string | null {
+    const candidate = normalizeNonEmptyText(value);
+    if (!candidate) return null;
+
+    try {
+        const parsed = new URL(candidate);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+            return parsed.toString();
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
 
 export function ContactLinksProvider({ children }: { children: ReactNode }) {
     const { data, loading } = useQuery(ContactLinksDocument, {
@@ -38,16 +63,28 @@ export function ContactLinksProvider({ children }: { children: ReactNode }) {
             normalizeWhatsAppNumber(data?.contactUs?.whatsapp_link) ?? DEFAULT_WHATSAPP_NUMBER;
         const whatsappLink =
             buildSafeWhatsAppHref(data?.contactUs?.whatsapp_link) ?? DEFAULT_WHATSAPP_LINK;
+        const mapsEmbedUrl = normalizeHttpUrl(data?.contactUs?.mapsUrl);
+        const contactHeroTitle = normalizeNonEmptyText(data?.contactUs?.hero?.title);
+        const contactHeroSubtitle = normalizeNonEmptyText(data?.contactUs?.hero?.subtitle);
+        const contactHeroNote = normalizeNonEmptyText(data?.contactUs?.hero?.description);
 
         return {
             salesEmail,
             infoEmail,
             whatsappNumber,
             whatsappLink,
+            mapsEmbedUrl,
+            contactHeroTitle,
+            contactHeroSubtitle,
+            contactHeroNote,
             loading,
         };
     }, [
+        data?.contactUs?.hero?.description,
+        data?.contactUs?.hero?.subtitle,
+        data?.contactUs?.hero?.title,
         data?.contactUs?.info_email,
+        data?.contactUs?.mapsUrl,
         data?.contactUs?.sales_email,
         data?.contactUs?.whatsapp_link,
         loading,

@@ -3,5 +3,11 @@ query ContactLinks {
         sales_email
         info_email
         whatsapp_link
+        mapsUrl
+        hero {
+            title
+            subtitle
+            description
+        }
     }
 }
