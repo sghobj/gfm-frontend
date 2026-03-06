@@ -14,6 +14,7 @@ import { resolveStrapiMediaUrl } from "../../../utils/strapiMedia.ts";
 import { hasNonEmptyText } from "../../../utils/localizedContent";
 import { HOME_SECTION_TYPOGRAPHY } from "./homeSectionTypography";
 import { useContactLinks } from "../../../providers/ContactLinksProvider";
+import { FALLBACK_NAV_LOGO_URL } from "../../../components/logo/Logo.tsx";
 
 type HeroData = NonNullable<GetHomeDataQuery["homepage"]>["hero"];
 type SlideVariant = "default" | "logo_weather";
@@ -404,7 +405,8 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                         <Box
                                                             component="img"
                                                             src={resolveStrapiMediaUrl(
-                                                                slide.logoImage ?? slide.image,
+                                                                slide.logoImage ??
+                                                                    FALLBACK_NAV_LOGO_URL,
                                                             )}
                                                             alt={
                                                                 slide.logoAlt ??

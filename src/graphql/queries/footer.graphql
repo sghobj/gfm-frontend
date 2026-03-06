@@ -9,10 +9,6 @@ query Footer($locale: I18NLocaleCode) {
     }
     address
     email
-    legalLinks {
-      label
-      href
-    }
     copyrightText
   }
 }

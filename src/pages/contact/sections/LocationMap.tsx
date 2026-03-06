@@ -15,7 +15,6 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { Logo } from "../../../components/logo/Logo";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useContactLinks } from "../../../providers/ContactLinksProvider";
@@ -46,7 +45,6 @@ const InfoRow = ({
     infoLink?: string | null;
 }) => {
     const shouldOpenInNewTab = Boolean(infoLink && /^https?:\/\//i.test(infoLink));
-
     return (
         <Stack direction="row" useFlexGap gap={1.5} alignItems="flex-start">
             <Box
@@ -107,7 +105,15 @@ export const LocationMap = () => {
                         }}
                     >
                         <CardHeader
-                            avatar={<Logo width={100} />}
+                            avatar={
+                                <img
+                                    src={
+                                        "https://res.cloudinary.com/ds8bdxtzs/image/upload/v1772815392/prod-gfm/large_gfmco_a364972fe8.jpg"
+                                    }
+                                    width={100}
+                                    alt={"logo"}
+                                />
+                            }
                             title={
                                 <Typography variant={"h5"}>
                                     {t("contactPage.location.companyName")}
