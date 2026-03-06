@@ -21,6 +21,9 @@ import { useTranslation } from "react-i18next";
 import { useContactLinks } from "../../../providers/ContactLinksProvider";
 import { buildSafeMailtoHref } from "../../../utils/contactLinks";
 
+const DEFAULT_MAP_EMBED_URL =
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3384.6023027198144!2d35.90720517611209!3d31.97168422470498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151ca194cbdaecaf%3A0xd96ed3b9c3083bff!2zR29vZCBGb29kIE1vb2QgQ28uINi02LHZg9ipINmF2LLYp9isINin2YTYutiw2KfYoSDYp9mE2KzZitiv!5e0!3m2!1sen!2sjo!4v1766145454698!5m2!1sen!2sjo";
+
 function buildPhoneHref(rawPhone: string): string | null {
     const trimmed = rawPhone.trim();
     if (!trimmed) return null;
@@ -95,9 +98,10 @@ const InfoRow = ({
 export const LocationMap = () => {
     const { t } = useTranslation("common");
     const [isMapLoading, setIsMapLoading] = useState(true);
-    const { infoEmail, whatsappNumber, whatsappLink } = useContactLinks();
+    const { infoEmail, whatsappNumber, whatsappLink, mapsEmbedUrl } = useContactLinks();
 
     const phoneValue = "+962 (6) 465-0000";
+    const mapSrc = mapsEmbedUrl ?? DEFAULT_MAP_EMBED_URL;
 
     return (
         <Box component="section">
