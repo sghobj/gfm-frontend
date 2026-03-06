@@ -33,16 +33,6 @@ function buildPhoneHref(rawPhone: string): string | null {
     return `tel:${trimmed.startsWith("+") ? `+${digits}` : digits}`;
 }
 
-function buildPhoneHref(rawPhone: string): string | null {
-    const trimmed = rawPhone.trim();
-    if (!trimmed) return null;
-
-    const digits = trimmed.replace(/\D+/g, "");
-    if (!digits) return null;
-
-    return `tel:${trimmed.startsWith("+") ? `+${digits}` : digits}`;
-}
-
 const InfoRow = ({
     icon,
     label,

@@ -733,10 +733,10 @@ export function Products() {
                     </Box>
                 ) : (
                     <Stack spacing={10}>
-                            {productsList.map(({ product, offerings: groupOfferings }) => {
-                                const heroImage = product.image;
-                                const isJapaneseProductGroup = isJapaneseProductsSection(product);
-                                const productMarketingTags = getProductMarketingTags(product);
+                        {productsList.map(({ product, offerings: groupOfferings }) => {
+                            const heroImage = product.image;
+                            const isJapaneseProductGroup = isJapaneseProductsSection(product);
+                            const productMarketingTags = getProductMarketingTags(product);
 
                             return (
                                 <Box
