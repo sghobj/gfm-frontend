@@ -38,6 +38,7 @@ import { LoadingState } from "../../components/state/LoadingState";
 import { toStrapiLocale } from "../../apollo/apolloClient.ts";
 import { isContentForLocale } from "../../utils/localizedContent.ts";
 import { MarketingTagChip } from "../../components/product/MarketingTagChip";
+import { resolveStrapiMediaUrl } from "../../utils/strapiMedia.ts";
 
 // ----------------------------
 // GraphQL Query
@@ -57,6 +58,16 @@ type ProductGroup = {
 
 const JAPANESE_PRODUCTS_SLUG = "japanese-products";
 const MAX_PACK_TAGS_PER_CARD = 6;
+const PIE_SLICE_COLORS = [
+    "#1f6f4a",
+    "#2f885a",
+    "#3fa16a",
+    "#4bb77b",
+    "#72c792",
+    "#8fd5aa",
+    "#a8dfbf",
+    "#c3ead5",
+];
 
 // ---------- UI helpers ----------
 function uniq<T>(arr: T[]) {
@@ -152,6 +163,80 @@ function getProductMarketingTags(
     }
 
     return normalized;
+}
+
+function polarToCartesian(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number,
+) {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
+    return {
+        x: centerX + radius * Math.cos(angleInRadians),
+        y: centerY + radius * Math.sin(angleInRadians),
+    };
+}
+
+function buildPieSlicePath(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+) {
+    const start = polarToCartesian(centerX, centerY, radius, startAngle);
+    const end = polarToCartesian(centerX, centerY, radius, endAngle);
+    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+
+    return [
+        `M ${centerX} ${centerY}`,
+        `L ${start.x} ${start.y}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`,
+        "Z",
+    ].join(" ");
+}
+
+function splitPieLabel(label: string, maxCharsPerLine = 14, maxLines = 2): string[] {
+    const trimmed = label.trim();
+    if (!trimmed) return [];
+
+    const words = trimmed.split(/\s+/);
+    const lines: string[] = [];
+    let current = "";
+    let wordIndex = 0;
+
+    while (wordIndex < words.length && lines.length < maxLines) {
+        const word = words[wordIndex];
+        const candidate = current ? `${current} ${word}` : word;
+
+        if (candidate.length <= maxCharsPerLine) {
+            current = candidate;
+            wordIndex += 1;
+            continue;
+        }
+
+        if (!current) {
+            lines.push(`${word.slice(0, Math.max(maxCharsPerLine - 1, 1))}…`);
+            wordIndex += 1;
+        } else {
+            lines.push(current);
+            current = "";
+        }
+    }
+
+    if (lines.length < maxLines && current) {
+        lines.push(current);
+    }
+
+    if (wordIndex < words.length && lines.length > 0) {
+        const lastIndex = lines.length - 1;
+        const withoutEllipsis = lines[lastIndex].replace(/…$/, "");
+        const truncated = withoutEllipsis.slice(0, Math.max(maxCharsPerLine - 1, 1)).trimEnd();
+        lines[lastIndex] = `${truncated}…`;
+    }
+
+    return lines.slice(0, maxLines);
 }
 
 // ---------- Component ----------
@@ -628,10 +713,10 @@ export function Products() {
                     </Box>
                 ) : (
                     <Stack spacing={10}>
-                        {productsList.map(({ product, offerings: groupOfferings }) => {
-                            const heroImage = product.image;
-                            const isJapaneseProductGroup = isJapaneseProductsSection(product);
-                            const productMarketingTags = getProductMarketingTags(product);
+                            {productsList.map(({ product, offerings: groupOfferings }) => {
+                                const heroImage = product.image;
+                                const isJapaneseProductGroup = isJapaneseProductsSection(product);
+                                const productMarketingTags = getProductMarketingTags(product);
 
                                 return (
                                     <Box
