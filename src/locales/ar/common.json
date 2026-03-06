@@ -55,6 +55,17 @@
             "other": "أخرى",
             "showMore": "عرض تفاصيل أكثر ->"
         },
+        "navigation": {
+            "pieAriaLabel": "مخطط دائري للتنقل بين أقسام المنتجات",
+            "pieCenterTop": "المنتجات",
+            "pieCenterBottom": "التنقل",
+            "title": "تنقل سريع بين المنتجات",
+            "subtitle": "انقر على أي جزء من المخطط أو اسم المنتج للانتقال مباشرة إلى القسم المطلوب.",
+            "floatingTitle": "المنتجات",
+            "mobileFabAriaLabel": "فتح التنقل السريع للمنتجات",
+            "mobileTitle": "الانتقال إلى منتج",
+            "mobileCloseAriaLabel": "إغلاق قائمة تنقل المنتجات"
+        },
         "empty": {
             "noResultsTitle": "لا توجد نتائج",
             "noResultsSubtitle": "جرّب تعديل البحث أو الفلاتر للوصول لما تبحث عنه.",

@@ -55,6 +55,17 @@
             "other": "Other",
             "showMore": "Show more details ->"
         },
+        "navigation": {
+            "pieAriaLabel": "Product sections pie navigation",
+            "pieCenterTop": "Products",
+            "pieCenterBottom": "Navigator",
+            "title": "Quick Product Navigation",
+            "subtitle": "Click any pie segment or list item to jump directly to that product section.",
+            "floatingTitle": "Products",
+            "mobileFabAriaLabel": "Open product quick navigation",
+            "mobileTitle": "Jump to Product",
+            "mobileCloseAriaLabel": "Close product navigation"
+        },
         "empty": {
             "noResultsTitle": "No results found",
             "noResultsSubtitle": "Try adjusting your search or filters to find what you're looking for.",

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Avatar,
     Box,
@@ -16,10 +16,13 @@ import {
     Button,
     Chip,
     Divider,
+    Fab,
+    Drawer,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StrapiImage } from "../../components/image/StrapiImage";
@@ -35,6 +38,7 @@ import { LoadingState } from "../../components/state/LoadingState";
 import { toStrapiLocale } from "../../apollo/apolloClient.ts";
 import { isContentForLocale } from "../../utils/localizedContent.ts";
 import { MarketingTagChip } from "../../components/product/MarketingTagChip";
+import { resolveStrapiMediaUrl } from "../../utils/strapiMedia.ts";
 
 // ----------------------------
 // GraphQL Query
@@ -54,6 +58,16 @@ type ProductGroup = {
 
 const JAPANESE_PRODUCTS_SLUG = "japanese-products";
 const MAX_PACK_TAGS_PER_CARD = 6;
+const PIE_SLICE_COLORS = [
+    "#1f6f4a",
+    "#2f885a",
+    "#3fa16a",
+    "#4bb77b",
+    "#72c792",
+    "#8fd5aa",
+    "#a8dfbf",
+    "#c3ead5",
+];
 
 // ---------- UI helpers ----------
 function uniq<T>(arr: T[]) {
@@ -151,12 +165,87 @@ function getProductMarketingTags(
     return normalized;
 }
 
+function polarToCartesian(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number,
+) {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
+    return {
+        x: centerX + radius * Math.cos(angleInRadians),
+        y: centerY + radius * Math.sin(angleInRadians),
+    };
+}
+
+function buildPieSlicePath(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+) {
+    const start = polarToCartesian(centerX, centerY, radius, startAngle);
+    const end = polarToCartesian(centerX, centerY, radius, endAngle);
+    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+
+    return [
+        `M ${centerX} ${centerY}`,
+        `L ${start.x} ${start.y}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`,
+        "Z",
+    ].join(" ");
+}
+
+function splitPieLabel(label: string, maxCharsPerLine = 14, maxLines = 2): string[] {
+    const trimmed = label.trim();
+    if (!trimmed) return [];
+
+    const words = trimmed.split(/\s+/);
+    const lines: string[] = [];
+    let current = "";
+    let wordIndex = 0;
+
+    while (wordIndex < words.length && lines.length < maxLines) {
+        const word = words[wordIndex];
+        const candidate = current ? `${current} ${word}` : word;
+
+        if (candidate.length <= maxCharsPerLine) {
+            current = candidate;
+            wordIndex += 1;
+            continue;
+        }
+
+        if (!current) {
+            lines.push(`${word.slice(0, Math.max(maxCharsPerLine - 1, 1))}…`);
+            wordIndex += 1;
+        } else {
+            lines.push(current);
+            current = "";
+        }
+    }
+
+    if (lines.length < maxLines && current) {
+        lines.push(current);
+    }
+
+    if (wordIndex < words.length && lines.length > 0) {
+        const lastIndex = lines.length - 1;
+        const withoutEllipsis = lines[lastIndex].replace(/…$/, "");
+        const truncated = withoutEllipsis.slice(0, Math.max(maxCharsPerLine - 1, 1)).trimEnd();
+        lines[lastIndex] = `${truncated}…`;
+    }
+
+    return lines.slice(0, maxLines);
+}
+
 // ---------- Component ----------
 export function Products() {
     const navigate = useNavigate();
     const { i18n, t } = useTranslation("common");
     const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
     const activeLocale = locale as "en" | "ar";
+    const isRtl = i18n.dir(i18n.resolvedLanguage ?? i18n.language ?? "en") === "rtl";
     const { data, loading, error } = useQuery(GET_ALL_OFFERINGS, {
         variables: { locale },
     });
@@ -179,6 +268,12 @@ export function Products() {
     // Filters
     const [search, setSearch] = useState("");
     const [brandFilter, setBrandFilter] = useState<string>("all");
+    const pieNavRef = useRef<HTMLDivElement | null>(null);
+    const productSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const [activeProductId, setActiveProductId] = useState<string | null>(null);
+    const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
+    const [showFloatingProductNav, setShowFloatingProductNav] = useState(false);
+    const [mobileProductNavOpen, setMobileProductNavOpen] = useState(false);
 
     // Modal state
     const [selectedOffering, setSelectedOffering] = useState<GQLOffering | null>(null);
@@ -233,6 +328,115 @@ export function Products() {
             }));
     }, [offerings, search, brandFilter]);
 
+    const productNavItems = useMemo(
+        () =>
+            productsList.map(({ product }, index) => ({
+                id: product.documentId,
+                name: product.name,
+                color: PIE_SLICE_COLORS[index % PIE_SLICE_COLORS.length],
+                imageUrl: product.image?.url ? resolveStrapiMediaUrl(product.image.url) : null,
+            })),
+        [productsList],
+    );
+
+    const pieSlices = useMemo(() => {
+        const total = productNavItems.length;
+        if (total === 0) return [];
+
+        return productNavItems.map((item, index) => {
+            const startAngle = (index / total) * 360;
+            const endAngle = ((index + 1) / total) * 360;
+            const middleAngle = startAngle + (endAngle - startAngle) / 2;
+            const labelPosition = polarToCartesian(100, 100, 63, middleAngle);
+
+            return {
+                ...item,
+                index,
+                path: buildPieSlicePath(100, 100, 98, startAngle, endAngle),
+                labelPosition,
+                labelLines: splitPieLabel(item.name),
+                patternId: `product-pie-pattern-${index}`,
+                middleAngle,
+            };
+        });
+    }, [productNavItems]);
+
+    const scrollToProductSection = useCallback((productId: string) => {
+        const target = productSectionRefs.current[productId];
+        if (!target) return;
+
+        const topOffset = 96;
+        const targetTop = target.getBoundingClientRect().top + window.scrollY - topOffset;
+        window.scrollTo({ top: Math.max(targetTop, 0), behavior: "smooth" });
+        setActiveProductId(productId);
+    }, []);
+
+    useEffect(() => {
+        if (productNavItems.length === 0) {
+            setActiveProductId(null);
+            return;
+        }
+
+        setActiveProductId((prev) => {
+            if (prev && productNavItems.some((item) => item.id === prev)) return prev;
+            return productNavItems[0].id;
+        });
+    }, [productNavItems]);
+
+    useEffect(() => {
+        if (loading || !!error || productNavItems.length === 0 || !pieNavRef.current) {
+            setShowFloatingProductNav(false);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                setShowFloatingProductNav(!entry.isIntersecting);
+            },
+            { threshold: 0.15 },
+        );
+
+        observer.observe(pieNavRef.current);
+        return () => observer.disconnect();
+    }, [loading, error, productNavItems.length]);
+
+    useEffect(() => {
+        if (productNavItems.length === 0) return;
+
+        const sections = productNavItems
+            .map((item) => productSectionRefs.current[item.id])
+            .filter((section): section is HTMLDivElement => Boolean(section));
+
+        if (sections.length === 0) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visibleEntries = entries.filter((entry) => entry.isIntersecting);
+                if (visibleEntries.length === 0) return;
+
+                const mostVisible = visibleEntries.reduce((best, entry) =>
+                    entry.intersectionRatio > best.intersectionRatio ? entry : best,
+                );
+                const id = (mostVisible.target as HTMLDivElement).dataset.productId;
+                if (id) setActiveProductId(id);
+            },
+            {
+                threshold: [0.15, 0.3, 0.5, 0.75],
+                rootMargin: "-25% 0px -45% 0px",
+            },
+        );
+
+        sections.forEach((section) => observer.observe(section));
+        return () => observer.disconnect();
+    }, [productNavItems]);
+
+    useEffect(() => {
+        if (!showFloatingProductNav) {
+            setMobileProductNavOpen(false);
+        }
+    }, [showFloatingProductNav]);
+
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
             {/* Hero & Filters */}
@@ -240,7 +444,8 @@ export function Products() {
                 <Box
                     sx={{
                         borderBottom: "1px solid rgba(255,255,255,0.1)",
-                        py: { xs: 8, md: 12 },
+                        py: { xs: 6, md: 8 },
+                        minHeight: { xs: "auto", lg: "calc(100vh - 72px)" },
                         display: "flex",
                         justifyContent: "center",
                     }}
@@ -252,59 +457,235 @@ export function Products() {
                             px: { xs: 2, sm: 4, md: 6 },
                         }}
                     >
-                        <Stack spacing={6}>
-                            <Stack spacing={2}>
-                                <SectionTitle>{t("products.hero.title")}</SectionTitle>
-                                <SectionSubtitle>{t("products.hero.subtitle")}</SectionSubtitle>
-                            </Stack>
+                        <Stack
+                            direction={{ xs: "column", lg: "row" }}
+                            spacing={{ xs: 5, lg: 7 }}
+                            alignItems="center"
+                            justifyContent="space-between"
+                            sx={{ minHeight: { xs: "auto", lg: "calc(100vh - 180px)" } }}
+                        >
+                            <Stack spacing={4} sx={{ width: "100%", flex: 1, maxWidth: 760 }}>
+                                <Stack spacing={2}>
+                                    <SectionTitle>{t("products.hero.title")}</SectionTitle>
+                                    <SectionSubtitle>{t("products.hero.subtitle")}</SectionSubtitle>
+                                </Stack>
 
-                            <Stack spacing={3}>
-                                {/* Search & Brand Filters */}
-                                <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={2}>
-                                    <TextField
-                                        size="small"
-                                        placeholder={t("products.filters.searchPlaceholder")}
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        sx={{
-                                            flex: 1,
-                                            minWidth: 260,
-                                            "& .MuiOutlinedInput-root": {
-                                                bgcolor: "white",
-                                                borderRadius: 2,
-                                                color: "black",
-                                            },
-                                        }}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <SearchIcon fontSize="small" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
-                                    <TextField
-                                        select
-                                        size="small"
-                                        value={brandFilter}
-                                        onChange={(e) => setBrandFilter(e.target.value)}
-                                        sx={{
-                                            minWidth: 200,
-                                            "& .MuiOutlinedInput-root": {
-                                                bgcolor: "white",
-                                                borderRadius: 2,
-                                                color: "black",
-                                            },
-                                        }}
-                                    >
-                                        {brands.map((b) => (
-                                            <MenuItem key={b.slug} value={b.slug}>
-                                                {b.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
+                                <Stack spacing={3}>
+                                    <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={2}>
+                                        <TextField
+                                            size="small"
+                                            placeholder={t("products.filters.searchPlaceholder")}
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            sx={{
+                                                flex: 1,
+                                                minWidth: 260,
+                                                "& .MuiOutlinedInput-root": {
+                                                    bgcolor: "white",
+                                                    borderRadius: 2,
+                                                    color: "black",
+                                                },
+                                            }}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <SearchIcon fontSize="small" />
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                        <TextField
+                                            select
+                                            size="small"
+                                            value={brandFilter}
+                                            onChange={(e) => setBrandFilter(e.target.value)}
+                                            sx={{
+                                                minWidth: 200,
+                                                "& .MuiOutlinedInput-root": {
+                                                    bgcolor: "white",
+                                                    borderRadius: 2,
+                                                    color: "black",
+                                                },
+                                            }}
+                                        >
+                                            {brands.map((b) => (
+                                                <MenuItem key={b.slug} value={b.slug}>
+                                                    {b.name}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Stack>
+                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+                                        {t("products.navigation.subtitle")}
+                                    </Typography>
                                 </Stack>
                             </Stack>
+
+                            {!loading && !error && productsList.length > 0 && (
+                                <Box
+                                    ref={pieNavRef}
+                                    sx={{
+                                        width: { xs: 290, sm: 360, lg: 460 },
+                                        maxWidth: "100%",
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <Box
+                                        component="svg"
+                                        viewBox="0 0 200 200"
+                                        role="img"
+                                        aria-label={t("products.navigation.pieAriaLabel")}
+                                        sx={{
+                                            display: "block",
+                                            width: "100%",
+                                            height: "auto",
+                                            filter: "drop-shadow(0 18px 34px rgba(23,59,33,0.25))",
+                                        }}
+                                    >
+                                        <defs>
+                                            {pieSlices
+                                                .filter((slice) => Boolean(slice.imageUrl))
+                                                .map((slice) => (
+                                                    <pattern
+                                                        key={slice.patternId}
+                                                        id={slice.patternId}
+                                                        x="0"
+                                                        y="0"
+                                                        width="200"
+                                                        height="200"
+                                                        patternUnits="userSpaceOnUse"
+                                                        patternContentUnits="userSpaceOnUse"
+                                                    >
+                                                        <image
+                                                            href={slice.imageUrl ?? undefined}
+                                                            width="200"
+                                                            height="200"
+                                                            preserveAspectRatio="xMidYMid slice"
+                                                            opacity="0.5"
+                                                        />
+                                                    </pattern>
+                                                ))}
+                                        </defs>
+
+                                        {pieSlices.map((slice) => {
+                                            const isActive = activeProductId === slice.id;
+                                            const isHovered = hoveredProductId === slice.id;
+                                            const labelShiftY =
+                                                slice.labelLines.length > 1 ? -3.5 : 0;
+                                            const labelFontSize =
+                                                pieSlices.length > 6 ? 6.4 : 7.2;
+                                            const overlayOpacity = slice.imageUrl ? 0.55 : 0.9;
+                                            const hoverRadians =
+                                                ((slice.middleAngle - 90) * Math.PI) / 180;
+                                            const hoverOffset = isHovered ? 3 : 0;
+                                            const hoverTranslateX =
+                                                Math.cos(hoverRadians) * hoverOffset;
+                                            const hoverTranslateY =
+                                                Math.sin(hoverRadians) * hoverOffset;
+
+                                            return (
+                                                <g
+                                                    key={slice.id}
+                                                    onClick={() => scrollToProductSection(slice.id)}
+                                                    onMouseEnter={() =>
+                                                        setHoveredProductId(slice.id)
+                                                    }
+                                                    onMouseLeave={() => setHoveredProductId(null)}
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        transform: `translate(${hoverTranslateX}px, ${hoverTranslateY}px) scale(${isHovered ? 1.02 : 1})`,
+                                                        transformOrigin: "center",
+                                                        transformBox: "fill-box",
+                                                        transition:
+                                                            "transform 220ms ease, filter 220ms ease",
+                                                        filter: isHovered
+                                                            ? "drop-shadow(0 8px 12px rgba(0,0,0,0.18))"
+                                                            : "none",
+                                                    }}
+                                                >
+                                                    {slice.imageUrl ? (
+                                                        <path
+                                                            d={slice.path}
+                                                            fill={`url(#${slice.patternId})`}
+                                                            style={{ transition: "all 220ms ease-in-out" }}
+                                                        />
+                                                    ) : null}
+                                                    <path
+                                                        d={slice.path}
+                                                        fill="#ffffff"
+                                                        opacity={isHovered ? overlayOpacity - 0.12 : overlayOpacity}
+                                                        style={{
+                                                            transition: "all 220ms ease-in-out",
+                                                        }}
+                                                    />
+                                                    <path
+                                                        d={slice.path}
+                                                        fill="none"
+                                                        stroke={
+                                                            isActive
+                                                                ? "rgba(17,48,27,0.96)"
+                                                                : isHovered
+                                                                  ? "rgba(17,48,27,0.6)"
+                                                                : "rgba(23,59,33,0.24)"
+                                                        }
+                                                        strokeWidth={isActive ? 2.8 : isHovered ? 2.2 : 1.35}
+                                                        style={{ transition: "all 220ms ease-in-out" }}
+                                                    />
+                                                    <text
+                                                        x={slice.labelPosition.x}
+                                                        y={slice.labelPosition.y + labelShiftY}
+                                                        textAnchor="middle"
+                                                        fill="#173b21"
+                                                        fontSize={isHovered ? labelFontSize + 0.4 : labelFontSize}
+                                                        fontWeight={isHovered ? "900" : "800"}
+                                                        style={{ pointerEvents: "none" }}
+                                                    >
+                                                        {slice.labelLines.map((line, lineIndex) => (
+                                                            <tspan
+                                                                key={`${slice.id}-line-${lineIndex}`}
+                                                                x={slice.labelPosition.x}
+                                                                dy={lineIndex === 0 ? 0 : 7.6}
+                                                            >
+                                                                {line}
+                                                            </tspan>
+                                                        ))}
+                                                    </text>
+                                                </g>
+                                            );
+                                        })}
+                                        <circle
+                                            cx="100"
+                                            cy="100"
+                                            r="34"
+                                            fill="rgba(255,255,255,0.95)"
+                                            stroke="rgba(31,111,74,0.2)"
+                                            strokeWidth="1.5"
+                                        />
+                                        <text
+                                            x="100"
+                                            y="95"
+                                            textAnchor="middle"
+                                            dominantBaseline="middle"
+                                            fill="#1f6f4a"
+                                            fontSize="9"
+                                            fontWeight="700"
+                                        >
+                                            {t("products.navigation.pieCenterTop")}
+                                        </text>
+                                        <text
+                                            x="100"
+                                            y="107"
+                                            textAnchor="middle"
+                                            dominantBaseline="middle"
+                                            fill="#1f6f4a"
+                                            fontSize="9"
+                                            fontWeight="700"
+                                        >
+                                            {t("products.navigation.pieCenterBottom")}
+                                        </text>
+                                    </Box>
+                                </Box>
+                            )}
                         </Stack>
                     </Container>
                 </Box>
@@ -332,16 +713,24 @@ export function Products() {
                     </Box>
                 ) : (
                     <Stack spacing={10}>
-                        {productsList.map(({ product, offerings: groupOfferings }) => {
-                            const heroImage = product.image;
-                            const isJapaneseProductGroup = isJapaneseProductsSection(product);
-                            const productMarketingTags = getProductMarketingTags(product);
+                            {productsList.map(({ product, offerings: groupOfferings }) => {
+                                const heroImage = product.image;
+                                const isJapaneseProductGroup = isJapaneseProductsSection(product);
+                                const productMarketingTags = getProductMarketingTags(product);
 
-                            return (
-                                <Box key={product.documentId}>
-                                    <Grid
-                                        container
-                                        spacing={{ xs: 4, md: 10 }}
+                                return (
+                                    <Box
+                                        key={product.documentId}
+                                        id={`product-section-${product.documentId}`}
+                                        data-product-id={product.documentId}
+                                        ref={(node: HTMLDivElement | null) => {
+                                            productSectionRefs.current[product.documentId] = node;
+                                        }}
+                                        sx={{ scrollMarginTop: { xs: 88, md: 110 } }}
+                                    >
+                                        <Grid
+                                            container
+                                            spacing={{ xs: 4, md: 10 }}
                                         sx={{ mb: 6 }}
                                         alignItems="center"
                                     >
@@ -634,30 +1023,252 @@ export function Products() {
                                     </Box>
                                     <Divider />
                                 </Box>
-                            );
-                        })}
+                                );
+                            })}
 
-                        {productsList.length === 0 && (
-                            <Box sx={{ py: 10, textAlign: "center" }}>
-                                <Typography variant="h5" fontWeight={900}>
-                                    {hasAnyAvailableOfferings
-                                        ? t("products.empty.noResultsTitle")
-                                        : t("products.empty.comingSoonTitle")}
-                                </Typography>
-                                {hasAnyAvailableOfferings ? (
-                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                        {t("products.empty.noResultsSubtitle")}
+                            {productsList.length === 0 && (
+                                <Box sx={{ py: 10, textAlign: "center" }}>
+                                    <Typography variant="h5" fontWeight={900}>
+                                        {hasAnyAvailableOfferings
+                                            ? t("products.empty.noResultsTitle")
+                                            : t("products.empty.comingSoonTitle")}
                                     </Typography>
-                                ) : (
-                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                        {t("products.empty.comingSoonSubtitle")}
-                                    </Typography>
-                                )}
-                            </Box>
-                        )}
+                                    {hasAnyAvailableOfferings ? (
+                                        <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                            {t("products.empty.noResultsSubtitle")}
+                                        </Typography>
+                                    ) : (
+                                        <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                            {t("products.empty.comingSoonSubtitle")}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            )}
                     </Stack>
                 )}
             </Container>
+
+            {showFloatingProductNav && productNavItems.length > 0 && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: { md: 96, lg: 118 },
+                        [isRtl ? "left" : "right"]: { md: 12, lg: 18 },
+                        zIndex: (theme) => theme.zIndex.speedDial,
+                        display: { xs: "none", md: "block" },
+                        width: { md: 76, lg: 84 },
+                        maxHeight: "70vh",
+                        overflowY: "auto",
+                        borderRadius: 2,
+                        p: 1,
+                        bgcolor: "rgba(255,255,255,0.96)",
+                        border: "1px solid rgba(31,111,74,0.18)",
+                        boxShadow: "0 16px 36px rgba(18,47,27,0.18)",
+                        backdropFilter: "blur(8px)",
+                    }}
+                >
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            display: "block",
+                            pb: 0.8,
+                            fontWeight: 700,
+                            color: "text.secondary",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.06em",
+                            textAlign: "center",
+                            fontSize: "0.58rem",
+                        }}
+                    >
+                        {t("products.navigation.floatingTitle", {
+                            defaultValue: "Products",
+                        })}
+                    </Typography>
+                    <Stack spacing={0.95} alignItems="center">
+                        {productNavItems.map((item) => {
+                            const isActive = activeProductId === item.id;
+                            return (
+                                <Stack
+                                    key={`floating-${item.id}`}
+                                    spacing={0.2}
+                                    alignItems="center"
+                                    sx={{
+                                        width: "100%",
+                                    }}
+                                >
+                                    <Button
+                                        size="small"
+                                        onClick={() => scrollToProductSection(item.id)}
+                                        title={item.name}
+                                        aria-label={item.name}
+                                        sx={{
+                                            p: 0,
+                                            minWidth: 0,
+                                            width: 44,
+                                            height: 44,
+                                            borderRadius: "50%",
+                                            border: "2px solid",
+                                            borderColor: isActive
+                                                ? "rgba(23,59,33,0.9)"
+                                                : "rgba(23,59,33,0.2)",
+                                            bgcolor: isActive
+                                                ? "rgba(31,111,74,0.08)"
+                                                : "rgba(255,255,255,0.9)",
+                                            boxShadow: isActive
+                                                ? "0 4px 12px rgba(23,59,33,0.2)"
+                                                : "none",
+                                            "&:hover": {
+                                                borderColor: "rgba(23,59,33,0.75)",
+                                                bgcolor: "rgba(31,111,74,0.08)",
+                                            },
+                                        }}
+                                    >
+                                        {item.imageUrl ? (
+                                            <Avatar
+                                                src={item.imageUrl}
+                                                alt={item.name}
+                                                sx={{
+                                                    width: 36,
+                                                    height: 36,
+                                                }}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: 36,
+                                                    height: 36,
+                                                    borderRadius: "50%",
+                                                    bgcolor: "rgba(31,111,74,0.16)",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        borderRadius: "50%",
+                                                        bgcolor: item.color,
+                                                    }}
+                                                />
+                                            </Box>
+                                        )}
+                                    </Button>
+                                </Stack>
+                            );
+                        })}
+                    </Stack>
+                </Box>
+            )}
+
+            {showFloatingProductNav && productNavItems.length > 0 && (
+                <>
+                    <Fab
+                        color="primary"
+                        aria-label={t("products.navigation.mobileFabAriaLabel", {
+                            defaultValue: "Open product quick navigation",
+                        })}
+                        onClick={() => setMobileProductNavOpen(true)}
+                        sx={{
+                            position: "fixed",
+                            bottom: 20,
+                            [isRtl ? "left" : "right"]: 16,
+                            zIndex: (theme) => theme.zIndex.modal,
+                            display: { xs: "inline-flex", md: "none" },
+                            boxShadow: "0 14px 30px rgba(18,47,27,0.3)",
+                        }}
+                    >
+                        <ViewListIcon />
+                    </Fab>
+
+                    <Drawer
+                        anchor="bottom"
+                        open={mobileProductNavOpen}
+                        onClose={() => setMobileProductNavOpen(false)}
+                        PaperProps={{
+                            sx: {
+                                borderTopLeftRadius: 18,
+                                borderTopRightRadius: 18,
+                                pb: "calc(16px + env(safe-area-inset-bottom))",
+                                px: 2,
+                                pt: 1.5,
+                                maxHeight: "75vh",
+                            },
+                        }}
+                        sx={{ display: { xs: "block", md: "none" } }}
+                    >
+                        <Stack spacing={1.5}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography variant="subtitle1" fontWeight={800}>
+                                    {t("products.navigation.mobileTitle", {
+                                        defaultValue: "Jump to Product",
+                                    })}
+                                </Typography>
+                                <IconButton
+                                    size="small"
+                                    aria-label={t("products.navigation.mobileCloseAriaLabel", {
+                                        defaultValue: "Close product navigation",
+                                    })}
+                                    onClick={() => setMobileProductNavOpen(false)}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Stack>
+                            <Stack spacing={1} sx={{ overflowY: "auto", pb: 0.5 }}>
+                                {productNavItems.map((item, index) => {
+                                    const isActive = activeProductId === item.id;
+                                    return (
+                                        <Button
+                                            key={`mobile-nav-${item.id}`}
+                                            variant={isActive ? "contained" : "outlined"}
+                                            onClick={() => {
+                                                scrollToProductSection(item.id);
+                                                setMobileProductNavOpen(false);
+                                            }}
+                                            sx={{
+                                                justifyContent: "flex-start",
+                                                textTransform: "none",
+                                                borderRadius: 2,
+                                                px: 1.5,
+                                                py: 1,
+                                                fontWeight: 700,
+                                                borderColor: "rgba(31,111,74,0.25)",
+                                                bgcolor: isActive ? item.color : "white",
+                                                color: isActive ? "white" : "text.primary",
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    width: 10,
+                                                    height: 10,
+                                                    borderRadius: "50%",
+                                                    bgcolor: item.color,
+                                                    mr: 1,
+                                                    flexShrink: 0,
+                                                    border: "1px solid rgba(0,0,0,0.12)",
+                                                }}
+                                            />
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    maxWidth: "100%",
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                                                {`${index + 1}. ${item.name}`}
+                                            </Typography>
+                                        </Button>
+                                    );
+                                })}
+                            </Stack>
+                        </Stack>
+                    </Drawer>
+                </>
+            )}
 
             {/* Product Summary Modal */}
             <Dialog
