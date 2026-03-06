@@ -180,18 +180,7 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
         let isActive = true;
 
         const loadWeather = async () => {
-            setWeather((prev) => {
-                const hasPreviousReadings =
-                    prev.temperatureC != null ||
-                    prev.weatherCode != null ||
-                    prev.windSpeedKmh != null;
-
-                // Keep background refresh silent to avoid visible flicker in the widget.
-                return {
-                    ...prev,
-                    isLoading: !hasPreviousReadings,
-                };
-            });
+            setWeather((prev) => ({ ...prev, isLoading: true, error: null }));
             try {
                 const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast");
                 weatherUrl.searchParams.set("latitude", String(firstSpecialSlide.weatherLatitude));
@@ -219,37 +208,24 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
 
                 if (!isActive) return;
 
-                setWeather((prev) => ({
+                setWeather({
                     isLoading: false,
                     temperatureC:
-                        typeof current?.temperature_2m === "number"
-                            ? current.temperature_2m
-                            : prev.temperatureC,
+                        typeof current?.temperature_2m === "number" ? current.temperature_2m : null,
                     weatherCode:
-                        typeof current?.weather_code === "number"
-                            ? current.weather_code
-                            : prev.weatherCode,
+                        typeof current?.weather_code === "number" ? current.weather_code : null,
                     windSpeedKmh:
-                        typeof current?.wind_speed_10m === "number"
-                            ? current.wind_speed_10m
-                            : prev.windSpeedKmh,
+                        typeof current?.wind_speed_10m === "number" ? current.wind_speed_10m : null,
                     error: null,
-                }));
+                });
             } catch {
                 if (!isActive) return;
-                setWeather((prev) => {
-                    const hasPreviousReadings =
-                        prev.temperatureC != null ||
-                        prev.weatherCode != null ||
-                        prev.windSpeedKmh != null;
-
-                    return {
-                        isLoading: false,
-                        temperatureC: hasPreviousReadings ? prev.temperatureC : null,
-                        weatherCode: hasPreviousReadings ? prev.weatherCode : null,
-                        windSpeedKmh: hasPreviousReadings ? prev.windSpeedKmh : null,
-                        error: "Weather unavailable",
-                    };
+                setWeather({
+                    isLoading: false,
+                    temperatureC: null,
+                    weatherCode: null,
+                    windSpeedKmh: null,
+                    error: "Weather unavailable",
                 });
             }
         };
@@ -350,17 +326,6 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                 month: "long",
                                 year: "numeric",
                             });
-                            const weatherConditionLabel =
-                                weather.weatherCode == null
-                                    ? weather.isLoading
-                                        ? "Loading weather..."
-                                        : "Weather unavailable"
-                                    : getWeatherLabel(weather.weatherCode);
-                            const weatherStatusMessage = weather.error
-                                ? weather.error
-                                : weather.isLoading
-                                  ? "Updating weather..."
-                                  : "\u00a0";
 
                             return (
                                 <SwiperSlide key={slide.id}>
@@ -483,7 +448,9 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                                     color: "rgba(23,59,33,0.88)",
                                                                 }}
                                                             >
-                                                                {weatherConditionLabel}
+                                                                {getWeatherLabel(
+                                                                    weather.weatherCode,
+                                                                )}
                                                             </Typography>
                                                             <Typography
                                                                 variant="body2"
@@ -496,17 +463,27 @@ export const HomeHero = ({ data }: HomeHeroProps) => {
                                                                     ? "--"
                                                                     : `${Math.round(weather.windSpeedKmh)} km/h`}
                                                             </Typography>
-                                                            <Typography
-                                                                variant="caption"
-                                                                sx={{
-                                                                    minHeight: "1.4em",
-                                                                    color: weather.error
-                                                                        ? "rgba(23,59,33,0.72)"
-                                                                        : "rgba(23,59,33,0.62)",
-                                                                }}
-                                                            >
-                                                                {weatherStatusMessage}
-                                                            </Typography>
+                                                            {weather.isLoading && (
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        color: "rgba(23,59,33,0.62)",
+                                                                    }}
+                                                                >
+                                                                    Updating weather...
+                                                                </Typography>
+                                                            )}
+                                                            {!weather.isLoading &&
+                                                                weather.error && (
+                                                                    <Typography
+                                                                        variant="caption"
+                                                                        sx={{
+                                                                            color: "rgba(23,59,33,0.72)",
+                                                                        }}
+                                                                    >
+                                                                        {weather.error}
+                                                                    </Typography>
+                                                                )}
                                                             {whatsappLink && (
                                                                 <Button
                                                                     variant="contained"
