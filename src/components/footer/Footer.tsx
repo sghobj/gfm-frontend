@@ -87,14 +87,6 @@ export function Footer() {
             return [{ label: link.label, href: link.href }];
         });
     }, [footer?.quickLinks]);
-    const legalLinks: FooterLink[] = useMemo(() => {
-        return (footer?.legalLinks ?? []).flatMap((link) => {
-            if (!link || !hasNonEmptyText(link.label) || !hasNonEmptyText(link.href)) {
-                return [];
-            }
-            return [{ label: link.label, href: link.href }];
-        });
-    }, [footer?.legalLinks]);
 
     const brandName = footer?.brandName ?? "";
     const brandDescription = footer?.brandDescription ?? "";
@@ -105,7 +97,7 @@ export function Footer() {
     const showBrandSection = hasAnyLocalizedContent(brandName, brandDescription);
     const showQuickLinksSection = quickLinks.length > 0;
     const showContactSection = hasAnyLocalizedContent(address, email);
-    const showBottomSection = hasNonEmptyText(copyrightText) || legalLinks.length > 0;
+    const showBottomSection = hasNonEmptyText(copyrightText);
     const hasDynamicFooterContent =
         showBrandSection || showQuickLinksSection || showContactSection || showBottomSection;
 
@@ -120,7 +112,6 @@ export function Footer() {
     const effectiveEmail = shouldUseFallback ? fallbackFooter.email : email;
     const effectiveMailtoHref = buildSafeMailtoHref(effectiveEmail);
     const effectiveQuickLinks = shouldUseFallback ? fallbackFooter.quickLinks : quickLinks;
-    const effectiveLegalLinks = shouldUseFallback ? fallbackFooter.legalLinks : legalLinks;
     const effectiveCopyrightText = shouldUseFallback ? fallbackFooter.copyrightText : copyrightText;
 
     const showEffectiveBrandSection = hasAnyLocalizedContent(
@@ -130,7 +121,7 @@ export function Footer() {
     const showEffectiveQuickLinksSection = effectiveQuickLinks.length > 0;
     const showEffectiveContactSection = hasAnyLocalizedContent(effectiveAddress, effectiveEmail);
     const showEffectiveBottomSection =
-        hasNonEmptyText(effectiveCopyrightText) || effectiveLegalLinks.length > 0;
+        hasNonEmptyText(effectiveCopyrightText);
     const hasRenderableFooter =
         showEffectiveBrandSection ||
         showEffectiveQuickLinksSection ||
@@ -254,7 +245,7 @@ export function Footer() {
                     </Grid>
 
                     <Box
-                         sx={{
+                        sx={{
                             mt: { xs: 4, md: 5 },
                             pt: { xs: 3, md: 4 },
                             borderTop: "1px solid",

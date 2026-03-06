@@ -471,7 +471,11 @@ export function Products() {
                                 </Stack>
 
                                 <Stack spacing={3}>
-                                    <Stack direction={{ xs: "column", md: "row" }} useFlexGap gap={2}>
+                                    <Stack
+                                        direction={{ xs: "column", md: "row" }}
+                                        useFlexGap
+                                        gap={2}
+                                    >
                                         <TextField
                                             size="small"
                                             placeholder={t("products.filters.searchPlaceholder")}
@@ -515,7 +519,10 @@ export function Products() {
                                             ))}
                                         </TextField>
                                     </Stack>
-                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: "rgba(255,255,255,0.9)" }}
+                                    >
                                         {t("products.navigation.subtitle")}
                                     </Typography>
                                 </Stack>
@@ -572,8 +579,7 @@ export function Products() {
                                             const isHovered = hoveredProductId === slice.id;
                                             const labelShiftY =
                                                 slice.labelLines.length > 1 ? -3.5 : 0;
-                                            const labelFontSize =
-                                                pieSlices.length > 6 ? 6.4 : 7.2;
+                                            const labelFontSize = pieSlices.length > 6 ? 6.4 : 7.2;
                                             const overlayOpacity = slice.imageUrl ? 0.55 : 0.9;
                                             const hoverRadians =
                                                 ((slice.middleAngle - 90) * Math.PI) / 180;
@@ -607,13 +613,19 @@ export function Products() {
                                                         <path
                                                             d={slice.path}
                                                             fill={`url(#${slice.patternId})`}
-                                                            style={{ transition: "all 220ms ease-in-out" }}
+                                                            style={{
+                                                                transition: "all 220ms ease-in-out",
+                                                            }}
                                                         />
                                                     ) : null}
                                                     <path
                                                         d={slice.path}
                                                         fill="#ffffff"
-                                                        opacity={isHovered ? overlayOpacity - 0.12 : overlayOpacity}
+                                                        opacity={
+                                                            isHovered
+                                                                ? overlayOpacity - 0.12
+                                                                : overlayOpacity
+                                                        }
                                                         style={{
                                                             transition: "all 220ms ease-in-out",
                                                         }}
@@ -626,17 +638,25 @@ export function Products() {
                                                                 ? "rgba(17,48,27,0.96)"
                                                                 : isHovered
                                                                   ? "rgba(17,48,27,0.6)"
-                                                                : "rgba(23,59,33,0.24)"
+                                                                  : "rgba(23,59,33,0.24)"
                                                         }
-                                                        strokeWidth={isActive ? 2.8 : isHovered ? 2.2 : 1.35}
-                                                        style={{ transition: "all 220ms ease-in-out" }}
+                                                        strokeWidth={
+                                                            isActive ? 2.8 : isHovered ? 2.2 : 1.35
+                                                        }
+                                                        style={{
+                                                            transition: "all 220ms ease-in-out",
+                                                        }}
                                                     />
                                                     <text
                                                         x={slice.labelPosition.x}
                                                         y={slice.labelPosition.y + labelShiftY}
                                                         textAnchor="middle"
                                                         fill="#173b21"
-                                                        fontSize={isHovered ? labelFontSize + 0.4 : labelFontSize}
+                                                        fontSize={
+                                                            isHovered
+                                                                ? labelFontSize + 0.4
+                                                                : labelFontSize
+                                                        }
                                                         fontWeight={isHovered ? "900" : "800"}
                                                         style={{ pointerEvents: "none" }}
                                                     >
@@ -713,24 +733,24 @@ export function Products() {
                     </Box>
                 ) : (
                     <Stack spacing={10}>
-                            {productsList.map(({ product, offerings: groupOfferings }) => {
-                                const heroImage = product.image;
-                                const isJapaneseProductGroup = isJapaneseProductsSection(product);
-                                const productMarketingTags = getProductMarketingTags(product);
+                        {productsList.map(({ product, offerings: groupOfferings }) => {
+                            const heroImage = product.image;
+                            const isJapaneseProductGroup = isJapaneseProductsSection(product);
+                            const productMarketingTags = getProductMarketingTags(product);
 
-                                return (
-                                    <Box
-                                        key={product.documentId}
-                                        id={`product-section-${product.documentId}`}
-                                        data-product-id={product.documentId}
-                                        ref={(node: HTMLDivElement | null) => {
-                                            productSectionRefs.current[product.documentId] = node;
-                                        }}
-                                        sx={{ scrollMarginTop: { xs: 88, md: 110 } }}
-                                    >
-                                        <Grid
-                                            container
-                                            spacing={{ xs: 4, md: 10 }}
+                            return (
+                                <Box
+                                    key={product.documentId}
+                                    id={`product-section-${product.documentId}`}
+                                    data-product-id={product.documentId}
+                                    ref={(node: HTMLDivElement | null) => {
+                                        productSectionRefs.current[product.documentId] = node;
+                                    }}
+                                    sx={{ scrollMarginTop: { xs: 88, md: 110 } }}
+                                >
+                                    <Grid
+                                        container
+                                        spacing={{ xs: 4, md: 10 }}
                                         sx={{ mb: 6 }}
                                         alignItems="center"
                                     >
@@ -1069,27 +1089,27 @@ export function Products() {
                                     </Box>
                                     <Divider />
                                 </Box>
-                                );
-                            })}
+                            );
+                        })}
 
-                            {productsList.length === 0 && (
-                                <Box sx={{ py: 10, textAlign: "center" }}>
-                                    <Typography variant="h5" fontWeight={900}>
-                                        {hasAnyAvailableOfferings
-                                            ? t("products.empty.noResultsTitle")
-                                            : t("products.empty.comingSoonTitle")}
+                        {productsList.length === 0 && (
+                            <Box sx={{ py: 10, textAlign: "center" }}>
+                                <Typography variant="h5" fontWeight={900}>
+                                    {hasAnyAvailableOfferings
+                                        ? t("products.empty.noResultsTitle")
+                                        : t("products.empty.comingSoonTitle")}
+                                </Typography>
+                                {hasAnyAvailableOfferings ? (
+                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                        {t("products.empty.noResultsSubtitle")}
                                     </Typography>
-                                    {hasAnyAvailableOfferings ? (
-                                        <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                            {t("products.empty.noResultsSubtitle")}
-                                        </Typography>
-                                    ) : (
-                                        <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                            {t("products.empty.comingSoonSubtitle")}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
+                                ) : (
+                                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                        {t("products.empty.comingSoonSubtitle")}
+                                    </Typography>
+                                )}
+                            </Box>
+                        )}
                     </Stack>
                 )}
             </Container>
@@ -1245,7 +1265,11 @@ export function Products() {
                         sx={{ display: { xs: "block", md: "none" } }}
                     >
                         <Stack spacing={1.5}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
                                 <Typography variant="subtitle1" fontWeight={800}>
                                     {t("products.navigation.mobileTitle", {
                                         defaultValue: "Jump to Product",

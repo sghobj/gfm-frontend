@@ -6,7 +6,7 @@ type LogoProps = {
     width?: number | string;
 };
 
-const FALLBACK_NAV_LOGO_URL =
+export const FALLBACK_NAV_LOGO_URL =
     "https://res.cloudinary.com/ds8bdxtzs/image/upload/v1772346627/gfm/large_shear_mzaj_alghdhae_aljyd_879b4f3f61.png";
 
 export const Logo = ({ width }: LogoProps) => {
