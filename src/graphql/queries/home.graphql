@@ -32,6 +32,7 @@ query GetHomeData($locale: I18NLocaleCode) {
             }
         }
         hero {
+            variant
             ctaPrimary
             ctaSecondary
             description
@@ -40,10 +41,18 @@ query GetHomeData($locale: I18NLocaleCode) {
                 alternativeText
                 url
             }
+            logoImage {
+                alternativeText
+                url
+            }
             primaryLink
             secondaryLink
             subtitle
             title
+            weatherCity
+            weatherLatitude
+            weatherLongitude
+            weatherTimezone
         }
         map {
             description

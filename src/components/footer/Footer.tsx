@@ -7,11 +7,7 @@ import {
     Typography,
     Link as MuiLink,
     Divider,
-    IconButton,
 } from "@mui/material";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import XIcon from "@mui/icons-material/X";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import { useQuery } from "@apollo/client/react";
@@ -25,6 +21,8 @@ import {
     hasNonEmptyText,
     isContentForLocale,
 } from "../../utils/localizedContent";
+import { useContactLinks } from "../../providers/ContactLinksProvider";
+import { buildSafeMailtoHref, normalizeEmailRecipient } from "../../utils/contactLinks";
 
 type FooterLink = {
     label: string;
@@ -70,6 +68,7 @@ const buildFallbackFooter = (
 
 export function Footer() {
     const { t, i18n } = useTranslation("common");
+    const { infoEmail } = useContactLinks();
     const locale = toStrapiLocale(i18n.resolvedLanguage ?? i18n.language ?? "en");
     const activeLocale = locale as "en" | "ar";
     const { data, loading } = useQuery(FooterDocument, {
@@ -100,7 +99,7 @@ export function Footer() {
     const brandName = footer?.brandName ?? "";
     const brandDescription = footer?.brandDescription ?? "";
     const address = footer?.address ?? "";
-    const email = footer?.email ?? "";
+    const email = normalizeEmailRecipient(footer?.email) ?? infoEmail ?? "";
     const copyrightText = footer?.copyrightText ?? "";
 
     const showBrandSection = hasAnyLocalizedContent(brandName, brandDescription);
@@ -119,6 +118,7 @@ export function Footer() {
         : brandDescription;
     const effectiveAddress = shouldUseFallback ? fallbackFooter.address : address;
     const effectiveEmail = shouldUseFallback ? fallbackFooter.email : email;
+    const effectiveMailtoHref = buildSafeMailtoHref(effectiveEmail);
     const effectiveQuickLinks = shouldUseFallback ? fallbackFooter.quickLinks : quickLinks;
     const effectiveLegalLinks = shouldUseFallback ? fallbackFooter.legalLinks : legalLinks;
     const effectiveCopyrightText = shouldUseFallback ? fallbackFooter.copyrightText : copyrightText;
@@ -149,7 +149,8 @@ export function Footer() {
                     sx={{
                         maxWidth: "1440px",
                         px: { xs: 2, sm: 4, md: 6 },
-                        py: { xs: 6, md: 8 },
+                        pt: { xs: 6, md: 8 },
+                        pb: { xs: 2, md: 3 },
                     }}
                 >
                     <Grid container spacing={4}>
@@ -168,41 +169,6 @@ export function Footer() {
                                     >
                                         {effectiveBrandDescription}
                                     </Typography>
-
-                                    <Stack direction="row" useFlexGap gap={1}>
-                                        <IconButton
-                                            aria-label="LinkedIn"
-                                            size="small"
-                                            component="a"
-                                            href="https://www.linkedin.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <LinkedInIcon fontSize="small" />
-                                        </IconButton>
-
-                                        <IconButton
-                                            aria-label="Instagram"
-                                            size="small"
-                                            component="a"
-                                            href="https://www.instagram.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <InstagramIcon fontSize="small" />
-                                        </IconButton>
-
-                                        <IconButton
-                                            aria-label="X"
-                                            size="small"
-                                            component="a"
-                                            href="https://x.com/"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <XIcon fontSize="small" />
-                                        </IconButton>
-                                    </Stack>
                                 </Stack>
                             </Grid>
                         )}
@@ -261,33 +227,34 @@ export function Footer() {
                                         </Stack>
                                     )}
 
-                                    {hasNonEmptyText(effectiveEmail) && (
-                                        <Stack
-                                            direction="row"
-                                            useFlexGap
-                                            gap={1}
-                                            alignItems="center"
-                                        >
-                                            <EmailOutlinedIcon
-                                                fontSize="small"
-                                                sx={{ opacity: 0.8 }}
-                                            />
-                                            <MuiLink
-                                                href={`mailto:${effectiveEmail}`}
-                                                underline="hover"
-                                                sx={{ color: "text.primary", opacity: 0.85 }}
+                                    {hasNonEmptyText(effectiveEmail) &&
+                                        hasNonEmptyText(effectiveMailtoHref) && (
+                                            <Stack
+                                                direction="row"
+                                                useFlexGap
+                                                gap={1}
+                                                alignItems="center"
                                             >
-                                                {effectiveEmail}
-                                            </MuiLink>
-                                        </Stack>
-                                    )}
+                                                <EmailOutlinedIcon
+                                                    fontSize="small"
+                                                    sx={{ opacity: 0.8 }}
+                                                />
+                                                <MuiLink
+                                                    href={effectiveMailtoHref}
+                                                    underline="hover"
+                                                    sx={{ color: "text.primary", opacity: 0.85 }}
+                                                >
+                                                    {effectiveEmail}
+                                                </MuiLink>
+                                            </Stack>
+                                        )}
                                 </Stack>
                             </Grid>
                         )}
                     </Grid>
 
                     <Box
-                        sx={{
+                         sx={{
                             mt: { xs: 4, md: 5 },
                             pt: { xs: 3, md: 4 },
                             borderTop: "1px solid",

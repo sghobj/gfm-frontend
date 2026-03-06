@@ -29,6 +29,8 @@ import {
     type PackagingApproxInput,
 } from "../../utils/packagingMath";
 import { upsertSubscriberCustomer } from "../../services/subscription/upsertSubscriberCustomer";
+import { useContactLinks } from "../../providers/ContactLinksProvider";
+import { buildSafeMailtoLink, buildSafeWhatsAppLink } from "../../utils/contactLinks";
 
 type Offering = NonNullable<GetOfferingQuery["offering"]>;
 
@@ -96,6 +98,7 @@ export const ProductInquiryModal: React.FC<ProductOrderModalProps> = ({
 }) => {
     const client = useApolloClient();
     const { t } = useTranslation("common");
+    const { salesEmail, whatsappNumber } = useContactLinks();
     const specs = useMemo(() => {
         const raw = offering.dateSpecifications ?? [];
         return raw.filter((s): s is DateSpec => Boolean(s));
@@ -312,7 +315,12 @@ Email: ${data.email}
 Message:
 ${data.message}`;
 
-        const mailtoUrl = `mailto:sales@gfm.jo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = buildSafeMailtoLink(salesEmail, subject, body);
+        if (!mailtoUrl) {
+            console.error("Invalid sales email configuration. Inquiry email action was blocked.");
+            return;
+        }
+
         window.location.assign(mailtoUrl);
         onClose();
     };
@@ -351,7 +359,13 @@ ${isDatesFlow ? `*Grade:* ${data.grade}\n*Size:* ${data.size}\n` : ""}*Packaging
 *Message:*
 ${data.message}`;
 
-        window.open(`https://wa.me/962779500599?text=${encodeURIComponent(text)}`, "_blank");
+        const whatsappUrl = buildSafeWhatsAppLink(whatsappNumber, text);
+        if (!whatsappUrl) {
+            console.error("Invalid WhatsApp configuration. Inquiry WhatsApp action was blocked.");
+            return;
+        }
+
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
         onClose();
     };
 

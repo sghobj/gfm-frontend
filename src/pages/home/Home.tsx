@@ -45,19 +45,29 @@ export const Home = () => {
     const qualityMarketing = homepage?.qualityMarketing;
     const mapSection = homepage?.map;
 
-    const hasHeroSection =
-        (homepage?.hero ?? []).filter(
-            (slide) =>
-                !!slide &&
-                hasNonEmptyText(slide.title) &&
-                hasNonEmptyText(slide.subtitle) &&
-                hasNonEmptyText(slide.description) &&
-                hasNonEmptyText(slide.ctaPrimary) &&
-                hasNonEmptyText(slide.ctaSecondary) &&
-                hasNonEmptyText(slide.primaryLink) &&
-                hasNonEmptyText(slide.secondaryLink) &&
-                hasNonEmptyText(slide.image?.url),
-        ).length > 0;
+    const hasRenderableHeroSlide = (
+        slide: NonNullable<NonNullable<typeof homepage>["hero"]>[number],
+    ) => {
+        if (!slide) return false;
+
+        const variant = slide.variant ?? "default";
+        if (variant === "logo_weather") {
+            return hasNonEmptyText(slide.logoImage?.url) || hasNonEmptyText(slide.image?.url);
+        }
+
+        return (
+            hasNonEmptyText(slide.title) &&
+            hasNonEmptyText(slide.subtitle) &&
+            hasNonEmptyText(slide.description) &&
+            hasNonEmptyText(slide.ctaPrimary) &&
+            hasNonEmptyText(slide.ctaSecondary) &&
+            hasNonEmptyText(slide.primaryLink) &&
+            hasNonEmptyText(slide.secondaryLink) &&
+            hasNonEmptyText(slide.image?.url)
+        );
+    };
+
+    const hasHeroSection = (homepage?.hero ?? []).filter(hasRenderableHeroSlide).length > 0;
 
     const qualityPoints =
         qualityMarketing?.points?.filter(

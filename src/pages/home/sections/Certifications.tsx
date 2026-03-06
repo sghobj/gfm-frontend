@@ -159,8 +159,8 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                                             flexDirection: "column",
                                                             alignItems: "center",
                                                             justifyContent: "center",
-                                                            p: { xs: 1.75, md: 2 },
-                                                            minHeight: { xs: 138, md: 168 },
+                                                            p: { xs: 2.25, md: 2.75 },
+                                                            minHeight: { xs: 172, md: 212 },
                                                             borderRadius: 2.5,
                                                             cursor: "pointer",
                                                             transition: "all 0.3s ease",
@@ -187,8 +187,8 @@ export const Certifications = ({ certificates }: CertificationsProps) => {
                                                             loading="lazy"
                                                             sx={{
                                                                 width: "100%",
-                                                                maxWidth: 210,
-                                                                height: { xs: 74, md: 90 },
+                                                                maxWidth: 260,
+                                                                height: { xs: 108, md: 132 },
                                                                 objectFit: "contain",
                                                                 filter: "grayscale(18%)",
                                                                 opacity: 0.9,

@@ -13,13 +13,16 @@ import "@fontsource/roboto/700.css";
 import { apolloClient } from "./apollo/apolloClient.ts";
 import { AdminAuthProvider } from "./auth/AdminAuthProvider";
 import { AppShell } from "./AppShell";
+import { ContactLinksProvider } from "./providers/ContactLinksProvider";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
             <ApolloProvider client={apolloClient}>
                 <AdminAuthProvider>
-                    <AppShell />
+                    <ContactLinksProvider>
+                        <AppShell />
+                    </ContactLinksProvider>
                 </AdminAuthProvider>
             </ApolloProvider>
         </BrowserRouter>
