@@ -28,6 +28,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LoadingState } from "../../components/state/LoadingState";
 import { toStrapiLocale } from "../../apollo/apolloClient.ts";
 import { isContentForLocale } from "../../utils/localizedContent.ts";
+import { MarketingTagChip } from "../../components/product/MarketingTagChip";
 
 function initials(name: string) {
     return name
@@ -36,6 +37,45 @@ function initials(name: string) {
         .slice(0, 2)
         .map((w) => w[0]?.toUpperCase())
         .join("");
+}
+
+function getProductMarketingTags(
+    product:
+        | {
+              documentId: string;
+              marketing_tags?: Array<{
+                  documentId: string;
+                  label?: string | null;
+                  iconName?: string | null;
+                  color?: string | null;
+              } | null> | null;
+          }
+        | null
+        | undefined,
+) {
+    if (!product?.marketing_tags) return [];
+
+    const tags: Array<{
+        id: string;
+        label: string;
+        iconName: string | null;
+        color: string | null;
+    }> = [];
+    for (let index = 0; index < product.marketing_tags.length; index++) {
+        const tag = product.marketing_tags[index];
+        if (!tag) continue;
+        const label = tag.label?.trim();
+        if (!label) continue;
+
+        tags.push({
+            id: tag.documentId ?? `${product.documentId}-tag-${index}`,
+            label,
+            iconName: tag.iconName?.trim() || null,
+            color: tag.color?.trim() || null,
+        });
+    }
+
+    return tags;
 }
 
 export const ProductDetails = () => {
@@ -67,6 +107,10 @@ export const ProductDetails = () => {
         }
         return list;
     }, [offering]);
+    const marketingTags = useMemo(
+        () => getProductMarketingTags(offering?.product),
+        [offering?.product],
+    );
 
     const [activeImg, setActiveImg] = useState<(typeof images)[number] | null>(null);
     const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -298,6 +342,24 @@ export const ProductDetails = () => {
                                                 >
                                                     {offering.product?.category?.name}
                                                 </Typography>
+                                                {marketingTags.length > 0 && (
+                                                    <Stack
+                                                        direction="row"
+                                                        useFlexGap
+                                                        gap={1}
+                                                        flexWrap="wrap"
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        {marketingTags.map((tag) => (
+                                                            <MarketingTagChip
+                                                                key={tag.id}
+                                                                label={tag.label}
+                                                                iconName={tag.iconName}
+                                                                backgroundColor={tag.color}
+                                                            />
+                                                        ))}
+                                                    </Stack>
+                                                )}
                                             </Box>
 
                                             <Divider />

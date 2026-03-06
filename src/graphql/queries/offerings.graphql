@@ -1,6 +1,7 @@
 query GetAllOfferings($locale: I18NLocaleCode) {
     offerings(locale: $locale) {
         documentId
+        variantLabel
         locale
         availability
         isMedjoolDate
@@ -28,8 +29,15 @@ query GetAllOfferings($locale: I18NLocaleCode) {
         product {
             documentId
             locale
+            slug
             name
             description
+            marketing_tags {
+                documentId
+                label
+                iconName
+                color
+            }
             category {
                 name
                 documentId
@@ -70,6 +78,7 @@ query GetAllOfferings($locale: I18NLocaleCode) {
 query GetOffering($id: ID!, $locale: I18NLocaleCode) {
     offering(documentId: $id, locale: $locale) {
         documentId
+        variantLabel
         locale
         availability
         isMedjoolDate
@@ -98,8 +107,15 @@ query GetOffering($id: ID!, $locale: I18NLocaleCode) {
         product {
             documentId
             locale
+            slug
             name
             description
+            marketing_tags {
+                documentId
+                label
+                iconName
+                color
+            }
             category {
                 name
             }

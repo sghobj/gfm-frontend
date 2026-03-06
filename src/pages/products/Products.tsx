@@ -34,6 +34,7 @@ import { SectionSubtitle, SectionTitle } from "../../components/typography/Secti
 import { LoadingState } from "../../components/state/LoadingState";
 import { toStrapiLocale } from "../../apollo/apolloClient.ts";
 import { isContentForLocale } from "../../utils/localizedContent.ts";
+import { MarketingTagChip } from "../../components/product/MarketingTagChip";
 
 // ----------------------------
 // GraphQL Query
@@ -51,6 +52,9 @@ type ProductGroup = {
     offerings: GQLOffering[];
 };
 
+const JAPANESE_PRODUCTS_SLUG = "japanese-products";
+const MAX_PACK_TAGS_PER_CARD = 6;
+
 // ---------- UI helpers ----------
 function uniq<T>(arr: T[]) {
     return Array.from(new Set(arr));
@@ -62,6 +66,89 @@ function initials(name: string) {
         .slice(0, 2)
         .map((w) => w[0]?.toUpperCase())
         .join("");
+}
+
+function getOptionalVariantLabel(offering: GQLOffering): string | null {
+    const maybeVariantLabel = (offering as GQLOffering & { variantLabel?: string | null })
+        .variantLabel;
+
+    if (typeof maybeVariantLabel !== "string") return null;
+    const trimmed = maybeVariantLabel.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
+function isJapaneseProductsSection(product: GQLProduct): boolean {
+    const maybeSlug = (product as GQLProduct & { slug?: string | null }).slug;
+    return maybeSlug === JAPANESE_PRODUCTS_SLUG;
+}
+
+function formatPackOptionLabel(option: {
+    displayLabel?: string | null;
+    amount?: number | null;
+    amountMin?: number | null;
+    amountMax?: number | null;
+    unit?: string | null;
+}): string | null {
+    const displayLabel = option.displayLabel?.trim();
+    if (displayLabel) return displayLabel;
+
+    if (option.amountMin != null && option.amountMax != null) {
+        return `${option.amountMin}-${option.amountMax} ${option.unit ?? ""}`.trim();
+    }
+
+    if (option.amount != null) {
+        return `${option.amount} ${option.unit ?? ""}`.trim();
+    }
+
+    return null;
+}
+
+function getOfferingPackOptionLabels(offering: GQLOffering): string[] {
+    const labels = new Set<string>();
+
+    for (const packOption of offering.pack_options ?? []) {
+        if (!packOption) continue;
+        const label = formatPackOptionLabel(packOption);
+        if (label) labels.add(label);
+    }
+
+    for (const dateSpec of offering.dateSpecifications ?? []) {
+        if (!dateSpec) continue;
+        for (const packOption of dateSpec.pack_options ?? []) {
+            if (!packOption) continue;
+            const label = formatPackOptionLabel(packOption);
+            if (label) labels.add(label);
+        }
+    }
+
+    return Array.from(labels);
+}
+
+function getProductMarketingTags(
+    product: GQLProduct,
+): Array<{ id: string; label: string; iconName: string | null; color: string | null }> {
+    const tags = product.marketing_tags ?? [];
+    const normalized: Array<{
+        id: string;
+        label: string;
+        iconName: string | null;
+        color: string | null;
+    }> = [];
+
+    for (let index = 0; index < tags.length; index++) {
+        const tag = tags[index];
+        if (!tag) continue;
+        const label = tag.label?.trim();
+        if (!label) continue;
+        normalized.push({
+            id: tag.documentId ?? `${product.documentId}-tag-${index}`,
+            label,
+            iconName: tag.iconName?.trim() || null,
+            color: tag.color?.trim() || null,
+        });
+    }
+
+    return normalized;
 }
 
 // ---------- Component ----------
@@ -117,9 +204,11 @@ export function Products() {
 
         // Filter offerings first
         const filtered = offerings.filter((o) => {
+            const variantLabel = getOptionalVariantLabel(o);
             const matchesSearch =
                 o.product!.name.toLowerCase().includes(term) ||
-                o.brand!.name.toLowerCase().includes(term);
+                o.brand!.name.toLowerCase().includes(term) ||
+                (variantLabel ? variantLabel.toLowerCase().includes(term) : false);
 
             const matchesBrand =
                 brandFilter === "all" || (o.brand!.slug || "unknown") === brandFilter;
@@ -245,6 +334,8 @@ export function Products() {
                     <Stack spacing={10}>
                         {productsList.map(({ product, offerings: groupOfferings }) => {
                             const heroImage = product.image;
+                            const isJapaneseProductGroup = isJapaneseProductsSection(product);
+                            const productMarketingTags = getProductMarketingTags(product);
 
                             return (
                                 <Box key={product.documentId}>
@@ -299,6 +390,24 @@ export function Products() {
                                                     >
                                                         {product.name}
                                                     </Typography>
+                                                    {productMarketingTags.length > 0 && (
+                                                        <Stack
+                                                            direction="row"
+                                                            useFlexGap
+                                                            gap={1}
+                                                            flexWrap="wrap"
+                                                            sx={{ mt: 1 }}
+                                                        >
+                                                            {productMarketingTags.map((tag) => (
+                                                                <MarketingTagChip
+                                                                    key={tag.id}
+                                                                    label={tag.label}
+                                                                    iconName={tag.iconName}
+                                                                    backgroundColor={tag.color}
+                                                                />
+                                                            ))}
+                                                        </Stack>
+                                                    )}
                                                 </Stack>
                                                 {product.description ? (
                                                     <BlocksTypography
@@ -332,6 +441,17 @@ export function Products() {
                                         {groupOfferings.map((o) => {
                                             const brand = o.brand!;
                                             const logo = brand.logo?.url;
+                                            const packOptionLabels = getOfferingPackOptionLabels(o);
+                                            const visiblePackOptionLabels = packOptionLabels.slice(
+                                                0,
+                                                MAX_PACK_TAGS_PER_CARD,
+                                            );
+                                            const hasMorePackOptions =
+                                                packOptionLabels.length >
+                                                visiblePackOptionLabels.length;
+                                            const variantLabel = getOptionalVariantLabel(o);
+                                            const shouldShowVariantBadge =
+                                                isJapaneseProductGroup && Boolean(variantLabel);
 
                                             return (
                                                 <Box
@@ -430,23 +550,64 @@ export function Products() {
                                                                 </Box>
                                                             </Stack>
 
-                                                            {o.product?.description && (
-                                                                <BlocksTypography
-                                                                    content={
-                                                                        o.product
-                                                                            ?.description as BlocksContent
-                                                                    }
-                                                                    paragraphSx={{
+                                                            {shouldShowVariantBadge && (
+                                                                <Chip
+                                                                    label={variantLabel}
+                                                                    size="small"
+                                                                    color="primary"
+                                                                    sx={{
                                                                         mt: 1,
-                                                                        fontSize: "0.85rem",
-                                                                        lineHeight: 1.4,
-                                                                        color: "text.secondary",
-                                                                        display: "-webkit-box",
-                                                                        WebkitLineClamp: 2,
-                                                                        WebkitBoxOrient: "vertical",
-                                                                        overflow: "hidden",
+                                                                        fontWeight: 700,
+                                                                        borderRadius: 1.5,
+                                                                        width: "fit-content",
                                                                     }}
                                                                 />
+                                                            )}
+
+                                                            {visiblePackOptionLabels.length > 0 ? (
+                                                                <Stack
+                                                                    direction="row"
+                                                                    useFlexGap
+                                                                    gap={0.75}
+                                                                    flexWrap="wrap"
+                                                                    sx={{ mt: 1 }}
+                                                                >
+                                                                    {visiblePackOptionLabels.map(
+                                                                        (label, idx) => (
+                                                                            <Chip
+                                                                                key={`${o.documentId}-pack-${idx}`}
+                                                                                label={label}
+                                                                                size="small"
+                                                                                variant="outlined"
+                                                                                sx={{
+                                                                                    fontWeight: 600,
+                                                                                    borderRadius: 1.5,
+                                                                                }}
+                                                                            />
+                                                                        ),
+                                                                    )}
+                                                                    {hasMorePackOptions && (
+                                                                        <Chip
+                                                                            label={`+${packOptionLabels.length - visiblePackOptionLabels.length}`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                borderRadius: 1.5,
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </Stack>
+                                                            ) : (
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    color="text.secondary"
+                                                                    sx={{ mt: 1, display: "block" }}
+                                                                >
+                                                                    {t(
+                                                                        "products.modal.contactPackaging",
+                                                                    )}
+                                                                </Typography>
                                                             )}
 
                                                             <Typography

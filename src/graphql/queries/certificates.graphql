@@ -15,6 +15,7 @@ query Certificates($locale: I18NLocaleCode) {
         documentId
         locale
         description
+        validation_link
         logo {
             alternativeText
             caption

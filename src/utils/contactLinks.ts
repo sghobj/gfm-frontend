@@ -37,7 +37,10 @@ export function normalizeWhatsAppNumber(rawValue: string | null | undefined): st
     const trimmed = rawValue.trim();
     if (!trimmed) return null;
 
-    if (trimmed.toLowerCase().startsWith("http://") || trimmed.toLowerCase().startsWith("https://")) {
+    if (
+        trimmed.toLowerCase().startsWith("http://") ||
+        trimmed.toLowerCase().startsWith("https://")
+    ) {
         try {
             const url = new URL(trimmed);
             const host = url.hostname.toLowerCase();

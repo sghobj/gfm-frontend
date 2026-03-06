@@ -89,8 +89,6 @@ export const LocationMap = () => {
     const { infoEmail, whatsappNumber, whatsappLink } = useContactLinks();
 
     const phoneValue = "+962 (6) 465-0000";
-    const emailValue = infoEmail ?? "hello@organicjordanian.com";
-    const whatsappValue = whatsappNumber ? `+${whatsappNumber}` : "+962 77 000000";
 
     return (
         <Box component="section">
@@ -122,24 +120,28 @@ export const LocationMap = () => {
                             }}
                         >
                             <Stack spacing={2}>
-                                <InfoRow
-                                    icon={<EmailIcon fontSize="small" />}
-                                    label={t("contactPage.location.emailLabel")}
-                                    value={emailValue}
-                                    infoLink={buildSafeMailtoHref(emailValue)}
-                                />
+                                {infoEmail && (
+                                    <InfoRow
+                                        icon={<EmailIcon fontSize="small" />}
+                                        label={t("contactPage.location.emailLabel")}
+                                        value={infoEmail}
+                                        infoLink={buildSafeMailtoHref(infoEmail)}
+                                    />
+                                )}
                                 <InfoRow
                                     icon={<PhoneIcon fontSize="small" />}
                                     label={t("contactPage.location.phoneLabel")}
                                     value={phoneValue}
                                     infoLink={buildPhoneHref(phoneValue)}
                                 />
-                                <InfoRow
-                                    icon={<WhatsAppIcon fontSize={"small"} />}
-                                    label={t("inquiryModal.actions.whatsapp")}
-                                    value={whatsappValue}
-                                    infoLink={whatsappLink}
-                                />
+                                {whatsappNumber && (
+                                    <InfoRow
+                                        icon={<WhatsAppIcon fontSize={"small"} />}
+                                        label={t("inquiryModal.actions.whatsapp")}
+                                        value={whatsappNumber}
+                                        infoLink={whatsappLink}
+                                    />
+                                )}
                                 <InfoRow
                                     icon={<LocationOnIcon fontSize="small" />}
                                     label={t("contactPage.location.officeLabel")}

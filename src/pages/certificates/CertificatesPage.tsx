@@ -276,27 +276,30 @@ export function CertificatesPage() {
                                                             {t("certificates.actions.auditReport")}
                                                         </Button>
                                                     )}
-                                                    {/* Validation link placeholder - using a generic URL or if a field exists in future */}
-                                                    <Button
-                                                        variant="text"
-                                                        size="large"
-                                                        startIcon={<VerifiedIcon />}
-                                                        component="a"
-                                                        href="#" // To be updated when validation URLs are available
-                                                        target="_blank"
-                                                        sx={{
-                                                            borderRadius: 2,
-                                                            fontWeight: 700,
-                                                            py: 1.5,
-                                                            px: 3,
-                                                            color: "text.secondary",
-                                                            "&:hover": { color: "primary.main" },
-                                                        }}
-                                                    >
-                                                        {t(
-                                                            "certificates.actions.officialValidation",
-                                                        )}
-                                                    </Button>
+                                                    {cert.validation_link && (
+                                                        <Button
+                                                            variant="text"
+                                                            size="large"
+                                                            startIcon={<VerifiedIcon />}
+                                                            component="a"
+                                                            href={cert.validation_link}
+                                                            target="_blank"
+                                                            sx={{
+                                                                borderRadius: 2,
+                                                                fontWeight: 700,
+                                                                py: 1.5,
+                                                                px: 3,
+                                                                color: "text.secondary",
+                                                                "&:hover": {
+                                                                    color: "primary.main",
+                                                                },
+                                                            }}
+                                                        >
+                                                            {t(
+                                                                "certificates.actions.officialValidation",
+                                                            )}
+                                                        </Button>
+                                                    )}
                                                 </Stack>
                                             </Stack>
                                         </Grid>
