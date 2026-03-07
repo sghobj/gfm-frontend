@@ -197,6 +197,15 @@ function buildPieSlicePath(
     ].join(" ");
 }
 
+function buildFullPiePath(centerX: number, centerY: number, radius: number) {
+    return [
+        `M ${centerX} ${centerY - radius}`,
+        `A ${radius} ${radius} 0 1 1 ${centerX} ${centerY + radius}`,
+        `A ${radius} ${radius} 0 1 1 ${centerX} ${centerY - radius}`,
+        "Z",
+    ].join(" ");
+}
+
 function splitPieLabel(label: string, maxCharsPerLine = 14, maxLines = 2): string[] {
     const trimmed = label.trim();
     if (!trimmed) return [];
@@ -248,6 +257,9 @@ export function Products() {
     const isRtl = i18n.dir(i18n.resolvedLanguage ?? i18n.language ?? "en") === "rtl";
     const { data, loading, error } = useQuery(GET_ALL_OFFERINGS, {
         variables: { locale },
+        fetchPolicy: "cache-and-network",
+        nextFetchPolicy: "cache-first",
+        notifyOnNetworkStatusChange: true,
     });
 
     const offerings: GQLOffering[] = useMemo(() => {
@@ -342,24 +354,37 @@ export function Products() {
     const pieSlices = useMemo(() => {
         const total = productNavItems.length;
         if (total === 0) return [];
+        const isSingleSlice = total === 1;
 
         return productNavItems.map((item, index) => {
-            const startAngle = (index / total) * 360;
-            const endAngle = ((index + 1) / total) * 360;
-            const middleAngle = startAngle + (endAngle - startAngle) / 2;
-            const labelPosition = polarToCartesian(100, 100, 63, middleAngle);
+            const startAngle = isSingleSlice ? 0 : (index / total) * 360;
+            const endAngle = isSingleSlice ? 360 : ((index + 1) / total) * 360;
+            const middleAngle = isSingleSlice ? 0 : startAngle + (endAngle - startAngle) / 2;
+            const labelPosition = isSingleSlice
+                ? { x: 100, y: 100 }
+                : polarToCartesian(100, 100, 63, middleAngle);
 
             return {
                 ...item,
                 index,
-                path: buildPieSlicePath(100, 100, 98, startAngle, endAngle),
+                path: isSingleSlice
+                    ? buildFullPiePath(100, 100, 98)
+                    : buildPieSlicePath(100, 100, 98, startAngle, endAngle),
                 labelPosition,
-                labelLines: splitPieLabel(item.name),
+                labelLines: splitPieLabel(
+                    item.name,
+                    isSingleSlice ? 20 : 14,
+                    isSingleSlice ? 3 : 2,
+                ),
                 patternId: `product-pie-pattern-${index}`,
                 middleAngle,
             };
         });
     }, [productNavItems]);
+
+    const showPieCenterBadge = pieSlices.length > 1;
+    const shouldShowPieNavigation = !error && productsList.length > 0;
+    const shouldShowPieLoadingPlaceholder = loading && !error && productsList.length === 0;
 
     const scrollToProductSection = useCallback((productId: string) => {
         const target = productSectionRefs.current[productId];
@@ -503,6 +528,27 @@ export function Products() {
                                             size="small"
                                             value={brandFilter}
                                             onChange={(e) => setBrandFilter(e.target.value)}
+                                            SelectProps={{
+                                                MenuProps: {
+                                                    disablePortal: true,
+                                                    disableScrollLock: true,
+                                                    anchorOrigin: {
+                                                        vertical: "bottom",
+                                                        horizontal: isRtl ? "right" : "left",
+                                                    },
+                                                    transformOrigin: {
+                                                        vertical: "top",
+                                                        horizontal: isRtl ? "right" : "left",
+                                                    },
+                                                    PaperProps: {
+                                                        sx: {
+                                                            mt: 0.5,
+                                                            maxHeight: 360,
+                                                            color: "common.black",
+                                                        },
+                                                    },
+                                                },
+                                            }}
                                             sx={{
                                                 minWidth: 200,
                                                 "& .MuiOutlinedInput-root": {
@@ -510,10 +556,20 @@ export function Products() {
                                                     borderRadius: 2,
                                                     color: "black",
                                                 },
+                                                "& .MuiSelect-select": {
+                                                    color: "black",
+                                                },
+                                                "& .MuiSvgIcon-root": {
+                                                    color: "black",
+                                                },
                                             }}
                                         >
                                             {brands.map((b) => (
-                                                <MenuItem key={b.slug} value={b.slug}>
+                                                <MenuItem
+                                                    key={b.slug}
+                                                    value={b.slug}
+                                                    sx={{ color: "black" }}
+                                                >
                                                     {b.name}
                                                 </MenuItem>
                                             ))}
@@ -528,13 +584,14 @@ export function Products() {
                                 </Stack>
                             </Stack>
 
-                            {!loading && !error && productsList.length > 0 && (
+                            {shouldShowPieNavigation && (
                                 <Box
                                     ref={pieNavRef}
                                     sx={{
                                         width: { xs: 290, sm: 360, lg: 460 },
                                         maxWidth: "100%",
                                         flexShrink: 0,
+                                        overflow: "visible",
                                     }}
                                 >
                                     <Box
@@ -546,6 +603,7 @@ export function Products() {
                                             display: "block",
                                             width: "100%",
                                             height: "auto",
+                                            overflow: "visible",
                                             filter: "drop-shadow(0 18px 34px rgba(23,59,33,0.25))",
                                         }}
                                     >
@@ -673,36 +731,140 @@ export function Products() {
                                                 </g>
                                             );
                                         })}
-                                        <circle
-                                            cx="100"
-                                            cy="100"
-                                            r="34"
-                                            fill="rgba(255,255,255,0.95)"
-                                            stroke="rgba(31,111,74,0.2)"
-                                            strokeWidth="1.5"
-                                        />
-                                        <text
-                                            x="100"
-                                            y="95"
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            fill="#1f6f4a"
-                                            fontSize="9"
-                                            fontWeight="700"
+                                        {showPieCenterBadge && (
+                                            <>
+                                                <circle
+                                                    cx="100"
+                                                    cy="100"
+                                                    r="34"
+                                                    fill="rgba(255,255,255,0.95)"
+                                                    stroke="rgba(31,111,74,0.2)"
+                                                    strokeWidth="1.5"
+                                                />
+                                                <text
+                                                    x="100"
+                                                    y="95"
+                                                    textAnchor="middle"
+                                                    dominantBaseline="middle"
+                                                    fill="#1f6f4a"
+                                                    fontSize="9"
+                                                    fontWeight="700"
+                                                >
+                                                    {t("products.navigation.pieCenterTop")}
+                                                </text>
+                                                <text
+                                                    x="100"
+                                                    y="107"
+                                                    textAnchor="middle"
+                                                    dominantBaseline="middle"
+                                                    fill="#1f6f4a"
+                                                    fontSize="9"
+                                                    fontWeight="700"
+                                                >
+                                                    {t("products.navigation.pieCenterBottom")}
+                                                </text>
+                                            </>
+                                        )}
+                                    </Box>
+                                </Box>
+                            )}
+                            {shouldShowPieLoadingPlaceholder && (
+                                <Box
+                                    sx={{
+                                        width: { xs: 290, sm: 360, lg: 460 },
+                                        maxWidth: "100%",
+                                        flexShrink: 0,
+                                        overflow: "visible",
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: "100%",
+                                            aspectRatio: "1 / 1",
+                                            position: "relative",
+                                        }}
+                                    >
+                                        <Box
+                                            component="svg"
+                                            viewBox="0 0 200 200"
+                                            role="img"
+                                            aria-label={t("products.navigation.pieAriaLabel")}
+                                            sx={{
+                                                display: "block",
+                                                width: "100%",
+                                                height: "100%",
+                                                overflow: "visible",
+                                                filter: "drop-shadow(0 14px 24px rgba(23,59,33,0.2))",
+                                            }}
                                         >
-                                            {t("products.navigation.pieCenterTop")}
-                                        </text>
-                                        <text
-                                            x="100"
-                                            y="107"
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            fill="#1f6f4a"
-                                            fontSize="9"
-                                            fontWeight="700"
+                                            {Array.from({ length: 8 }).map((_, index) => {
+                                                const startAngle = (index / 8) * 360;
+                                                const endAngle = ((index + 1) / 8) * 360;
+                                                return (
+                                                    <path
+                                                        key={`pie-loading-slice-${index}`}
+                                                        d={buildPieSlicePath(
+                                                            100,
+                                                            100,
+                                                            98,
+                                                            startAngle,
+                                                            endAngle,
+                                                        )}
+                                                        fill={
+                                                            index % 2 === 0
+                                                                ? "rgba(255,255,255,0.8)"
+                                                                : "rgba(242,248,244,0.92)"
+                                                        }
+                                                        stroke="rgba(31,111,74,0.12)"
+                                                        strokeWidth={1.2}
+                                                    />
+                                                );
+                                            })}
+                                            <circle
+                                                cx="100"
+                                                cy="100"
+                                                r="35"
+                                                fill="rgba(255,255,255,0.95)"
+                                                stroke="rgba(31,111,74,0.16)"
+                                                strokeWidth="1.4"
+                                            />
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                position: "absolute",
+                                                inset: 0,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                pointerEvents: "none",
+                                            }}
                                         >
-                                            {t("products.navigation.pieCenterBottom")}
-                                        </text>
+                                            <Stack alignItems="center" spacing={1.2}>
+                                                <Box
+                                                    sx={{
+                                                        width: 36,
+                                                        height: 36,
+                                                        borderRadius: "50%",
+                                                        border: "3px solid rgba(31,111,74,0.2)",
+                                                        borderTopColor: "rgba(31,111,74,0.9)",
+                                                        animation: "pieLoaderSpin 900ms linear infinite",
+                                                        "@keyframes pieLoaderSpin": {
+                                                            to: { transform: "rotate(360deg)" },
+                                                        },
+                                                    }}
+                                                />
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{
+                                                        fontWeight: 700,
+                                                        color: "rgba(23,59,33,0.74)",
+                                                        letterSpacing: 0.25,
+                                                    }}
+                                                >
+                                                    {t("products.loading")}
+                                                </Typography>
+                                            </Stack>
+                                        </Box>
                                     </Box>
                                 </Box>
                             )}
@@ -972,7 +1134,6 @@ export function Products() {
                                                                     }}
                                                                 />
                                                             )}
-
                                                             {visiblePackOptionLabels.length > 0 ? (
                                                                 <Stack
                                                                     direction="row"
@@ -981,20 +1142,6 @@ export function Products() {
                                                                     flexWrap="wrap"
                                                                     sx={{ mt: 1 }}
                                                                 >
-                                                                    {visiblePackOptionLabels.map(
-                                                                        (label, idx) => (
-                                                                            <Chip
-                                                                                key={`${o.documentId}-pack-${idx}`}
-                                                                                label={label}
-                                                                                size="small"
-                                                                                variant="outlined"
-                                                                                sx={{
-                                                                                    fontWeight: 600,
-                                                                                    borderRadius: 1.5,
-                                                                                }}
-                                                                            />
-                                                                        ),
-                                                                    )}
                                                                     {hasMorePackOptions && (
                                                                         <Chip
                                                                             label={`+${packOptionLabels.length - visiblePackOptionLabels.length}`}

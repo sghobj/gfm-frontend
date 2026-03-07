@@ -6,6 +6,7 @@ import {
     GetAllOfferingsDocument,
     type GenerateOrderInvitationMutation,
     type GenerateOrderInvitationMutationVariables,
+    type OrderType,
 } from "../../graphql/gql/graphql";
 import { useTranslation } from "react-i18next";
 import { toStrapiLocale } from "../../apollo/apolloClient";
@@ -15,10 +16,12 @@ const FRONTEND_URL = import.meta.env.VITE_APP_URL ?? window.location.origin;
 
 type OfferingOption = {
     documentId: string;
+    variantLabel?: string | null;
     locale?: string | null;
     availability?: string | null;
     product?: {
         locale?: string | null;
+        slug?: string | null;
         name?: string | null;
     } | null;
     brand?: {
@@ -28,6 +31,8 @@ type OfferingOption = {
 };
 
 const DEFAULT_EXPIRY_DAYS = 7;
+const DEFAULT_ORDER_TYPE: OrderType = "ORDER";
+const JAPANESE_PRODUCTS_SLUG = "japanese-products";
 
 const toInputDate = (date: Date): string => date.toISOString().slice(0, 10);
 
@@ -77,6 +82,7 @@ export function OrderLinkGenerator() {
     const [customerName, setCustomerName] = useState("");
     const [customerCompany, setCustomerCompany] = useState("");
     const [expiryDate, setExpiryDate] = useState<string>(buildDefaultExpiryDate());
+    const [orderType, setOrderType] = useState<OrderType>(DEFAULT_ORDER_TYPE);
 
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -108,6 +114,7 @@ export function OrderLinkGenerator() {
                         customerCompany: customerCompany.trim() || undefined,
                         expiresAt: expiryToIso(expiryDate),
                         quantity: 1,
+                        orderType,
                     },
                 },
             });
@@ -133,6 +140,18 @@ export function OrderLinkGenerator() {
         await navigator.clipboard.writeText(resultLink);
     };
 
+    const getOfferingDisplayName = (offering: OfferingOption): string => {
+        const productName = offering.product?.name?.trim();
+        const variantLabel = offering.variantLabel?.trim();
+        const isJapaneseProduct = offering.product?.slug === JAPANESE_PRODUCTS_SLUG;
+
+        if (isJapaneseProduct && variantLabel) {
+            return variantLabel;
+        }
+
+        return productName || t("adminOrderLinks.labels.unknownProduct");
+    };
+
     return (
         <Paper sx={{ p: 3 }}>
             <Stack spacing={2.5}>
@@ -152,8 +171,7 @@ export function OrderLinkGenerator() {
                 >
                     {offerings.map((offering) => (
                         <MenuItem key={offering.documentId} value={offering.documentId}>
-                            {(offering.product?.name ||
-                                t("adminOrderLinks.labels.unknownProduct")) +
+                            {getOfferingDisplayName(offering) +
                                 " - " +
                                 (offering.brand?.name || t("adminOrderLinks.labels.unknownBrand"))}
                         </MenuItem>
@@ -183,6 +201,17 @@ export function OrderLinkGenerator() {
                     value={customerCompany}
                     onChange={(event) => setCustomerCompany(event.target.value)}
                 />
+
+                <TextField
+                    select
+                    label={t("adminOrderLinks.fields.orderType")}
+                    value={orderType}
+                    onChange={(event) => setOrderType((event.target.value as OrderType) || "ORDER")}
+                    fullWidth
+                >
+                    <MenuItem value="ORDER">{t("adminOrderLinks.options.order")}</MenuItem>
+                    <MenuItem value="SAMPLE">{t("adminOrderLinks.options.sample")}</MenuItem>
+                </TextField>
 
                 <Stack
                     direction={{ xs: "column", sm: "row" }}
@@ -220,6 +249,7 @@ export function OrderLinkGenerator() {
                             setCustomerCompany("");
                             setCustomerEmail("");
                             setExpiryDate(buildDefaultExpiryDate());
+                            setOrderType(DEFAULT_ORDER_TYPE);
                             setError(null);
                             setResultLink(null);
                         }}

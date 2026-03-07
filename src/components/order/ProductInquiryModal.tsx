@@ -370,7 +370,7 @@ ${data.message}`;
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle sx={{ m: 0, p: 2, pr: 6, fontWeight: 900 }}>
                 {t("inquiryModal.title")}
                 <IconButton
@@ -414,177 +414,206 @@ ${data.message}`;
 
                         <Divider sx={{ my: 1 }} />
 
-                        <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>
-                            {t("inquiryModal.sections.specifications")}
-                        </Typography>
-
-                        {isDatesFlow && (
-                            <Controller
-                                name="grade"
-                                control={control}
-                                rules={{ required: t("inquiryModal.validation.gradeRequired") }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        select
-                                        fullWidth
-                                        label={t("inquiryModal.fields.grade")}
-                                        error={!!errors.grade}
-                                        helperText={errors.grade?.message}
-                                    >
-                                        {availableGrades.map((g) => (
-                                            <MenuItem key={g} value={g}>
-                                                {g}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                )}
-                            />
-                        )}
-
-                        {/* Size (dates: real sizes, non-dates: pack option label choices) */}
-                        <Controller
-                            name="size"
-                            control={control}
-                            rules={{ required: t("inquiryModal.validation.selectionRequired") }}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    fullWidth
-                                    label={
-                                        isDatesFlow
-                                            ? t("inquiryModal.fields.size")
-                                            : t("inquiryModal.fields.option")
-                                    }
-                                    disabled={isDatesFlow ? !selectedGrade : false}
-                                    error={!!errors.size}
-                                    helperText={errors.size?.message}
-                                >
-                                    {availableSizes.map((opt) => (
-                                        <MenuItem key={opt.value} value={opt.value}>
-                                            {opt.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        />
-
-                        {/* Packaging only for dates */}
-                        {isDatesFlow && (
-                            <Controller
-                                name="packOption"
-                                control={control}
-                                rules={{ required: t("inquiryModal.validation.packagingRequired") }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        select
-                                        fullWidth
-                                        label={t("inquiryModal.fields.packagingOption")}
-                                        disabled={!selectedSize}
-                                        error={!!errors.packOption}
-                                        helperText={errors.packOption?.message}
-                                    >
-                                        {availableDatePackOptions.map((opt) => (
-                                            <MenuItem key={opt.documentId} value={opt.documentId}>
-                                                {opt.displayLabel || formatDatePackOption(opt)}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                )}
-                            />
-                        )}
-
-                        <Controller
-                            name="quantityKg"
-                            control={control}
-                            rules={{
-                                required: t("inquiryModal.validation.quantityRequired"),
-                                min: {
-                                    value: 0.1,
-                                    message: t("inquiryModal.validation.quantityMin"),
-                                },
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                                gap: 3,
+                                alignItems: "start",
                             }}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    type="number"
-                                    fullWidth
-                                    label={t("inquiryModal.fields.quantityKg")}
-                                    inputProps={{ min: 0.1, step: 0.1 }}
-                                    error={!!errors.quantityKg}
-                                    helperText={errors.quantityKg?.message}
+                        >
+                            <Stack spacing={2}>
+                                <Typography variant="subtitle1" fontWeight={800}>
+                                    {t("inquiryModal.sections.specifications")}
+                                </Typography>
+
+                                {isDatesFlow && (
+                                    <Controller
+                                        name="grade"
+                                        control={control}
+                                        rules={{
+                                            required: t("inquiryModal.validation.gradeRequired"),
+                                        }}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                select
+                                                fullWidth
+                                                label={t("inquiryModal.fields.grade")}
+                                                error={!!errors.grade}
+                                                helperText={errors.grade?.message}
+                                            >
+                                                {availableGrades.map((g) => (
+                                                    <MenuItem key={g} value={g}>
+                                                        {g}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        )}
+                                    />
+                                )}
+
+                                {/* Size (dates: real sizes, non-dates: pack option label choices) */}
+                                <Controller
+                                    name="size"
+                                    control={control}
+                                    rules={{
+                                        required: t("inquiryModal.validation.selectionRequired"),
+                                    }}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            select
+                                            fullWidth
+                                            label={
+                                                isDatesFlow
+                                                    ? t("inquiryModal.fields.size")
+                                                    : t("inquiryModal.fields.option")
+                                            }
+                                            disabled={isDatesFlow ? !selectedGrade : false}
+                                            error={!!errors.size}
+                                            helperText={errors.size?.message}
+                                        >
+                                            {availableSizes.map((opt) => (
+                                                <MenuItem key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    )}
                                 />
-                            )}
-                        />
 
-                        <TextField
-                            fullWidth
-                            label={t("inquiryModal.fields.approxPackages")}
-                            value={
-                                approxPackages
-                                    ? t("inquiryModal.fields.packagesCount", {
-                                          value: formatApproxPackageCount(approxPackages),
-                                      })
-                                    : t("inquiryModal.fields.selectPackaging")
-                            }
-                            InputProps={{ readOnly: true }}
-                            helperText={t("inquiryModal.fields.approximationHelp")}
-                        />
+                                {/* Packaging only for dates */}
+                                {isDatesFlow && (
+                                    <Controller
+                                        name="packOption"
+                                        control={control}
+                                        rules={{
+                                            required: t(
+                                                "inquiryModal.validation.packagingRequired",
+                                            ),
+                                        }}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                select
+                                                fullWidth
+                                                label={t("inquiryModal.fields.packagingOption")}
+                                                disabled={!selectedSize}
+                                                error={!!errors.packOption}
+                                                helperText={errors.packOption?.message}
+                                            >
+                                                {availableDatePackOptions.map((opt) => (
+                                                    <MenuItem
+                                                        key={opt.documentId}
+                                                        value={opt.documentId}
+                                                    >
+                                                        {opt.displayLabel ||
+                                                            formatDatePackOption(opt)}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        )}
+                                    />
+                                )}
 
-                        <Divider sx={{ my: 1 }} />
+                                <Controller
+                                    name="quantityKg"
+                                    control={control}
+                                    rules={{
+                                        required: t("inquiryModal.validation.quantityRequired"),
+                                        validate: {
+                                            minQuantity: (value) =>
+                                                Number(value) >= 1 ||
+                                                t("inquiryModal.validation.quantityMin"),
+                                            wholeNumber: (value) =>
+                                                Number.isInteger(Number(value)) ||
+                                                t("inquiryModal.validation.quantityWholeNumber"),
+                                        },
+                                    }}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            type="number"
+                                            fullWidth
+                                            label={t("inquiryModal.fields.quantityKg")}
+                                            inputProps={{ min: 1, step: 1 }}
+                                            error={!!errors.quantityKg}
+                                            helperText={errors.quantityKg?.message}
+                                        />
+                                    )}
+                                />
 
-                        <Typography variant="subtitle1" fontWeight={800} sx={{ mb: -1 }}>
-                            {t("inquiryModal.sections.yourInformation")}
-                        </Typography>
+                                <TextField
+                                    fullWidth
+                                    label={t("inquiryModal.fields.approxPackages")}
+                                    value={
+                                        approxPackages
+                                            ? t("inquiryModal.fields.packagesCount", {
+                                                  value: formatApproxPackageCount(approxPackages),
+                                              })
+                                            : t("inquiryModal.fields.selectPackaging")
+                                    }
+                                    InputProps={{ readOnly: true }}
+                                    helperText={t("inquiryModal.fields.approximationHelp")}
+                                />
+                            </Stack>
 
-                        <TextField
-                            {...register("name", {
-                                required: t("inquiryModal.validation.nameRequired"),
-                            })}
-                            fullWidth
-                            label={t("inquiryModal.fields.fullName")}
-                            error={!!errors.name}
-                            helperText={errors.name?.message}
-                        />
+                            <Stack spacing={2}>
+                                <Typography variant="subtitle1" fontWeight={800}>
+                                    {t("inquiryModal.sections.yourInformation")}
+                                </Typography>
 
-                        <Stack direction={{ xs: "column", sm: "row" }} useFlexGap gap={2}>
-                            <TextField
-                                {...register("email", {
-                                    required: t("inquiryModal.validation.emailRequired"),
-                                    pattern: {
-                                        value: /^\S+@\S+$/i,
-                                        message: t("inquiryModal.validation.invalidEmail"),
-                                    },
-                                })}
-                                fullWidth
-                                label={t("inquiryModal.fields.email")}
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
-                            />
-                            <TextField
-                                {...register("company")}
-                                fullWidth
-                                label={t("inquiryModal.fields.company")}
-                            />
-                        </Stack>
+                                <TextField
+                                    {...register("name", {
+                                        required: t("inquiryModal.validation.nameRequired"),
+                                    })}
+                                    fullWidth
+                                    label={t("inquiryModal.fields.fullName")}
+                                    error={!!errors.name}
+                                    helperText={errors.name?.message}
+                                />
 
-                        <TextField
-                            {...register("message")}
-                            fullWidth
-                            label={t("inquiryModal.fields.additionalMessage")}
-                            multiline
-                            rows={3}
-                        />
+                                <TextField
+                                    {...register("email", {
+                                        required: t("inquiryModal.validation.emailRequired"),
+                                        pattern: {
+                                            value: /^\S+@\S+$/i,
+                                            message: t("inquiryModal.validation.invalidEmail"),
+                                        },
+                                    })}
+                                    fullWidth
+                                    label={t("inquiryModal.fields.email")}
+                                    error={!!errors.email}
+                                    helperText={errors.email?.message}
+                                />
 
-                        <FormControlLabel
-                            control={
-                                <Checkbox {...register("subscribeToUpdates")} color="primary" />
-                            }
-                            label={t("inquiryModal.fields.subscribeToUpdates")}
-                            sx={{ mt: -0.5 }}
-                        />
+                                <TextField
+                                    {...register("company")}
+                                    fullWidth
+                                    label={t("inquiryModal.fields.company")}
+                                />
+
+                                <TextField
+                                    {...register("message")}
+                                    fullWidth
+                                    label={t("inquiryModal.fields.additionalMessage")}
+                                    multiline
+                                    rows={3}
+                                />
+
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            {...register("subscribeToUpdates")}
+                                            color="primary"
+                                        />
+                                    }
+                                    label={t("inquiryModal.fields.subscribeToUpdates")}
+                                    sx={{ mt: -0.5 }}
+                                />
+                            </Stack>
+                        </Box>
                     </Stack>
                 </DialogContent>
 

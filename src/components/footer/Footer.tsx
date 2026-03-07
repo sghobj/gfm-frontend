@@ -35,7 +35,6 @@ type FooterFallbackContent = {
     address: string;
     email: string;
     quickLinks: FooterLink[];
-    legalLinks: FooterLink[];
     copyrightText: string;
 };
 
@@ -54,10 +53,6 @@ const buildFallbackFooter = (
             { label: translate("footer.fallback.quickLinks.home"), href: "/" },
             { label: translate("footer.fallback.quickLinks.products"), href: "/products" },
             { label: translate("footer.fallback.quickLinks.contact"), href: "/contact-us" },
-        ],
-        legalLinks: [
-            { label: translate("footer.fallback.legalLinks.privacy"), href: "/privacy" },
-            { label: translate("footer.fallback.legalLinks.terms"), href: "/terms" },
         ],
         copyrightText: translate("footer.fallback.copyright", {
             year,
@@ -120,8 +115,7 @@ export function Footer() {
     );
     const showEffectiveQuickLinksSection = effectiveQuickLinks.length > 0;
     const showEffectiveContactSection = hasAnyLocalizedContent(effectiveAddress, effectiveEmail);
-    const showEffectiveBottomSection =
-        hasNonEmptyText(effectiveCopyrightText);
+    const showEffectiveBottomSection = hasNonEmptyText(effectiveCopyrightText);
     const hasRenderableFooter =
         showEffectiveBrandSection ||
         showEffectiveQuickLinksSection ||
@@ -269,7 +263,7 @@ export function Footer() {
                             </Box>
                             <Button
                                 variant="outlined"
-                                href="/#b2b-subscribe"
+                                href="/#subscribe"
                                 sx={{
                                     borderRadius: 2,
                                     fontWeight: 700,
